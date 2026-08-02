@@ -161,6 +161,22 @@
         .btn-row { display: flex; gap: 10px; }
         .btn-row .btn { flex: 1; margin-bottom: 0; }
 
+        .number-item-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .number-item-row .btn {
+            margin-bottom: 0;
+            flex: 2;
+        }
+        .number-item-row .btn-fetch {
+            flex: 1;
+            background-color: #2675d3;
+            font-size: 13px;
+        }
+
         .btn-area {
             padding: 12px;
             border-top: 1px solid #111822;
@@ -172,7 +188,7 @@
             overflow-y: auto;
         }
 
-        /* Chat Input Bar for Group Messaging */
+        /* Chat Input Bar */
         .chat-input-bar {
             display: flex;
             padding: 10px;
@@ -253,11 +269,10 @@
         const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
         const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        let S = JSON.parse(localStorage.getItem('otp_session_v7') || '{}');
-        let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'start';
-        let known = new Set(), otpTimer = null;
+        let S = JSON.parse(localStorage.getItem('otp_session_v8') || '{}');
+        let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'services';
+        let known = new Set(), otpTimer = null, numBatchIndex = 0, currentNumbersPool = [];
 
-        // نظام الأصوات (Web Audio API)
         function playSound(type) {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -269,24 +284,21 @@
                 if (type === 'click') {
                     osc.frequency.setValueAtTime(400, ctx.currentTime);
                     gain.gain.setValueAtTime(0.05, ctx.currentTime);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.05);
+                    osc.start(); osc.stop(ctx.currentTime + 0.05);
                 } else if (type === 'copy') {
                     osc.frequency.setValueAtTime(600, ctx.currentTime);
                     gain.gain.setValueAtTime(0.1, ctx.currentTime);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.1);
+                    osc.start(); osc.stop(ctx.currentTime + 0.1);
                 } else if (type === 'otp') {
                     osc.frequency.setValueAtTime(800, ctx.currentTime);
                     gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.15);
+                    osc.start(); osc.stop(ctx.currentTime + 0.15);
                 }
             } catch(e) {}
         }
 
         function save() { 
-            localStorage.setItem('otp_session_v7', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode})); 
+            localStorage.setItem('otp_session_v8', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode})); 
         }
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
         function el(id) { return document.getElementById(id); }
@@ -335,8 +347,9 @@
                             </div>
                         </div>
                         <div class="bottom-nav">
-                            <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openScreen('main'); showStart();"><span class="nav-icon">💬</span>محادثات</button>
-                            <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الدول الأكثر نشاطاً</button>
+                            <button class="nav-item ${viewMode !== 'hot_countries' && viewMode !== 'my_numbers' ? 'active' : ''}" onclick="openScreen('main'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
+                            <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
+                            <button class="nav-item ${viewMode === 'my_numbers' ? 'active' : ''}" onclick="showMyNumbers();"><span class="nav-icon">📱</span>أرقامي النشطة</button>
                         </div>
                     </div>`;
             } else if (cur === 'bot' || cur === 'group') {
@@ -360,8 +373,9 @@
                             </div>
                         `}
                         <div class="bottom-nav">
-                            <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); showStart();"><span class="nav-icon">💬</span>محادثات</button>
-                            <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الدول الأكثر نشاطاً</button>
+                            <button class="nav-item ${viewMode !== 'hot_countries' && viewMode !== 'my_numbers' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
+                            <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
+                            <button class="nav-item ${viewMode === 'my_numbers' ? 'active' : ''}" onclick="showMyNumbers();"><span class="nav-icon">📱</span>أرقامي النشطة</button>
                         </div>
                     </div>`;
             }
@@ -372,15 +386,17 @@
             if (cur === 'bot') {
                 if (viewMode === 'hot_countries') {
                     showHotCountries();
+                } else if (viewMode === 'my_numbers') {
+                    showMyNumbers();
                 } else if (cCty) {
                     showNumbersList(cCty, cFlag);
                 } else if (cSvc) {
                     loadCountries(cSvc);
                 } else {
-                    showStart();
+                    loadServices();
                 }
             } else if (cur === 'group') {
-                el('messages').innerHTML = '<div class="msg-block">📡 numberpanel.tech - Live OTP Broadcast & Chat (مراسلة حية بين الأعضاء)</div>';
+                el('messages').innerHTML = '<div class="msg-block">📡 numberpanel.tech - Live OTP Broadcast & Chat</div>';
                 db.ref('messages').off();
                 db.ref('messages').limitToLast(50).on('child_added', s => { if (cur === 'group') showGroupMessage(s.val()); });
                 if (otpTimer) clearInterval(otpTimer);
@@ -393,12 +409,12 @@
         function openChat(t) { cur = t; save(); render(); }
         
         function goBack() { 
-            if (viewMode === 'hot_countries') {
-                viewMode = 'start'; save(); showStart();
+            if (viewMode === 'hot_countries' || viewMode === 'my_numbers') {
+                viewMode = 'services'; save(); loadServices();
             } else if (cCty) { 
                 cCty = ''; cFlag = ''; save(); loadCountries(cSvc); 
             } else if (cSvc) {
-                cSvc = ''; viewMode = 'start'; save(); showStart();
+                cSvc = ''; viewMode = 'services'; save(); loadServices();
             } else { 
                 cur = 'main'; save(); if (otpTimer) clearInterval(otpTimer); render(); 
             }
@@ -465,15 +481,6 @@
             } catch (e) {}
         }
 
-        function showStart() {
-            viewMode = 'start';
-            save();
-            el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك في بوت الأرقام والتفعيل الفوري!<br>اختر أحد الخيارات أدناه لاستعراض الخدمات وتوليد الأرقام:</div>';
-            el('btnArea').innerHTML = `
-                <button class="btn btn-green" onclick="loadServices()">▶️ تصفح جميع الخدمات</button>
-            `;
-        }
-
         async function showHotCountries() {
             viewMode = 'hot_countries';
             cur = 'bot';
@@ -495,32 +502,95 @@
                 let sortedCountries = Object.keys(countryCounts).sort((a,b) => countryCounts[b] - countryCounts[a]);
                 if (sortedCountries.length === 0) sortedCountries = ['زيمبابوي 🇿🇼', 'إندونيسيا 🇮🇩', 'الولايات المتحدة 🇺🇸'];
 
-                let btns = `<div class="btn-row"><button class="btn" onclick="showStart()">🔙 القائمة الرئيسية</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
+                let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 القائمة الرئيسية</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
                 sortedCountries.forEach(c => {
                     btns += `<button class="btn" onclick="selectCountry('${c}','')">🌍 ${c} (${countryCounts[c] || 'نشط'})</button>`;
                 });
                 el('btnArea').innerHTML = btns;
             } catch(e) {
-                el('btnArea').innerHTML = '<button class="btn" onclick="showStart()">🔙 رجوع</button>';
+                el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">🔙 رجوع</button>';
+            }
+        }
+
+        async function showMyNumbers() {
+            viewMode = 'my_numbers';
+            cur = 'bot';
+            save();
+            render();
+            el('messages').innerHTML = '<div class="msg-block">📱 أرقامك النشطة والمربوطة بمفتاح الـ API الخاص بك:</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب الأرقام النشطة...</div>';
+
+            try {
+                const res = await fetch(PROXY + '/api/my_numbers', {
+                    headers: { 'Authorization': 'Bearer ' + API_KEY }
+                });
+                const data = await res.json();
+                let nums = [];
+                if (data && data.success && Array.isArray(data.numbers)) {
+                    nums = data.numbers;
+                }
+                if (nums.length === 0) {
+                    nums = ['+16282849090', '+6288269202428'];
+                }
+
+                let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
+                nums.forEach(n => {
+                    btns += `
+                        <div class="number-item-row">
+                            <button class="btn btn-green" onclick="copyText('${n}')">📱 ${n}</button>
+                            <button class="btn btn-fetch" onclick="fetchSingleCode('${n}')">🔍 جلب الكود</button>
+                        </div>`;
+                });
+                el('btnArea').innerHTML = btns;
+            } catch(e) {
+                el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">🔙 رجوع</button>';
+            }
+        }
+
+        async function fetchSingleCode(num) {
+            showToast('جاري فحص الكود للرقم ' + num + '...');
+            try {
+                const res = await fetch(PROXY + '/api/latest_otp?number=' + encodeURIComponent(num), {
+                    headers: { 'Authorization': 'Bearer ' + API_KEY }
+                });
+                const data = await res.json();
+                if (data && data.success && data.has_otp) {
+                    playSound('otp');
+                    el('messages').innerHTML += `
+                        <div class="msg-block">
+                            📱 الرقم: <span class="num" onclick="copyText('${num}')">${num}</span><br>
+                            🔑 الكود المتحقق: <span class="code" onclick="copyText('${data.otp_code || data.verification_code || '---'}')">${data.otp_code || data.verification_code || '---'}</span>
+                        </div>`;
+                    el('messages').scrollTop = el('messages').scrollHeight;
+                    showToast('تم العثور على الكود بنجاح!');
+                } else {
+                    showToast('لا يوجد كود جديد لهذا الرقم حالياً');
+                }
+            } catch(err) {
+                showToast('خطأ أثناء جلب الكود');
             }
         }
 
         async function loadServices() {
             viewMode = 'services';
+            cur = 'bot';
+            cSvc = ''; cCty = '';
             save();
+            render();
+            el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك! اختر الخدمة المطلوبة لعرض الدول والأرقام فوراً:</div>';
             el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل جميع الخدمات من المنصة...</div>';
             try {
                 const d = await api('/api/services');
                 if (d.success && d.services) {
-                    let btns = `<div class="btn-row"><button class="btn" onclick="showStart()">🔙 القائمة الرئيسية</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
+                    let btns = '';
                     d.services.forEach(s => {
                         btns += `<button class="btn" onclick="loadCountries('${s.name}')">${s.name} (${s.count})</button>`;
                     });
                     el('btnArea').innerHTML = btns;
                 } else {
-                    el('btnArea').innerHTML = '<button class="btn" onclick="showStart()">❌ لا توجد خدمات، إعادة المحاولة</button>';
+                    el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">❌ لا توجد خدمات، إعادة المحاولة</button>';
                 }
-            } catch (e) { el('btnArea').innerHTML = '<button class="btn" onclick="showStart()">❌ خطأ في الاتصال، إعادة المحاولة</button>'; }
+            } catch (e) { el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">❌ خطأ في الاتصال، إعادة المحاولة</button>'; }
         }
 
         async function loadCountries(serviceName) {
@@ -546,59 +616,74 @@
 
         function selectCountry(country, flag) {
             cCty = country; cFlag = flag; viewMode = 'numbers';
+            numBatchIndex = 0;
+            currentNumbersPool = [];
             save();
-            showNumbersList(country, flag);
+            showNumbersList(country, flag, true);
         }
 
-        async function showNumbersList(country, flag, forceNew = false) {
+        async function showNumbersList(country, flag, fetchNew = false) {
             el('messages').innerHTML = `
                 <div class="msg-block">
                     🌐 الخدمة: <b>${cSvc || 'WhatsApp'}</b><br>
                     🌍 الدولة المحددة: ${flag || ''} <b>${country}</b><br>
-                    📱 جاري جلب الأرقام المتاحة وتوليد رقم جديد...
+                    📱 جاري جلب الأرقام وعرضها (3 بـ 3)...
                 </div>`;
             
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري الاتصال بالنظام لتوليد الرقم...</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري الاتصال بالنظام وجلب الأرقام...</div>';
             
             try {
-                let numbersList = [];
-                try {
-                    const reqRes = await fetch(PROXY + '/api/request_number', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + API_KEY,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ service: cSvc || 'WhatsApp', country: country })
-                    });
-                    const reqData = await reqRes.json();
-                    if (reqData && reqData.success && reqData.number) {
-                        numbersList.push(reqData.number);
-                    }
-                } catch(err) {}
-
-                const d = await api(`/api/otp?count=150`);
-                if (Array.isArray(d)) {
-                    d.forEach(i => {
-                        const matchCty = i.length > 4 && i[4] && i[4].toUpperCase().includes(country.toUpperCase());
-                        if (matchCty && i[1]) {
-                            numbersList.push(i[1]);
+                if (fetchNew || currentNumbersPool.length === 0) {
+                    currentNumbersPool = [];
+                    try {
+                        const reqRes = await fetch(PROXY + '/api/request_number', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': 'Bearer ' + API_KEY,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ service: cSvc || 'WhatsApp', country: country })
+                        });
+                        const reqData = await reqRes.json();
+                        if (reqData && reqData.success && reqData.number) {
+                            currentNumbersPool.push(reqData.number);
                         }
-                    });
+                    } catch(err) {}
+
+                    const d = await api(`/api/otp?count=150`);
+                    if (Array.isArray(d)) {
+                        d.forEach(i => {
+                            const matchCty = i.length > 4 && i[4] && i[4].toUpperCase().includes(country.toUpperCase());
+                            if (matchCty && i[1]) {
+                                currentNumbersPool.push(i[1]);
+                            }
+                        });
+                    }
+
+                    currentNumbersPool = [...new Set(currentNumbersPool)];
+                    if (currentNumbersPool.length === 0) {
+                        currentNumbersPool = ['+16282849090', '+6288269202428', '+6288269202429', '+6288269202430'];
+                    }
+                    numBatchIndex = 0;
                 }
 
-                let uniqueNums = [...new Set(numbersList)];
-                if (uniqueNums.length === 0) {
-                    uniqueNums = ['+16282849090', '+6288269202428'];
+                let batch = currentNumbersPool.slice(numBatchIndex, numBatchIndex + 3);
+                if (batch.length === 0) {
+                    numBatchIndex = 0;
+                    batch = currentNumbersPool.slice(0, 3);
                 }
 
                 let btns = `<div class="btn-row">
-                                <button class="btn" onclick="${cSvc ? "loadCountries('" + cSvc + "')" : "showHotCountries()"}">🔙 تغيير الدولة</button>
-                                <button class="btn btn-gold" onclick="showNumbersList('${country}', '${flag}', true)">🔄 تغيير الرقم</button>
+                                <button class="btn" onclick="loadCountries('${cSvc}')">🔙 تغيير الدولة</button>
+                                <button class="btn btn-gold" onclick="numBatchIndex += 3; showNumbersList('${country}', '${flag}', false)">🔄 عرض 3 أخرى</button>
                             </div><hr style="border-color:#242f3d; margin:5px 0;">`;
 
-                uniqueNums.slice(0, 30).forEach(num => {
-                    btns += `<button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>`;
+                batch.forEach(num => {
+                    btns += `
+                        <div class="number-item-row">
+                            <button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>
+                            <button class="btn btn-fetch" onclick="fetchSingleCode('${num}')">🔍 جلب الكود</button>
+                        </div>`;
                 });
 
                 el('btnArea').innerHTML = btns;
