@@ -10,85 +10,65 @@
         :root { --bg: #0e1621; --surface: #17212b; --card: #1e293b; --accent: #3b82f6; --gold: #f59e0b; --green: #10b981; --text: #f1f5f9; --text2: #94a3b8; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
         body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app { width: 100%; max-width: 430px; height: 100vh; background: var(--surface); display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        
-        .header { background: var(--card); padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .back { color: #fff; font-size: 22px; cursor: pointer; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; }
-        .avatar-sm { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; overflow: hidden; background: var(--accent); flex-shrink: 0; }
-        .avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
-        .header-info { flex: 1; }
-        .header-info .name { font-size: 16px; font-weight: 600; color: #fff; }
-        .header-info .status { font-size: 12px; color: var(--text2); }
-        
+        .app { width: 100%; max-width: 430px; height: 100vh; background: var(--surface); display: flex; flex-direction: column; overflow: hidden; }
         .screen { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .chat-list { flex: 1; overflow-y: auto; }
-        .chat-row { display: flex; align-items: center; padding: 14px 16px; gap: 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .chat-row:hover { background: rgba(255,255,255,0.02); }
-        .chat-row .avatar-sm { width: 52px; height: 52px; font-size: 22px; }
-        .chat-row .info { flex: 1; }
-        .chat-row .name { font-size: 16px; color: #fff; margin-bottom: 3px; }
-        .chat-row .preview { font-size: 14px; color: var(--text2); }
-        
-        .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; background: var(--bg); }
-        .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 15px; line-height: 1.5; animation: fadeIn 0.2s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .msg-in { align-self: flex-start; background: var(--card); }
-        .msg-out { align-self: flex-end; background: var(--accent); }
-        .msg-otp { align-self: flex-start; background: var(--card); border-right: 3px solid var(--gold); }
-        .msg .sender { font-size: 12px; color: #93c5fd; font-weight: 600; margin-bottom: 3px; cursor: pointer; }
-        .msg .number { color: #60a5fa; font-weight: 700; font-size: 15px; }
+        .header { background: var(--card); padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .back { color: #fff; font-size: 22px; cursor: pointer; }
+        .av { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; overflow: hidden; background: var(--accent); flex-shrink: 0; font-weight: bold; }
+        .av img { width: 100%; height: 100%; object-fit: cover; }
+        .hinfo { flex: 1; }
+        .hinfo .n { font-size: 16px; font-weight: 600; color: #fff; }
+        .hinfo .s { font-size: 12px; color: var(--text2); }
+        .clist { flex: 1; overflow-y: auto; }
+        .crow { display: flex; align-items: center; padding: 14px 16px; gap: 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .crow:hover { background: rgba(255,255,255,0.02); }
+        .crow .av { width: 52px; height: 52px; font-size: 22px; }
+        .crow .info { flex: 1; }
+        .crow .n { font-size: 16px; color: #fff; margin-bottom: 3px; }
+        .crow .p { font-size: 14px; color: var(--text2); }
+        .msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; background: var(--bg); }
+        .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 15px; line-height: 1.5; animation: f 0.15s; }
+        @keyframes f { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .mi { align-self: flex-start; background: var(--card); }
+        .mo { align-self: flex-end; background: var(--accent); }
+        .motp { align-self: flex-start; background: var(--card); border-right: 3px solid var(--gold); }
+        .msg .num { color: #60a5fa; font-weight: 700; font-size: 15px; }
         .msg .code { background: var(--gold); color: #000; padding: 3px 10px; border-radius: 5px; font-weight: 700; display: inline-block; margin: 4px 0; font-size: 16px; }
         .msg .time { font-size: 11px; color: var(--text2); margin-top: 4px; }
-        .msg img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
-        
-        .btn-area { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); background: var(--surface); display: flex; flex-direction: column; gap: 8px; }
+        .center-num { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .center-num .big { text-align: center; font-size: 32px; font-weight: 700; color: #60a5fa; word-break: break-all; }
+        .center-num .emoji { font-size: 50px; }
+        .ba { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); background: var(--surface); display: flex; flex-direction: column; gap: 8px; }
         .btn { padding: 12px; border-radius: 22px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; text-align: center; }
-        .btn-blue { background: var(--accent); color: #fff; }
-        .btn-green { background: var(--green); color: #fff; }
-        .btn-gold { background: var(--gold); color: #000; }
-        .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
-        .btn-row { display: flex; gap: 8px; }
-        .btn-row .btn { flex: 1; }
-        
-        .input-bar { padding: 12px; background: var(--surface); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px; align-items: center; }
-        .input-bar input { flex: 1; background: var(--card); border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
-        .input-bar button { background: var(--accent); color: #fff; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px; }
-        .input-bar .attach { background: transparent; color: var(--text2); font-size: 22px; width: auto; padding: 0 8px; }
-        .input-bar input[type="file"] { display: none; }
-        
-        .nav-bar { display: flex; background: var(--surface); border-top: 1px solid rgba(255,255,255,0.05); padding: 8px 0; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; color: var(--text2); font-size: 11px; cursor: pointer; gap: 3px; background: none; border: none; }
-        .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 20px; }
-        
-        .fab { position: absolute; bottom: 80px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 24px; border: none; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(59,130,246,0.4); }
-        
-        .fab-menu { position: absolute; bottom: 140px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
-        .fab-item { background: var(--card); color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 14px; cursor: pointer; border: none; text-align: right; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        
-        .search-bar { padding: 10px 16px; }
-        .search-bar input { width: 100%; background: var(--card); border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
-        
+        .bblue { background: var(--accent); color: #fff; }
+        .bgreen { background: var(--green); color: #fff; }
+        .bgold { background: var(--gold); color: #000; }
+        .brow { display: flex; gap: 8px; }
+        .brow .btn { flex: 1; }
+        .ibar { padding: 12px; background: var(--surface); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px; }
+        .ibar input { flex: 1; background: var(--card); border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
+        .ibar button { background: var(--accent); color: #fff; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px; }
+        .nav { display: flex; background: var(--surface); border-top: 1px solid rgba(255,255,255,0.05); padding: 8px 0; }
+        .ni { flex: 1; display: flex; flex-direction: column; align-items: center; color: var(--text2); font-size: 11px; cursor: pointer; gap: 3px; background: none; border: none; }
+        .ni.ac { color: var(--accent); }
+        .nic { font-size: 20px; }
+        .fab { position: absolute; bottom: 85px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 24px; border: none; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(59,130,246,0.4); }
+        .fabm { position: absolute; bottom: 145px; right: 20px; display: none; flex-direction: column; gap: 8px; z-index: 10; }
+        .fabm button { background: var(--card); color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 14px; cursor: pointer; border: none; }
+        .search { padding: 10px 16px; }
+        .search input { width: 100%; background: var(--card); border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
         .setup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; gap: 18px; background: var(--surface); }
         .setup h2 { color: #fff; font-size: 22px; }
-        .setup .avatar-sm { width: 85px; height: 85px; font-size: 38px; cursor: pointer; }
+        .setup .av { width: 85px; height: 85px; font-size: 38px; cursor: pointer; }
         .setup input { width: 100%; background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #fff; font-size: 16px; text-align: center; outline: none; }
         .setup input[type="file"] { display: none; }
         .setup .btn { width: 100%; }
-        
-        .profile-page { padding: 20px; text-align: center; flex: 1; overflow-y: auto; }
-        .profile-page .avatar-sm { width: 80px; height: 80px; font-size: 35px; margin: 0 auto 15px; cursor: pointer; }
-        .profile-page input { width: 100%; background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 10px; color: #fff; font-size: 15px; text-align: center; margin: 8px 0; outline: none; }
-        
-        .create-page { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; gap: 18px; background: var(--surface); }
-        .create-page h2 { color: #fff; font-size: 20px; }
-        .create-page .avatar-sm { width: 80px; height: 80px; font-size: 35px; cursor: pointer; }
-        .create-page input { width: 100%; background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #fff; font-size: 16px; text-align: center; outline: none; }
-        .create-page input[type="file"] { display: none; }
-        
-        .member-list { padding: 10px; }
-        .member-row { display: flex; align-items: center; padding: 10px; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        
+        .prof { padding: 25px; text-align: center; flex: 1; overflow-y: auto; }
+        .prof .av { width: 80px; height: 80px; font-size: 35px; margin: 0 auto 15px; cursor: pointer; }
+        .prof input { width: 100%; background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 10px; color: #fff; font-size: 15px; text-align: center; margin: 8px 0; outline: none; }
+        .admin-panel { padding: 12px; background: var(--card); border-top: 1px solid rgba(255,255,255,0.05); }
+        .admin-panel h4 { color: var(--gold); margin-bottom: 8px; }
+        .admin-panel input { width: 100%; background: var(--surface); border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 8px; }
         ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
     </style>
 </head>
@@ -98,214 +78,88 @@
         firebase.initializeApp({apiKey:"AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",projectId:"otp-5acda",databaseURL:"https://otp-5acda-default-rtdb.firebaseio.com"});
         const db=firebase.database();
         const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
+        const ADMIN='201500972046';
         
-        let S=JSON.parse(localStorage.getItem('hub_v11')||'{}');
+        let S=JSON.parse(localStorage.getItem('t2')||'{}');
         let cur=S.cur||'setup',cSvc=S.cSvc||'',cCty=S.cCty||'',curNum=S.curNum||'';
         let profile=S.profile||{name:'',phone:'',avatar:'',username:''};
-        let known=new Set(),otpTimer=null,showFabMenu=false;
+        let known=new Set(),otpTimer=null;
         const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
         
-        function save(){localStorage.setItem('hub_v11',JSON.stringify({cur,cSvc,cCty,curNum,profile}));}
+        function save(){S={cur,cSvc,cCty,curNum,profile};localStorage.setItem('t2',JSON.stringify(S));}
         function api(p){return fetch(PROXY+p).then(r=>r.json());}
-        function el(id){return document.getElementById(id);}
         
-        // ====== RENDER ======
         function render(){
-            const app=el('app');
-            if(cur==='setup') renderSetup(app);
-            else if(cur==='main') renderMain(app);
-            else if(cur==='bot'||cur==='group') renderChat(app);
-            else if(cur==='profile') renderProfile(app);
-            else if(cur==='create_group') renderCreate(app,'group');
-            else if(cur==='create_channel') renderCreate(app,'channel');
-            else if(cur.startsWith('group_')) renderGroupChat(app,cur.replace('group_',''));
-            else if(cur.startsWith('private_')) renderPrivateChat(app,cur.replace('private_',''));
-            bindEvents();
+            const app=document.getElementById('app');app.innerHTML='';
+            if(!profile.name||!profile.phone){cur='setup';app.innerHTML=setupHTML();bindSetup();}
+            else if(cur==='main'){app.innerHTML=mainHTML();bindMain();}
+            else if(cur==='bot'){app.innerHTML=chatHTML('bot');bindBot();}
+            else if(cur==='group'){app.innerHTML=chatHTML('group');bindGroup();}
+            else if(cur==='profile'){app.innerHTML=profileHTML();bindProfile();}
+            else if(cur==='search'){app.innerHTML=searchHTML();bindSearch();}
+            else if(cur==='create_group'||cur==='create_channel'){app.innerHTML=createHTML(cur.replace('create_',''));bindCreate();}
+            else if(cur.startsWith('grp_')){app.innerHTML=groupChatHTML(cur.replace('grp_',''));bindGroupChat(cur.replace('grp_',''));}
+            else if(cur.startsWith('pv_')){app.innerHTML=privateHTML(cur.replace('pv_',''));bindPrivate(cur.replace('pv_',''));}
         }
         
-        function renderSetup(app){
-            app.innerHTML='<div class="setup"><h2>🚀 أهلاً بك</h2><div class="avatar-sm" id="avSetup" onclick="document.getElementById(\'fSetup\').click()">📷</div><input type="file" id="fSetup" accept="image/*" onchange="prevSetup(this)"><input id="inPhone" placeholder="رقم الهاتف (مثال: +201500972046)" value="'+profile.phone+'"><input id="inName" placeholder="الاسم" value="'+profile.name+'"><input id="inUser" placeholder="يوزر نيم (اختياري)" value="'+profile.username+'"><button class="btn btn-blue" onclick="saveSetup()">🚀 دخول</button></div>';
-            if(profile.avatar) setTimeout(()=>{const a=el('avSetup');if(a)a.innerHTML='<img src="'+profile.avatar+'">';},100);
-        }
+        function setupHTML(){return '<div class="setup"><h2>🚀 أهلاً بك</h2><div class="av" id="avSetup" onclick="document.getElementById(\'fSetup\').click()">📷</div><input type="file" id="fSetup" accept="image/*" onchange="prevSetup()"><input id="inPhone" placeholder="رقم الهاتف" value="'+profile.phone+'"><input id="inName" placeholder="الاسم" value="'+profile.name+'"><input id="inUser" placeholder="يوزر نيم" value="'+profile.username+'"><button class="btn bblue" id="btnSetup" onclick="saveSetup()">🚀 دخول</button></div>';}
+        function mainHTML(){return '<div class="screen"><div class="header"><div class="av">'+(profile.avatar?'<img src="'+profile.avatar+'">':(profile.name?profile.name[0]:'👤'))+'</div><div class="hinfo"><div class="n">Telegram</div><div class="s">'+profile.name+'</div></div></div><div class="search"><input type="text" id="searchInput" placeholder="🔍 بحث برقم أو يوزر..." onkeypress="if(event.key==\'Enter\')doSearch()"></div><div class="clist" id="mainList"><div class="crow" onclick="goTo(\'bot\')"><div class="av" style="background:#3b82f6;">🤖</div><div class="info"><div class="n">🤖 NUMBER BOT</div><div class="p">'+(curNum?'الرقم: '+curNum:'بوت الأرقام')+'</div></div></div><div class="crow" onclick="goTo(\'group\')"><div class="av" style="background:#e17076;">👥</div><div class="info"><div class="n">👥 OTP GROUP</div><div class="p">Live OTP</div></div></div></div><div class="nav"><button class="ni ac" onclick="goTo(\'main\')"><span class="nic">💬</span>محادثات</button><button class="ni" onclick="goTo(\'search\')"><span class="nic">🔍</span>بحث</button><button class="ni" onclick="goTo(\'profile\')"><span class="nic">👤</span>ملف</button></div><button class="fab" id="fabBtn">+</button><div class="fabm" id="fabMenu"><button onclick="goTo(\'create_group\')">👥 مجموعة</button><button onclick="goTo(\'create_channel\')">📢 قناة</button></div></div>';}
+        function chatHTML(type){const b=type==='bot';return '<div class="screen"><div class="header"><div class="back" onclick="goTo(\'main\')">←</div><div class="av" id="chatAv" style="background:'+(b?'#3b82f6':'#e17076')+';">'+(b?'🤖':'👥')+'</div><div class="hinfo"><div class="n" id="chatName">'+(b?'🤖 NUMBER BOT':'👥 OTP GROUP')+'</div><div class="s">'+(b?'online':'live')+'</div></div></div><div class="msgs" id="messages" style="'+(b?'':'display:flex;')+'"></div>'+(b?'<div class="ba" id="btnArea"></div><div class="admin-panel" id="adminPanel" style="display:none;"><h4>⚙️ إعدادات</h4><input id="adName" placeholder="الاسم"><input id="adAvatar" placeholder="رابط الصورة"><button class="btn bblue" style="width:100%;" onclick="saveAdmin(\''+type+'\')">💾 حفظ</button></div>':'<div class="ibar"><input type="text" id="groupInput" placeholder="رسالة..." onkeypress="if(event.key==\'Enter\')sendGroupMsg()"><button id="btnGroupSend">📤</button></div>')+'</div>';}
+        function searchHTML(){return '<div class="screen"><div class="header"><div class="back" onclick="goTo(\'main\')">←</div><div class="hinfo"><div class="n">🔍 بحث</div></div></div><div style="flex:1;padding:20px;"><input type="text" id="searchInput2" placeholder="رقم أو يوزر..." style="width:100%;background:var(--card);border:none;border-radius:12px;padding:14px;color:#fff;font-size:15px;margin-bottom:15px;"><button class="btn bblue" style="width:100%;" id="btnSearch">🔍 بحث</button><div id="searchResult" style="margin-top:15px;"></div></div></div>';}
+        function profileHTML(){return '<div class="screen"><div class="header"><div class="back" onclick="goTo(\'main\')">←</div><div class="hinfo"><div class="n">👤 الملف الشخصي</div></div></div><div class="prof"><div class="av" onclick="document.getElementById(\'fProf\').click()">'+(profile.avatar?'<img src="'+profile.avatar+'">':'📷')+'</div><input type="file" id="fProf" accept="image/*" onchange="prevProf()" style="display:none;"><input id="eName" value="'+profile.name+'"><input id="ePhone" value="'+profile.phone+'"><input id="eUser" value="'+profile.username+'"><button class="btn bblue" style="width:100%;margin-top:10px;" id="btnSaveProfile" onclick="saveProfile()">💾 حفظ</button></div></div>';}
+        function createHTML(type){return '<div class="screen"><div class="header"><div class="back" onclick="goTo(\'main\')">←</div><div class="hinfo"><div class="n">'+(type==='group'?'👥 مجموعة جديدة':'📢 قناة جديدة')+'</div></div></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:18px;"><div class="av" id="avCreate" onclick="document.getElementById(\'fCreate\').click()">📷</div><input type="file" id="fCreate" accept="image/*" onchange="prevCreate()" style="display:none;"><input id="inCreateName" placeholder="الاسم" style="width:100%;background:var(--card);border:1px solid rgba(255,255,255,0.1);padding:15px;border-radius:12px;color:#fff;font-size:16px;text-align:center;"><button class="btn bblue" style="width:100%;" id="btnCreate" onclick="doCreate(\''+type+'\')">✅ إنشاء</button></div></div>';}
+        function groupChatHTML(gid){return '<div class="screen"><div class="header"><div class="back" onclick="goTo(\'main\')">←</div><div class="av" id="gAv" style="background:#8b5cf6;cursor:pointer;" onclick="groupSettings(\''+gid+'\')">👥</div><div class="hinfo"><div class="n" id="gName">...</div><div class="s" id="gStatus">...</div></div></div><div class="msgs" id="messages"></div><div class="ibar"><input type="text" id="groupInput2" placeholder="رسالة..." onkeypress="if(event.key==\'Enter\')sendGroupMsg2(\''+gid+'\')"><button id="btnGroupSend2" onclick="sendGroupMsg2(\''+gid+'\')">📤</button></div></div>';}
+        function privateHTML(phone){return '<div class="screen"><div class="header"><div class="back" onclick="goTo(\'main\')">←</div><div class="av" id="pAv">👤</div><div class="hinfo"><div class="n" id="pName">...</div><div class="s" id="pStatus">...</div></div></div><div class="msgs" id="messages"></div><div class="ibar"><input type="text" id="privInput" placeholder="رسالة..." onkeypress="if(event.key==\'Enter\')sendPrivMsg(\''+phone+'\')"><button id="btnPrivSend" onclick="sendPrivMsg(\''+phone+'\')">📤</button></div></div>';}
         
-        function renderMain(app){
-            let list='<div class="chat-list">';
-            list+='<div class="chat-row" onclick="openChat(\'bot\')"><div class="avatar-sm" id="botAv" style="background:#3b82f6;">🤖</div><div class="info"><div class="name">🤖 NUMBER BOT</div><div class="preview">'+(curNum?'الرقم: '+curNum:'بوت الأرقام')+'</div></div></div>';
-            list+='<div class="chat-row" onclick="openChat(\'group\')"><div class="avatar-sm" id="otpAv" style="background:#e17076;">👥</div><div class="info"><div class="name">👥 OTP GROUP</div><div class="preview">Live OTP</div></div></div>';
-            // مجموعات المستخدم
-            db.ref('groups').orderByChild('members').once('value').then(snap=>{
-                snap.forEach(s=>{
-                    const g=s.val();const gid=s.key;
-                    if(g.members&&g.members.includes(profile.phone)){
-                        const el=document.getElementById('group_'+gid);
-                        if(!el){
-                            document.querySelector('.chat-list').innerHTML+='<div class="chat-row" id="group_'+gid+'" onclick="openGroupChat(\''+gid+'\')"><div class="avatar-sm" style="background:#8b5cf6;">'+(g.avatar?'<img src="'+g.avatar+'">':'👥')+'</div><div class="info"><div class="name">'+g.name+'</div><div class="preview">مجموعة</div></div></div>';
-                        }
-                    }
-                });
-            });
-            list+='</div>';
-            app.innerHTML='<div class="screen"><div class="header"><div class="avatar-sm" onclick="openScreen(\'profile\')">'+(profile.avatar?'<img src="'+profile.avatar+'">':(profile.name?profile.name[0]:'👤'))+'</div><div class="header-info"><div class="name">Telegram</div><div class="status">'+profile.name+'</div></div></div><div class="search-bar"><input type="text" placeholder="🔍 بحث برقم أو يوزر..." onkeypress="if(event.key==\'Enter\')search(this.value)"></div>'+list+'<div class="nav-bar"><button class="nav-item active" onclick="openScreen(\'main\')"><span class="nav-icon">💬</span>محادثات</button><button class="nav-item" onclick="openScreen(\'profile\')"><span class="nav-icon">👤</span>ملف</button></div><button class="fab" onclick="toggleFab()">+</button><div class="fab-menu" id="fabMenu" style="display:none;"><button class="fab-item" onclick="openScreen(\'create_group\')">👥 مجموعة</button><button class="fab-item" onclick="openScreen(\'create_channel\')">📢 قناة</button><button class="fab-item" onclick="newChat()">💬 محادثة</button></div></div>';
-        }
+        function bindSetup(){if(profile.avatar){const a=document.getElementById('avSetup');if(a)a.innerHTML='<img src="'+profile.avatar+'">';}}
+        function bindMain(){const fb=document.getElementById('fabBtn');if(fb)fb.onclick=()=>{const m=document.getElementById('fabMenu');m.style.display=m.style.display==='flex'?'none':'flex';};setTimeout(loadMainGroups,300);}
+        function bindBot(){if(profile.phone===ADMIN){document.getElementById('adminPanel').style.display='block';loadAdminData('bot');}if(curNum){document.getElementById('messages').innerHTML='<div class="center-num"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div></div></div>';document.getElementById('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="loadServices()">🌍 دولة</button></div><div class="brow"><button class="btn bblue" onclick="getNumber(\''+cCty+'\',\'\')">🔄 تغيير</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';}else{showStart();}loadChatAvatar('bot');}
+        function bindGroup(){if(profile.phone===ADMIN){document.getElementById('adminPanel').style.display='block';loadAdminData('group');}document.getElementById('messages').innerHTML='';const btn=document.getElementById('btnGroupSend');if(btn)btn.onclick=sendGroupMsg;db.ref('group_msgs').off();db.ref('group_msgs').limitToLast(50).on('child_added',s=>showOTPMsg(s.val()));if(otpTimer)clearInterval(otpTimer);otpTimer=setInterval(fetchOTP,2000);fetchOTP();loadChatAvatar('group');}
+        function bindSearch(){document.getElementById('btnSearch').onclick=()=>doSearch(document.getElementById('searchInput2').value);}
+        function bindProfile(){}
+        function bindCreate(){}
+        function bindGroupChat(gid){db.ref('groups/'+gid).once('value').then(snap=>{const g=snap.val();if(!g)return goTo('main');const a=document.getElementById('gAv');if(a){if(g.avatar)a.innerHTML='<img src="'+g.avatar+'">';else a.textContent='👥';}document.getElementById('gName').textContent=g.name;document.getElementById('gStatus').textContent=(g.members?g.members.length:0)+' أعضاء';});document.getElementById('messages').innerHTML='';db.ref('groups/'+gid+'/messages').off();db.ref('groups/'+gid+'/messages').limitToLast(50).on('child_added',snap=>{const m=snap.val();const isMe=m.from===profile.phone;document.getElementById('messages').innerHTML+='<div class="msg '+(isMe?'mo':'mi')+'">'+(m.text||'')+'<div class="time">'+(m.time||'')+'</div></div>';document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;});}
+        function bindPrivate(phone){db.ref('users/'+btoa(phone)).once('value').then(snap=>{const u=snap.val();if(!u)return goTo('main');const a=document.getElementById('pAv');if(a){if(u.avatar)a.innerHTML='<img src="'+u.avatar+'">';else a.textContent='👤';}document.getElementById('pName').textContent=u.name;document.getElementById('pStatus').textContent=u.phone;});const chatId=[profile.phone,phone].sort().join('_');document.getElementById('messages').innerHTML='';db.ref('chats/'+chatId).off();db.ref('chats/'+chatId).limitToLast(50).on('child_added',snap=>{const m=snap.val();const isMe=m.from===profile.phone;document.getElementById('messages').innerHTML+='<div class="msg '+(isMe?'mo':'mi')+'">'+(m.text||'')+'<div class="time">'+(m.time||'')+'</div></div>';document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;});}
         
-        function renderChat(app){
-            const isBot=cur==='bot';
-            app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="avatar-sm" style="background:'+(isBot?'#3b82f6':'#e17076')+';">'+(isBot?'🤖':'👥')+'</div><div class="header-info"><div class="name">'+(isBot?'🤖 NUMBER BOT':'👥 OTP GROUP')+'</div><div class="status">'+(isBot?'online':'live')+'</div></div></div><div class="messages" id="messages"></div>'+(isBot?'<div class="btn-area" id="btnArea"></div><div id="adminPanel" style="display:none;padding:10px;background:var(--card);border-top:1px solid rgba(255,255,255,0.05);"><h4 style="color:#f59e0b;margin-bottom:8px;">⚙️ إعدادات الأدمن</h4><input id="adName" placeholder="الاسم" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;color:#fff;margin-bottom:8px;"><input id="adAvatar" placeholder="رابط الصورة" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;color:#fff;margin-bottom:8px;"><button class="btn bblue" style="width:100%;" onclick="saveAdmin()">💾 حفظ</button></div>':'<div class="input-bar"><input type="file" id="imgInput" accept="image/*" onchange="sendGroupImg()" style="display:none;"><button class="attach" onclick="document.getElementById(\'imgInput\').click()">📎</button><input type="text" id="groupInput" placeholder="رسالة..." onkeypress="if(event.key===\'Enter\')sendGroupMsg()"><button onclick="sendGroupMsg()">📤</button></div>')+'</div>';
-        }
+        function loadAdminData(type){db.ref('bot_settings').once('value').then(snap=>{const s=snap.val()||{};document.getElementById('adName').value=s[type==='bot'?'name':'otp_name']||'';document.getElementById('adAvatar').value=s[type==='bot'?'avatar':'otp_avatar']||'';});}
+        function saveAdmin(type){const n=document.getElementById('adName').value.trim();const a=document.getElementById('adAvatar').value.trim();if(n){db.ref('bot_settings/'+(type==='bot'?'name':'otp_name')).set(n);document.getElementById('chatName').textContent=n;}if(a){db.ref('bot_settings/'+(type==='bot'?'avatar':'otp_avatar')).set(a);document.getElementById('chatAv').innerHTML='<img src="'+a+'">';}alert('✅ تم الحفظ');}
         
-        function renderGroupChat(app,gid){
-            db.ref('groups/'+gid).once('value').then(snap=>{
-                const g=snap.val();if(!g) return goBack();
-                app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="avatar-sm" style="background:#8b5cf6;" onclick="groupSettings(\''+gid+'\')">'+(g.avatar?'<img src="'+g.avatar+'">':'👥')+'</div><div class="header-info"><div class="name">'+g.name+'</div><div class="status">'+(g.members?g.members.length:0)+' أعضاء</div></div></div><div class="messages" id="messages"></div><div class="input-bar"><input type="file" id="imgInput" accept="image/*" onchange="sendGroupImg2(\''+gid+'\')" style="display:none;"><button class="attach" onclick="document.getElementById(\'imgInput\').click()">📎</button><input type="text" id="groupInput2" placeholder="رسالة..." onkeypress="if(event.key===\'Enter\')sendGroupMsg2(\''+gid+'\')"><button onclick="sendGroupMsg2(\''+gid+'\')">📤</button></div></div>';
-                bindGroupChat(gid);
-            });
-        }
+        function loadChatAvatar(type){db.ref('bot_settings').once('value').then(snap=>{const s=snap.val()||{};const key=type==='bot'?'avatar':'otp_avatar';const nk=type==='bot'?'name':'otp_name';if(s[key]){const a=document.getElementById('chatAv');if(a)a.innerHTML='<img src="'+s[key]+'">';}if(s[nk]){const n=document.getElementById('chatName');if(n)n.textContent=s[nk];}});}
         
-        function renderPrivateChat(app,phone){
-            db.ref('users/'+btoa(phone)).once('value').then(snap=>{
-                const u=snap.val();if(!u) return goBack();
-                const chatId=[profile.phone,phone].sort().join('_');
-                app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="avatar-sm">'+(u.avatar?'<img src="'+u.avatar+'">':'👤')+'</div><div class="header-info"><div class="name">'+u.name+'</div><div class="status">'+u.phone+'</div></div></div><div class="messages" id="messages"></div><div class="input-bar"><input type="text" id="privInput" placeholder="رسالة..." onkeypress="if(event.key===\'Enter\')sendPrivMsg(\''+chatId+'\',\''+phone+'\')"><button onclick="sendPrivMsg(\''+chatId+'\',\''+phone+'\')">📤</button></div></div>';
-                bindPrivateChat(chatId);
-            });
-        }
+        function loadMainGroups(){db.ref('groups').once('value').then(snap=>{const list=document.getElementById('mainList');if(!list)return;snap.forEach(s=>{const g=s.val();const gid=s.key;if(g.members&&g.members.includes(profile.phone)&&!document.getElementById('grp_'+gid)){list.innerHTML+='<div class="crow" id="grp_'+gid+'" onclick="goTo(\'grp_'+gid+'\')"><div class="av" style="background:#8b5cf6;">'+(g.avatar?'<img src="'+g.avatar+'">':'👥')+'</div><div class="info"><div class="n">'+g.name+'</div><div class="p">مجموعة</div></div></div>';}});});}
         
-        function renderProfile(app){
-            app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="header-info"><div class="name">👤 الملف الشخصي</div></div></div><div class="profile-page"><div class="avatar-sm" onclick="document.getElementById(\'fProf\').click()">'+(profile.avatar?'<img src="'+profile.avatar+'">':'📷')+'</div><input type="file" id="fProf" accept="image/*" onchange="prevProf(this)"><input id="eName" value="'+profile.name+'"><input id="ePhone" value="'+profile.phone+'"><input id="eUser" value="'+profile.username+'"><button class="btn btn-blue" style="width:100%;margin-top:10px;" onclick="saveProfile()">💾 حفظ</button></div></div>';
-        }
+        function showOTPMsg(m){if(cur!=='group')return;const t=m.time||new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});if(m.type==='otp'){const cn=cNames[m.country]||m.country||'';document.getElementById('messages').innerHTML+='<div class="msg motp">📩 '+m.service+' <span style="color:#10b981;font-size:11px;">'+cn+'</span><br>📱 <span class="num">'+m.number+'</span><br>🔑 <span class="code">'+m.code+'</span><div class="time">'+t+'</div><button class="btn bgold" style="margin-top:6px;width:100%;padding:8px;font-size:13px;" onclick="copyCode(\''+m.code+'\')">📋 نسخ الكود</button></div>';}else{document.getElementById('messages').innerHTML+='<div class="msg '+(m.phone===profile.phone?'mo':'mi')+'">'+m.text+'<div class="time">'+t+'</div></div>';}document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;}
         
-        function renderCreate(app,type){
-            const title=type==='group'?'👥 مجموعة جديدة':'📢 قناة جديدة';
-            app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="header-info"><div class="name">'+title+'</div></div></div><div class="create-page"><div class="avatar-sm" id="avCreate" onclick="document.getElementById(\'fCreate\').click()">📷</div><input type="file" id="fCreate" accept="image/*" onchange="prevCreate(this)"><input id="inCreateName" placeholder="الاسم"><button class="btn btn-blue" style="width:100%;" onclick="doCreate(\''+type+'\')">✅ إنشاء</button></div></div>';
-        }
+        function goTo(page){cur=page;save();if(otpTimer&&page!=='group'){clearInterval(otpTimer);otpTimer=null;}render();}
+        function prevSetup(){const f=document.getElementById('fSetup').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;document.getElementById('avSetup').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
+        function prevProf(){const f=document.getElementById('fProf').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;};r.readAsDataURL(f);}}
+        function prevCreate(){const f=document.getElementById('fCreate').files[0];if(f){const r=new FileReader();r.onload=function(e){window._createAvatar=e.target.result;document.getElementById('avCreate').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
         
-        // ====== BIND EVENTS ======
-        function bindEvents(){
-            if(cur==='bot'){
-                if(curNum){el('messages').innerHTML='<div class="msg msg-in">📱 <span class="number">'+curNum+'</span></div>';el('btnArea').innerHTML='<div class="btn-row"><button class="btn btn-green" onclick="copyNum(\''+curNum+'\')">📋 نسخ</button><button class="btn btn-blue" onclick="loadServices()">🌍 دولة</button></div><div class="btn-row"><button class="btn btn-blue" onclick="getNumber(\''+cCty+'\',\'\')">🔄 تغيير</button><button class="btn btn-gold" onclick="checkCode(\''+curNum+'\')">📩 كود</button></div>';}else showStart();}
-            if(cur==='group'){el('messages').innerHTML='';db.ref('group_msgs').off();db.ref('group_msgs').limitToLast(50).on('child_added',s=>{if(cur==='group')showGroupMsg(s.val())});if(otpTimer)clearInterval(otpTimer);otpTimer=setInterval(fetchOTP,2000);fetchOTP();}
-        }
+        function saveSetup(){profile.phone=document.getElementById('inPhone').value.trim();profile.name=document.getElementById('inName').value.trim()||'مستخدم';profile.username=document.getElementById('inUser').value.trim();if(!profile.phone){alert('أدخل رقم الهاتف');return;}save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
+        function saveProfile(){profile.name=document.getElementById('eName').value.trim()||profile.name;profile.phone=document.getElementById('ePhone').value.trim()||profile.phone;profile.username=document.getElementById('eUser').value.trim();save();db.ref('users/'+btoa(profile.phone)).set(profile);goTo('main');}
+        function doCreate(type){const name=document.getElementById('inCreateName').value.trim();if(!name){alert('أدخل اسماً');return;}const data={name,createdBy:profile.phone,members:type==='group'?[profile.phone]:[],avatar:window._createAvatar||'',type};db.ref('groups').push(data).then(ref=>{alert('✅ تم!');goTo('grp_'+ref.key);});}
+        function doSearch(q){if(!q)return;const res=document.getElementById('searchResult');res.innerHTML='جاري البحث...';db.ref('users/'+btoa(q)).once('value').then(s=>{if(s.val()){const u=s.val();res.innerHTML='<div style="background:var(--card);padding:15px;border-radius:10px;cursor:pointer;" onclick="goTo(\'pv_'+u.phone+'\')"><b>'+u.name+'</b><br>📱 '+u.phone+'</div>';}else{res.innerHTML='❌ لم يتم العثور';}});}
+        function groupSettings(gid){if(!confirm('⚙️ إعدادات المجموعة'))return;const opt=prompt('1 - إضافة عضو\n2 - حذف المجموعة');if(opt==='1'){const q=prompt('يوزر العضو:');if(q)db.ref('users').orderByChild('username').equalTo(q).once('value').then(s=>{if(s.val()){const u=Object.values(s.val())[0];db.ref('groups/'+gid+'/members').once('value').then(s2=>{const m=s2.val()||[];if(!m.includes(u.phone)){m.push(u.phone);db.ref('groups/'+gid+'/members').set(m);alert('✅ تم');}else alert('موجود');});}else alert('❌');});}else if(opt==='2'){if(confirm('حذف؟')){db.ref('groups/'+gid).remove();goTo('main');}}}
         
-        function bindGroupChat(gid){
-            el('messages').innerHTML='';
-            db.ref('groups/'+gid+'/messages').off();
-            db.ref('groups/'+gid+'/messages').limitToLast(50).on('child_added',s=>showGroupMsg2(s.val(),gid));
-        }
-        
-        function bindPrivateChat(chatId){
-            el('messages').innerHTML='';
-            db.ref('chats/'+chatId).off();
-            db.ref('chats/'+chatId).limitToLast(50).on('child_added',s=>{
-                const m=s.val();
-                el('messages').innerHTML+='<div class="msg '+(m.from===profile.phone?'msg-out':'msg-in')+'">'+(m.img?'<img src="'+m.img+'" style="max-width:100%;border-radius:10px;">':'')+(m.text||'')+'<div class="time">'+m.time+'</div></div>';
-                el('messages').scrollTop=el('messages').scrollHeight;
-            });
-        }
-        
-        function showGroupMsg(m){
-            if(cur!=='group')return;
-            const t=m.time||new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
-            if(m.type==='otp'){
-                const cn=cNames[m.country]||m.country||'';
-                el('messages').innerHTML+='<div class="msg msg-otp">📩 '+m.service+' <span style="color:#10b981;font-size:11px;">'+cn+'</span><br>📱 <span class="number">'+m.number+'</span><br>🔑 <span class="code">'+m.code+'</span><div class="time">'+t+'</div><button class="btn btn-gold" style="margin-top:6px;width:100%;padding:8px;font-size:13px;" onclick="copyCode(\''+m.code+'\')">📋 نسخ الكود</button></div>';
-            }else{
-                el('messages').innerHTML+='<div class="msg '+(m.phone===profile.phone?'msg-out':'msg-in')+'"><div class="sender" onclick="contactClick(\''+m.phone+'\',\''+m.sender+'\')">👤 '+m.sender+'</div>'+(m.img?'<img src="'+m.img+'" style="max-width:100%;border-radius:10px;">':'')+m.text+'<div class="time">'+t+'</div></div>';
-            }
-            el('messages').scrollTop=el('messages').scrollHeight;
-        }
-        
-        function showGroupMsg2(m,gid){
-            const t=m.time||'';
-            el('messages').innerHTML+='<div class="msg '+(m.from===profile.phone?'msg-out':'msg-in')+'"><div class="sender" onclick="contactClick(\''+m.from+'\',\''+m.sender+'\')">👤 '+m.sender+'</div>'+(m.img?'<img src="'+m.img+'" style="max-width:100%;border-radius:10px;">':'')+(m.text||'')+'<div class="time">'+t+'</div></div>';
-            el('messages').scrollTop=el('messages').scrollHeight;
-        }
-        
-        function groupSettings(gid){
-            const opt=prompt('⚙️ إعدادات المجموعة:\n1 - إضافة عضو\n2 - حذف المجموعة\n\nاكتب الرقم:');
-            if(opt==='1'){
-                const q=prompt('أدخل رقم الهاتف أو اليوزر:');
-                if(q) db.ref('users').orderByChild(q.includes('@')?'username':'phone').equalTo(q).once('value').then(snap=>{
-                    if(snap.val()){
-                        const u=Object.values(snap.val())[0];
-                        db.ref('groups/'+gid+'/members').once('value').then(s=>{
-                            const members=s.val()||[];
-                            if(!members.includes(u.phone)){
-                                members.push(u.phone);
-                                db.ref('groups/'+gid+'/members').set(members);
-                                alert('✅ تمت الإضافة!');
-                            }else alert('العضو موجود بالفعل');
-                        });
-                    }else alert('❌ لم يتم العثور');
-                });
-            }else if(opt==='2'){
-                if(confirm('متأكد من حذف المجموعة؟')){db.ref('groups/'+gid).remove();goBack();}
-            }
-        }
-        
-        function contactClick(phone,name){
-            if(phone===profile.phone) return;
-            if(confirm('👤 '+name+'\n📱 '+phone+'\n\n💬 فتح محادثة خاصة؟')) openScreen('private_'+phone);
-        }
-        
-        // ====== ACTIONS ======
-        function prevSetup(i){const f=i.files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;const a=el('avSetup');if(a)a.innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
-        function prevProf(i){const f=i.files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;};r.readAsDataURL(f);}}
-        function prevCreate(i){window._createAvatar=i.files[0];}
-        function saveSetup(){profile.phone=el('inPhone').value.trim();profile.name=el('inName').value.trim()||'مستخدم';profile.username=el('inUser').value.trim();if(!profile.phone){alert('من فضلك أدخل رقم الهاتف');return;}save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
-        function saveProfile(){profile.name=el('eName').value.trim()||profile.name;profile.phone=el('ePhone').value.trim()||profile.phone;profile.username=el('eUser').value.trim();save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
-        function doCreate(type){
-            const name=el('inCreateName').value.trim();if(!name){alert('أدخل اسماً');return;}
-            const f=window._createAvatar;
-            const saveGroup=(avatarUrl)=>{
-                const data={name,createdBy:profile.phone,members:type==='group'?[profile.phone]:[],avatar:avatarUrl||'',type};
-                const ref=type==='group'?db.ref('groups').push(data):db.ref('channels').push(data);
-                alert('✅ تم!');goBack();
-            };
-            if(f){const r=new FileReader();r.onload=function(e){saveGroup(e.target.result);};r.readAsDataURL(f);}else{saveGroup('');}
-        }
-        
-        function toggleFab(){showFabMenu=!showFabMenu;const m=document.getElementById('fabMenu');if(m)m.style.display=showFabMenu?'flex':'none';}
-        function newChat(){const q=prompt('🔍 رقم الهاتف أو اليوزر:');if(q) search(q);}
-        
-        function search(q){
-            if(!q)return;
-            db.ref('users').orderByChild('username').equalTo(q).once('value').then(s=>{
-                if(s.val()){const u=Object.values(s.val())[0];openContact(u);}
-                else{
-                    db.ref('users/'+btoa(q)).once('value').then(s2=>{
-                        if(s2.val()) openContact(s2.val());
-                        else alert('❌ لم يتم العثور');
-                    });
-                }
-            });
-        }
-        function openContact(u){if(confirm('👤 '+u.name+'\n📱 '+u.phone+'\n\n💬 فتح محادثة؟'))openScreen('private_'+u.phone);}
-        
-        var adminType='bot';function showAdminPanel(type){if(profile.phone!=='201500972046')return;adminType=type;var p=document.getElementById('adminPanel');p.style.display='block';var n=document.getElementById('adName');var a=document.getElementById('adAvatar');db.ref('bot_settings').once('value').then(function(s){var d=s.val()||{};n.value=d[type==='bot'?'name':'otp_name']||'';a.value=d[type==='bot'?'avatar':'otp_avatar']||'';});}function saveAdmin(){var n=document.getElementById('adName').value.trim();var a=document.getElementById('adAvatar').value.trim();if(n)db.ref('bot_settings/'+(adminType==='bot'?'name':'otp_name')).set(n);if(a)db.ref('bot_settings/'+(adminType==='bot'?'avatar':'otp_avatar')).set(a);alert('✅ تم الحفظ');goTo('main');}function copyCode(c){navigator.clipboard.writeText(c);}
-        function copyNum(n){navigator.clipboard.writeText(n);}
-        function openScreen(s){cur=s;save();if(otpTimer)clearInterval(otpTimer);render();}
-        function openChat(t){cur=t;save();render();}
-        function openGroupChat(gid){cur='group_'+gid;save();render();}
-        function goBack(){cur='main';save();if(otpTimer)clearInterval(otpTimer);render();}
+        function copyCode(c){navigator.clipboard.writeText(c);}
+        function copyNum(){if(curNum)navigator.clipboard.writeText(curNum);}
         
         async function fetchOTP(){try{const d=await api('/api/otp?count=15');if(Array.isArray(d))d.forEach(i=>{const k=i[1]+'-'+i[2];if(!known.has(k)){known.add(k);db.ref('group_msgs').push({type:'otp',service:i[0],number:i[1],code:i[2].match(/\d{4,8}/)?.[0]||i[2],country:i[4]||'',time:new Date().toLocaleTimeString('ar-EG')});}});}catch(e){}}
+        function sendGroupMsg(){const inp=document.getElementById('groupInput');const tx=inp.value.trim();if(!tx)return;db.ref('group_msgs').push({type:'user',text:tx,sender:profile.name,phone:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
+        function sendGroupMsg2(gid){const inp=document.getElementById('groupInput2');const tx=inp.value.trim();if(!tx)return;db.ref('groups/'+gid+'/messages').push({text:tx,sender:profile.name,from:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
+        function sendPrivMsg(phone){const inp=document.getElementById('privInput');const tx=inp.value.trim();if(!tx)return;const chatId=[profile.phone,phone].sort().join('_');db.ref('chats/'+chatId).push({text:tx,from:profile.phone,to:phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
         
-        function sendGroupMsg(){const inp=el('groupInput'),tx=inp.value.trim();if(!tx||!profile.name)return;db.ref('group_msgs').push({type:'user',text:tx,sender:profile.name,phone:profile.phone,avatar:profile.avatar,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
-        function sendGroupImg(){const f=el('imgInput').files[0];if(!f)return;const r=new FileReader();r.onload=function(e){db.ref('group_msgs').push({type:'user',text:'',img:e.target.result,sender:profile.name,phone:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});};r.readAsDataURL(f);}
+        function showStart(){document.getElementById('messages').innerHTML='<div class="center-num"><div style="font-size:18px;color:#fff;">👋 أهلًا بك في NUMBER BOT!<br><br>اضغط START للبدء</div></div>';document.getElementById('btnArea').innerHTML='<button class="btn bblue" style="width:100%;" onclick="loadServices()">▶️ START</button>';}
         
-        function sendGroupMsg2(gid){const inp=el('groupInput2'),tx=inp.value.trim();if(!tx)return;db.ref('groups/'+gid+'/messages').push({text:tx,sender:profile.name,from:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
-        function sendGroupImg2(gid){const f=el('imgInput').files[0];if(!f)return;const r=new FileReader();r.onload=function(e){db.ref('groups/'+gid+'/messages').push({text:'',img:e.target.result,sender:profile.name,from:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});};r.readAsDataURL(f);}
-        function sendPrivMsg(chatId,phone){const inp=el('privInput'),tx=inp.value.trim();if(!tx)return;db.ref('chats/'+chatId).push({text:tx,from:profile.phone,to:phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
+        async function loadServices(){document.getElementById('btnArea').innerHTML='';try{const d=await api('/api/services');if(d.success){let btns='';d.services.slice(0,8).forEach((s,i)=>{if(i%2===0)btns+='<div class="brow">';btns+='<button class="btn bblue" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';if(i%2===1||i===d.services.length-1)btns+='</div>';});document.getElementById('btnArea').innerHTML=btns;}}catch(e){}}
         
-        function showStart(){el('messages').innerHTML='<div class="msg msg-in">👋 أهلًا بك في NUMBER BOT!</div>';el('btnArea').innerHTML='<button class="btn btn-blue" style="width:100%;" onclick="loadServices()">▶️ START</button>';}
-        async function loadServices(){el('btnArea').innerHTML='';try{const d=await api('/api/services');if(d.success){let btns='';d.services.slice(0,8).forEach((s,i)=>{if(i%2===0)btns+='<div class="btn-row">';btns+='<button class="btn btn-blue" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';if(i%2===1||i===d.services.length-1)btns+='</div>';});el('btnArea').innerHTML=btns;}}catch(e){}}
-        async function loadCountries(key,name){cSvc=key;save();el('btnArea').innerHTML='';try{const d=await api('/api/countries?service='+key);if(d.success){let btns='';d.countries.slice(0,10).forEach((c,i)=>{const cn=cNames[c.name]||c.name;if(i%2===0)btns+='<div class="btn-row">';btns+='<button class="btn btn-blue" onclick="getNumber(\''+c.name+'\',\''+c.flag+'\')">'+c.flag+' '+cn+' ('+c.count+')</button>';if(i%2===1||i===d.countries.length-1)btns+='</div>';});el('btnArea').innerHTML=btns;}}catch(e){}}
-        async function getNumber(country,flag){cCty=country;save();document.getElementById('btnArea').innerHTML='';fetch(PROXY+'/api/otp?count=50').then(r=>r.json()).then(function(d){if(Array.isArray(d)){var flt=d.filter(function(i){return i[4]&&i[4].trim().toUpperCase()===country.toUpperCase()&&i[0].toLowerCase().includes(cSvc.toLowerCase());});if(flt.length>0){curNum=flt[Math.floor(Math.random()*flt.length)][1];save();document.getElementById('messages').innerHTML='<div style="flex:1;display:flex;align-items:center;justify-content:center;"><div style="text-align:center;"><div style="font-size:40px;margin-bottom:10px;">📱</div><div style="font-size:28px;font-weight:700;color:#60a5fa;">'+curNum+'</div><div style="color:#10b981;margin-top:8px;">'+flag+' '+country+'</div></div></div>';document.getElementById('btnArea').innerHTML='<div class="btn-row"><button class="btn btn-green" onclick="copyNum(\''+curNum+'\')">📋 نسخ</button><button class="btn btn-blue" onclick="getNumber(\''+country+'\',\''+flag+'\')">🔄 تغيير</button></div><div class="btn-row"><button class="btn btn-blue" onclick="loadServices()">🌍 دولة</button><button class="btn btn-gold" onclick="checkCode(\''+curNum+'\')">📩 كود</button></div>';}else{alert('❌ لا توجد أرقام في '+country+' حالياً');document.getElementById('btnArea').innerHTML='<button class="btn btn-blue" style="width:100%;" onclick="loadServices()">🔙 رجوع</button>';}}else{alert('❌ خطأ');}});return;}function _old_getNumber(country,flag){el('btnArea').innerHTML='';try{const d=await api('/api/otp?count=30');if(Array.isArray(d)){const flt=d.filter(i=>i[0].toLowerCase().includes(cSvc.toLowerCase()));if(flt.length>0){curNum=flt[Math.floor(Math.random()*Math.min(flt.length,5))][1];save();const cn=cNames[country]||country;el('messages').innerHTML+='<div class="msg msg-in">📱 <span class="number">'+curNum+'</span><br><span style="color:#10b981;">'+flag+' '+cn+'</span></div>';el('btnArea').innerHTML='<div class="btn-row"><button class="btn btn-green" onclick="copyNum(\''+curNum+'\')">📋 نسخ</button><button class="btn btn-blue" onclick="getNumber(\''+country+'\',\''+flag+'\')">🔄 تغيير</button></div><div class="btn-row"><button class="btn btn-blue" onclick="loadServices()">🌍 دولة</button><button class="btn btn-gold" onclick="checkCode(\''+curNum+'\')">📩 كود</button></div>';}else{el('btnArea').innerHTML='<button class="btn btn-blue" style="width:100%;" onclick="getNumber(\''+country+'\',\''+flag+'\')">🔄 جرب تاني</button>';}}}catch(e){}}
-        async function checkCode(num){try{const d=await api('/api/otp?count=40');if(Array.isArray(d)){const f=d.find(i=>i[1]===num);if(f){const cd=f[2].match(/\d{4,8}/)?.[0]||f[2];el('messages').innerHTML+='<div class="msg msg-in">✅ الكود: <span class="code">'+cd+'</span></div>';el('messages').scrollTop=el('messages').scrollHeight;}else{el('messages').innerHTML+='<div class="msg msg-in">⏳ لم يصل بعد...</div>';el('messages').scrollTop=el('messages').scrollHeight;}}}catch(e){}}
+        async function loadCountries(key,name){cSvc=key;save();document.getElementById('btnArea').innerHTML='';try{const d=await api('/api/countries?service='+key);if(d.success){let btns='';d.countries.slice(0,10).forEach((c,i)=>{const cn=cNames[c.name]||c.name;if(i%2===0)btns+='<div class="brow">';btns+='<button class="btn bblue" onclick="getNumber(\''+c.name+'\',\''+c.flag+'\')">'+c.flag+' '+cn+' ('+c.count+')</button>';if(i%2===1||i===d.countries.length-1)btns+='</div>';});document.getElementById('btnArea').innerHTML=btns;}}catch(e){}}
         
-        window.onload=()=>{
-            if(!profile.name||!profile.phone){cur='setup';render();}else{cur=S.cur||'main';render();}
-        };
+        async function getNumber(country,flag){cCty=country;save();document.getElementById('btnArea').innerHTML='';const d=await api('/api/otp?count=60');if(Array.isArray(d)){let flt=d.filter(i=>i[4]&&i[4].trim().toUpperCase()===country.toUpperCase()&&i[0].toLowerCase().includes(cSvc.toLowerCase()));if(flt.length===0)flt=d.filter(i=>i[0].toLowerCase().includes(cSvc.toLowerCase()));if(flt.length>0){curNum=flt[Math.floor(Math.random()*flt.length)][1];save();const cn=cNames[country]||country;document.getElementById('messages').innerHTML='<div class="center-num"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div><div style="color:#10b981;margin-top:8px;">'+flag+' '+cn+'</div></div></div>';document.getElementById('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="getNumber(\''+country+'\',\''+flag+'\')">🔄 تغيير</button></div><div class="brow"><button class="btn bblue" onclick="loadServices()">🌍 دولة</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';}else{alert('❌ لا توجد أرقام');document.getElementById('btnArea').innerHTML='<button class="btn bblue" style="width:100%;" onclick="loadServices()">🔙 رجوع</button>';}}}
+        
+        async function checkCode(){if(!curNum)return;const d=await api('/api/otp?count=50');if(Array.isArray(d)){const f=d.find(i=>i[1]===curNum);if(f){const cd=f[2].match(/\d{4,8}/)?.[0]||f[2];document.getElementById('messages').innerHTML='<div class="center-num"><div><div class="emoji">✅</div><div class="big" style="font-size:36px;color:#f59e0b;">'+cd+'</div><div style="color:#fff;margin-top:8px;">'+curNum+'</div></div></div>';}else{alert('⏳ لم يصل الكود بعد');}}}
+        
+        window.onload=()=>{if(!profile.name||!profile.phone){cur='setup';}else if(!cur||cur==='setup'){cur='main';}render();};
     </script>
 </body>
 </html>
