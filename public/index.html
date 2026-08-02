@@ -7,26 +7,18 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
+        :root { --bg: #0e1621; --surface: #17212b; --card: #1e293b; --accent: #3b82f6; --gold: #f59e0b; --green: #10b981; --text: #f1f5f9; --text2: #94a3b8; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background: #0e1621; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app { width: 100%; max-width: 430px; height: 100vh; background: #17212b; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        body { background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app { width: 100%; max-width: 430px; height: 100vh; background: var(--surface); display: flex; flex-direction: column; overflow: hidden; position: relative; }
         
-        .setup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; gap: 20px; background: #17212b; }
-        .setup h2 { color: #fff; font-size: 22px; }
-        .setup .avatar { width: 90px; height: 90px; border-radius: 50%; background: #2b5278; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; cursor: pointer; overflow: hidden; }
-        .setup .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .setup input { width: 100%; background: #242f3d; border: 1px solid #334155; padding: 16px; border-radius: 12px; color: #fff; font-size: 16px; text-align: center; outline: none; }
-        .setup input:focus { border-color: #3b82f6; }
-        .setup input[type="file"] { display: none; }
-        .setup .btn { width: 100%; padding: 16px; border-radius: 12px; background: #3b82f6; color: #fff; border: none; font-size: 17px; font-weight: 600; cursor: pointer; }
-        
-        .header { background: #242f3d; padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #111822; }
-        .back { color: #fff; font-size: 22px; cursor: pointer; }
-        .avatar-sm { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; overflow: hidden; background: #2b5278; flex-shrink: 0; }
+        .header { background: var(--card); padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .back { color: #fff; font-size: 22px; cursor: pointer; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; }
+        .avatar-sm { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; overflow: hidden; background: var(--accent); flex-shrink: 0; }
         .avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
         .header-info { flex: 1; }
-        .header-info .name { font-size: 16px; color: #fff; font-weight: 600; }
-        .header-info .status { font-size: 12px; color: #7d8b99; }
+        .header-info .name { font-size: 16px; font-weight: 600; color: #fff; }
+        .header-info .status { font-size: 12px; color: var(--text2); }
         
         .screen { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .chat-list { flex: 1; overflow-y: auto; }
@@ -35,45 +27,69 @@
         .chat-row .avatar-sm { width: 52px; height: 52px; font-size: 22px; }
         .chat-row .info { flex: 1; }
         .chat-row .name { font-size: 16px; color: #fff; margin-bottom: 3px; }
-        .chat-row .preview { font-size: 14px; color: #7d8b99; }
+        .chat-row .preview { font-size: 14px; color: var(--text2); }
         
-        .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; background: #0e1621; }
+        .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; background: var(--bg); }
         .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 15px; line-height: 1.5; animation: fadeIn 0.2s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .msg-in { align-self: flex-start; background: #182533; border: 1px solid #242f3d; }
-        .msg-out { align-self: flex-end; background: #2b5278; }
-        .msg-otp { align-self: flex-start; background: #182533; border-right: 3px solid #f59e0b; }
-        .msg .sender { font-size: 12px; color: #64b5f6; font-weight: 600; margin-bottom: 3px; }
+        .msg-in { align-self: flex-start; background: var(--card); }
+        .msg-out { align-self: flex-end; background: var(--accent); }
+        .msg-otp { align-self: flex-start; background: var(--card); border-right: 3px solid var(--gold); }
+        .msg .sender { font-size: 12px; color: #93c5fd; font-weight: 600; margin-bottom: 3px; cursor: pointer; }
         .msg .number { color: #60a5fa; font-weight: 700; font-size: 15px; }
-        .msg .code { background: #f59e0b; color: #000; padding: 3px 10px; border-radius: 5px; font-weight: 700; display: inline-block; margin: 4px 0; font-size: 16px; }
-        .msg .time { font-size: 11px; color: #7d8b99; margin-top: 4px; }
+        .msg .code { background: var(--gold); color: #000; padding: 3px 10px; border-radius: 5px; font-weight: 700; display: inline-block; margin: 4px 0; font-size: 16px; }
+        .msg .time { font-size: 11px; color: var(--text2); margin-top: 4px; }
+        .msg img { max-width: 100%; border-radius: 10px; margin-top: 5px; }
         
-        .btn-area { padding: 12px; border-top: 1px solid #111822; background: #17212b; display: flex; flex-direction: column; gap: 8px; }
+        .btn-area { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); background: var(--surface); display: flex; flex-direction: column; gap: 8px; }
         .btn { padding: 12px; border-radius: 22px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; text-align: center; }
-        .btn-blue { background: #2b5278; color: #fff; }
-        .btn-green { background: #2e8b57; color: #fff; }
-        .btn-gold { background: #f59e0b; color: #000; }
+        .btn-blue { background: var(--accent); color: #fff; }
+        .btn-green { background: var(--green); color: #fff; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); }
         .btn-row { display: flex; gap: 8px; }
         .btn-row .btn { flex: 1; }
         
-        .input-bar { padding: 12px; background: #17212b; border-top: 1px solid #111822; display: flex; gap: 10px; }
-        .input-bar input { flex: 1; background: #242f3d; border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
-        .input-bar button { background: #2b5278; color: #fff; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px; }
+        .input-bar { padding: 12px; background: var(--surface); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px; align-items: center; }
+        .input-bar input { flex: 1; background: var(--card); border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
+        .input-bar button { background: var(--accent); color: #fff; border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; font-size: 18px; }
+        .input-bar .attach { background: transparent; color: var(--text2); font-size: 22px; width: auto; padding: 0 8px; }
+        .input-bar input[type="file"] { display: none; }
         
-        .nav-bar { display: flex; background: #17212b; border-top: 1px solid #111822; padding: 8px 0; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; color: #7d8b99; font-size: 11px; cursor: pointer; gap: 3px; background: none; border: none; }
-        .nav-item.active { color: #5288c1; }
+        .nav-bar { display: flex; background: var(--surface); border-top: 1px solid rgba(255,255,255,0.05); padding: 8px 0; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; color: var(--text2); font-size: 11px; cursor: pointer; gap: 3px; background: none; border: none; }
+        .nav-item.active { color: var(--accent); }
         .nav-icon { font-size: 20px; }
-        .fab { position: absolute; bottom: 80px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: #3b82f6; color: #fff; font-size: 24px; border: none; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(59,130,246,0.4); }
+        
+        .fab { position: absolute; bottom: 80px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 24px; border: none; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(59,130,246,0.4); }
+        
+        .fab-menu { position: absolute; bottom: 140px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+        .fab-item { background: var(--card); color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 14px; cursor: pointer; border: none; text-align: right; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         
         .search-bar { padding: 10px 16px; }
-        .search-bar input { width: 100%; background: #242f3d; border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
+        .search-bar input { width: 100%; background: var(--card); border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
+        
+        .setup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; gap: 18px; background: var(--surface); }
+        .setup h2 { color: #fff; font-size: 22px; }
+        .setup .avatar-sm { width: 85px; height: 85px; font-size: 38px; cursor: pointer; }
+        .setup input { width: 100%; background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #fff; font-size: 16px; text-align: center; outline: none; }
+        .setup input[type="file"] { display: none; }
+        .setup .btn { width: 100%; }
         
         .profile-page { padding: 20px; text-align: center; flex: 1; overflow-y: auto; }
         .profile-page .avatar-sm { width: 80px; height: 80px; font-size: 35px; margin: 0 auto 15px; cursor: pointer; }
-        .profile-page input { width: 100%; background: #242f3d; border: 1px solid #334155; padding: 14px; border-radius: 10px; color: #fff; font-size: 15px; text-align: center; margin: 8px 0; outline: none; }
+        .profile-page input { width: 100%; background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 10px; color: #fff; font-size: 15px; text-align: center; margin: 8px 0; outline: none; }
         
-        ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        .create-page { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; gap: 18px; background: var(--surface); }
+        .create-page h2 { color: #fff; font-size: 20px; }
+        .create-page .avatar-sm { width: 80px; height: 80px; font-size: 35px; cursor: pointer; }
+        .create-page input { width: 100%; background: var(--card); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #fff; font-size: 16px; text-align: center; outline: none; }
+        .create-page input[type="file"] { display: none; }
+        
+        .member-list { padding: 10px; }
+        .member-row { display: flex; align-items: center; padding: 10px; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        
+        ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -83,74 +99,203 @@
         const db=firebase.database();
         const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
         
-        let S=JSON.parse(localStorage.getItem('hub_x')||'{}');
+        let S=JSON.parse(localStorage.getItem('hub_v11')||'{}');
         let cur=S.cur||'setup',cSvc=S.cSvc||'',cCty=S.cCty||'',curNum=S.curNum||'';
         let profile=S.profile||{name:'',phone:'',avatar:'',username:''};
-        let known=new Set(),otpTimer=null;
+        let known=new Set(),otpTimer=null,showFabMenu=false;
         const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
         
-        function save(){localStorage.setItem('hub_x',JSON.stringify({cur,cSvc,cCty,curNum,profile}));}
+        function save(){localStorage.setItem('hub_v11',JSON.stringify({cur,cSvc,cCty,curNum,profile}));}
         function api(p){return fetch(PROXY+p).then(r=>r.json());}
         function el(id){return document.getElementById(id);}
         
+        // ====== RENDER ======
         function render(){
             const app=el('app');
-            if(cur==='setup'){
-                app.innerHTML='<div class="setup"><h2>🚀 أهلاً بك</h2><div class="avatar" id="avSetup" onclick="document.getElementById(\'fSetup\').click()">📷</div><input type="file" id="fSetup" accept="image/*" onchange="prevSetup(this)"><input id="inPhone" type="tel" placeholder="رقم الهاتف (مثال: +201500972046)" value="'+profile.phone+'"><input id="inName" placeholder="الاسم" value="'+profile.name+'"><input id="inUser" placeholder="يوزر نيم (اختياري)" value="'+profile.username+'"><button class="btn" onclick="saveSetup()">🚀 دخول</button></div>';
-                if(profile.avatar){setTimeout(()=>{const a=el('avSetup');if(a)a.innerHTML='<img src="'+profile.avatar+'">';},100);}
-            }else if(cur==='main'){
-                app.innerHTML='<div class="screen"><div class="header"><div class="avatar-sm" onclick="openScreen(\'profile\')">'+(profile.avatar?'<img src="'+profile.avatar+'">':(profile.name?profile.name[0]:'👤'))+'</div><div class="header-info"><div class="name">OTP Hub</div><div class="status">'+profile.name+'</div></div></div><div class="search-bar"><input type="text" placeholder="🔍 بحث برقم أو يوزر..." onkeypress="if(event.key==\'Enter\')search(this.value)"></div><div class="chat-list"><div class="chat-row" onclick="openChat(\'bot\')"><div class="avatar-sm" style="background:#3b82f6;">🤖</div><div class="info"><div class="name">🤖 NUMBER BOT</div><div class="preview">'+(curNum?'الرقم: '+curNum:'بوت الأرقام والخدمات')+'</div></div></div><div class="chat-row" onclick="openChat(\'group\')"><div class="avatar-sm" style="background:#e17076;">👥</div><div class="info"><div class="name">👥 OTP GROUP</div><div class="preview">Live OTP</div></div></div></div><div class="nav-bar"><button class="nav-item active" onclick="openScreen(\'main\')"><span class="nav-icon">💬</span>محادثات</button><button class="nav-item" onclick="openScreen(\'profile\')"><span class="nav-icon">👤</span>ملف</button></div><button class="fab" onclick="showFab()">+</button></div>';
-            }else if(cur==='bot'||cur==='group'){
-                const isBot=cur==='bot';
-                app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="avatar-sm" style="background:'+(isBot?'#3b82f6':'#e17076')+';">'+(isBot?'🤖':'👥')+'</div><div class="header-info"><div class="name">'+(isBot?'🤖 NUMBER BOT':'👥 OTP GROUP')+'</div><div class="status">'+(isBot?'online':'live')+'</div></div></div><div class="messages" id="messages"></div>'+(isBot?'<div class="btn-area" id="btnArea"></div>':'<div class="input-bar"><input type="text" id="groupInput" placeholder="رسالة..." onkeypress="if(event.key===\'Enter\')sendGroupMsg()"><button onclick="sendGroupMsg()">📤</button></div>')+'</div>';
-            }else if(cur==='profile'){
-                app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="header-info"><div class="name">👤 الملف الشخصي</div></div></div><div class="profile-page"><div class="avatar-sm" onclick="document.getElementById(\'fProf\').click()">'+(profile.avatar?'<img src="'+profile.avatar+'">':'📷')+'</div><input type="file" id="fProf" accept="image/*" onchange="prevProf(this)"><input id="eName" placeholder="الاسم" value="'+profile.name+'"><input id="ePhone" placeholder="رقم الهاتف" value="'+profile.phone+'"><input id="eUser" placeholder="يوزر نيم" value="'+profile.username+'"><button class="btn btn-blue" style="width:100%;margin-top:10px;" onclick="saveProfile()">💾 حفظ</button></div></div>';
-            }
+            if(cur==='setup') renderSetup(app);
+            else if(cur==='main') renderMain(app);
+            else if(cur==='bot'||cur==='group') renderChat(app);
+            else if(cur==='profile') renderProfile(app);
+            else if(cur==='create_group') renderCreate(app,'group');
+            else if(cur==='create_channel') renderCreate(app,'channel');
+            else if(cur.startsWith('group_')) renderGroupChat(app,cur.replace('group_',''));
+            else if(cur.startsWith('private_')) renderPrivateChat(app,cur.replace('private_',''));
             bindEvents();
         }
         
-        function prevSetup(i){const f=i.files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;const a=el('avSetup');if(a)a.innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
-        function prevProf(i){const f=i.files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;};r.readAsDataURL(f);}}
-        function saveSetup(){profile.phone=el('inPhone').value.trim();profile.name=el('inName').value.trim()||'مستخدم';profile.username=el('inUser').value.trim();if(!profile.phone){alert('من فضلك أدخل رقم الهاتف');return;}save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
-        function saveProfile(){profile.name=el('eName').value.trim()||profile.name;profile.phone=el('ePhone').value.trim()||profile.phone;profile.username=el('eUser').value.trim();save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
+        function renderSetup(app){
+            app.innerHTML='<div class="setup"><h2>🚀 أهلاً بك</h2><div class="avatar-sm" id="avSetup" onclick="document.getElementById(\'fSetup\').click()">📷</div><input type="file" id="fSetup" accept="image/*" onchange="prevSetup(this)"><input id="inPhone" placeholder="رقم الهاتف (مثال: +201500972046)" value="'+profile.phone+'"><input id="inName" placeholder="الاسم" value="'+profile.name+'"><input id="inUser" placeholder="يوزر نيم (اختياري)" value="'+profile.username+'"><button class="btn btn-blue" onclick="saveSetup()">🚀 دخول</button></div>';
+            if(profile.avatar) setTimeout(()=>{const a=el('avSetup');if(a)a.innerHTML='<img src="'+profile.avatar+'">';},100);
+        }
         
+        function renderMain(app){
+            let list='<div class="chat-list">';
+            list+='<div class="chat-row" onclick="openChat(\'bot\')"><div class="avatar-sm" style="background:#3b82f6;">🤖</div><div class="info"><div class="name">🤖 NUMBER BOT</div><div class="preview">'+(curNum?'الرقم: '+curNum:'بوت الأرقام')+'</div></div></div>';
+            list+='<div class="chat-row" onclick="openChat(\'group\')"><div class="avatar-sm" style="background:#e17076;">👥</div><div class="info"><div class="name">👥 OTP GROUP</div><div class="preview">Live OTP</div></div></div>';
+            // مجموعات المستخدم
+            db.ref('groups').orderByChild('members').once('value').then(snap=>{
+                snap.forEach(s=>{
+                    const g=s.val();const gid=s.key;
+                    if(g.members&&g.members.includes(profile.phone)){
+                        const el=document.getElementById('group_'+gid);
+                        if(!el){
+                            document.querySelector('.chat-list').innerHTML+='<div class="chat-row" id="group_'+gid+'" onclick="openGroupChat(\''+gid+'\')"><div class="avatar-sm" style="background:#8b5cf6;">'+(g.avatar?'<img src="'+g.avatar+'">':'👥')+'</div><div class="info"><div class="name">'+g.name+'</div><div class="preview">مجموعة</div></div></div>';
+                        }
+                    }
+                });
+            });
+            list+='</div>';
+            app.innerHTML='<div class="screen"><div class="header"><div class="avatar-sm" onclick="openScreen(\'profile\')">'+(profile.avatar?'<img src="'+profile.avatar+'">':(profile.name?profile.name[0]:'👤'))+'</div><div class="header-info"><div class="name">OTP Hub</div><div class="status">'+profile.name+'</div></div></div><div class="search-bar"><input type="text" placeholder="🔍 بحث برقم أو يوزر..." onkeypress="if(event.key==\'Enter\')search(this.value)"></div>'+list+'<div class="nav-bar"><button class="nav-item active" onclick="openScreen(\'main\')"><span class="nav-icon">💬</span>محادثات</button><button class="nav-item" onclick="openScreen(\'profile\')"><span class="nav-icon">👤</span>ملف</button></div><button class="fab" onclick="toggleFab()">+</button><div class="fab-menu" id="fabMenu" style="display:none;"><button class="fab-item" onclick="openScreen(\'create_group\')">👥 مجموعة</button><button class="fab-item" onclick="openScreen(\'create_channel\')">📢 قناة</button><button class="fab-item" onclick="newChat()">💬 محادثة</button></div></div>';
+        }
+        
+        function renderChat(app){
+            const isBot=cur==='bot';
+            app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="avatar-sm" style="background:'+(isBot?'#3b82f6':'#e17076')+';">'+(isBot?'🤖':'👥')+'</div><div class="header-info"><div class="name">'+(isBot?'🤖 NUMBER BOT':'👥 OTP GROUP')+'</div><div class="status">'+(isBot?'online':'live')+'</div></div></div><div class="messages" id="messages"></div>'+(isBot?'<div class="btn-area" id="btnArea"></div>':'<div class="input-bar"><input type="file" id="imgInput" accept="image/*" onchange="sendGroupImg()" style="display:none;"><button class="attach" onclick="document.getElementById(\'imgInput\').click()">📎</button><input type="text" id="groupInput" placeholder="رسالة..." onkeypress="if(event.key===\'Enter\')sendGroupMsg()"><button onclick="sendGroupMsg()">📤</button></div>')+'</div>';
+        }
+        
+        function renderGroupChat(app,gid){
+            db.ref('groups/'+gid).once('value').then(snap=>{
+                const g=snap.val();if(!g) return goBack();
+                app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="avatar-sm" style="background:#8b5cf6;" onclick="groupSettings(\''+gid+'\')">'+(g.avatar?'<img src="'+g.avatar+'">':'👥')+'</div><div class="header-info"><div class="name">'+g.name+'</div><div class="status">'+(g.members?g.members.length:0)+' أعضاء</div></div></div><div class="messages" id="messages"></div><div class="input-bar"><input type="file" id="imgInput" accept="image/*" onchange="sendGroupImg2(\''+gid+'\')" style="display:none;"><button class="attach" onclick="document.getElementById(\'imgInput\').click()">📎</button><input type="text" id="groupInput2" placeholder="رسالة..." onkeypress="if(event.key===\'Enter\')sendGroupMsg2(\''+gid+'\')"><button onclick="sendGroupMsg2(\''+gid+'\')">📤</button></div></div>';
+                bindGroupChat(gid);
+            });
+        }
+        
+        function renderPrivateChat(app,phone){
+            db.ref('users/'+btoa(phone)).once('value').then(snap=>{
+                const u=snap.val();if(!u) return goBack();
+                const chatId=[profile.phone,phone].sort().join('_');
+                app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="avatar-sm">'+(u.avatar?'<img src="'+u.avatar+'">':'👤')+'</div><div class="header-info"><div class="name">'+u.name+'</div><div class="status">'+u.phone+'</div></div></div><div class="messages" id="messages"></div><div class="input-bar"><input type="text" id="privInput" placeholder="رسالة..." onkeypress="if(event.key===\'Enter\')sendPrivMsg(\''+chatId+'\',\''+phone+'\')"><button onclick="sendPrivMsg(\''+chatId+'\',\''+phone+'\')">📤</button></div></div>';
+                bindPrivateChat(chatId);
+            });
+        }
+        
+        function renderProfile(app){
+            app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="header-info"><div class="name">👤 الملف الشخصي</div></div></div><div class="profile-page"><div class="avatar-sm" onclick="document.getElementById(\'fProf\').click()">'+(profile.avatar?'<img src="'+profile.avatar+'">':'📷')+'</div><input type="file" id="fProf" accept="image/*" onchange="prevProf(this)"><input id="eName" value="'+profile.name+'"><input id="ePhone" value="'+profile.phone+'"><input id="eUser" value="'+profile.username+'"><button class="btn btn-blue" style="width:100%;margin-top:10px;" onclick="saveProfile()">💾 حفظ</button></div></div>';
+        }
+        
+        function renderCreate(app,type){
+            const title=type==='group'?'👥 مجموعة جديدة':'📢 قناة جديدة';
+            app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="header-info"><div class="name">'+title+'</div></div></div><div class="create-page"><div class="avatar-sm" id="avCreate" onclick="document.getElementById(\'fCreate\').click()">📷</div><input type="file" id="fCreate" accept="image/*" onchange="prevCreate(this)"><input id="inCreateName" placeholder="الاسم"><button class="btn btn-blue" style="width:100%;" onclick="doCreate(\''+type+'\')">✅ إنشاء</button></div></div>';
+        }
+        
+        // ====== BIND EVENTS ======
         function bindEvents(){
             if(cur==='bot'){
                 if(curNum){el('messages').innerHTML='<div class="msg msg-in">📱 <span class="number">'+curNum+'</span></div>';el('btnArea').innerHTML='<div class="btn-row"><button class="btn btn-green" onclick="copyNum(\''+curNum+'\')">📋 نسخ</button><button class="btn btn-blue" onclick="loadServices()">🌍 دولة</button></div><div class="btn-row"><button class="btn btn-blue" onclick="getNumber(\''+cCty+'\',\'\')">🔄 تغيير</button><button class="btn btn-gold" onclick="checkCode(\''+curNum+'\')">📩 كود</button></div>';}else showStart();}
             if(cur==='group'){el('messages').innerHTML='';db.ref('group_msgs').off();db.ref('group_msgs').limitToLast(50).on('child_added',s=>{if(cur==='group')showGroupMsg(s.val())});if(otpTimer)clearInterval(otpTimer);otpTimer=setInterval(fetchOTP,2000);fetchOTP();}
         }
         
+        function bindGroupChat(gid){
+            el('messages').innerHTML='';
+            db.ref('groups/'+gid+'/messages').off();
+            db.ref('groups/'+gid+'/messages').limitToLast(50).on('child_added',s=>showGroupMsg2(s.val(),gid));
+        }
+        
+        function bindPrivateChat(chatId){
+            el('messages').innerHTML='';
+            db.ref('chats/'+chatId).off();
+            db.ref('chats/'+chatId).limitToLast(50).on('child_added',s=>{
+                const m=s.val();
+                el('messages').innerHTML+='<div class="msg '+(m.from===profile.phone?'msg-out':'msg-in')+'">'+(m.img?'<img src="'+m.img+'" style="max-width:100%;border-radius:10px;">':'')+(m.text||'')+'<div class="time">'+m.time+'</div></div>';
+                el('messages').scrollTop=el('messages').scrollHeight;
+            });
+        }
+        
         function showGroupMsg(m){
             if(cur!=='group')return;
             const t=m.time||new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
-            const isMe=m.phone===profile.phone;
             if(m.type==='otp'){
                 const cn=cNames[m.country]||m.country||'';
                 el('messages').innerHTML+='<div class="msg msg-otp">📩 '+m.service+' <span style="color:#10b981;font-size:11px;">'+cn+'</span><br>📱 <span class="number">'+m.number+'</span><br>🔑 <span class="code">'+m.code+'</span><div class="time">'+t+'</div><button class="btn btn-gold" style="margin-top:6px;width:100%;padding:8px;font-size:13px;" onclick="copyCode(\''+m.code+'\')">📋 نسخ الكود</button></div>';
             }else{
-                el('messages').innerHTML+='<div class="msg '+(isMe?'msg-out':'msg-in')+'"><div class="sender" onclick="showContact(\''+m.phone+'\',\''+m.sender+'\')">👤 '+m.sender+'</div>'+m.text+'<div class="time">'+t+'</div></div>';
+                el('messages').innerHTML+='<div class="msg '+(m.phone===profile.phone?'msg-out':'msg-in')+'"><div class="sender" onclick="contactClick(\''+m.phone+'\',\''+m.sender+'\')">👤 '+m.sender+'</div>'+(m.img?'<img src="'+m.img+'" style="max-width:100%;border-radius:10px;">':'')+m.text+'<div class="time">'+t+'</div></div>';
             }
             el('messages').scrollTop=el('messages').scrollHeight;
         }
         
-        function showContact(phone,name){if(confirm('👤 '+name+'\n📱 '+phone+'\n\nفتح واتساب؟'))window.open('https://wa.me/'+phone.replace(/\D/g,''),'_blank');}
+        function showGroupMsg2(m,gid){
+            const t=m.time||'';
+            el('messages').innerHTML+='<div class="msg '+(m.from===profile.phone?'msg-out':'msg-in')+'"><div class="sender" onclick="contactClick(\''+m.from+'\',\''+m.sender+'\')">👤 '+m.sender+'</div>'+(m.img?'<img src="'+m.img+'" style="max-width:100%;border-radius:10px;">':'')+(m.text||'')+'<div class="time">'+t+'</div></div>';
+            el('messages').scrollTop=el('messages').scrollHeight;
+        }
+        
+        function groupSettings(gid){
+            const opt=prompt('⚙️ إعدادات المجموعة:\n1 - إضافة عضو\n2 - حذف المجموعة\n\nاكتب الرقم:');
+            if(opt==='1'){
+                const q=prompt('أدخل رقم الهاتف أو اليوزر:');
+                if(q) db.ref('users').orderByChild(q.includes('@')?'username':'phone').equalTo(q).once('value').then(snap=>{
+                    if(snap.val()){
+                        const u=Object.values(snap.val())[0];
+                        db.ref('groups/'+gid+'/members').once('value').then(s=>{
+                            const members=s.val()||[];
+                            if(!members.includes(u.phone)){
+                                members.push(u.phone);
+                                db.ref('groups/'+gid+'/members').set(members);
+                                alert('✅ تمت الإضافة!');
+                            }else alert('العضو موجود بالفعل');
+                        });
+                    }else alert('❌ لم يتم العثور');
+                });
+            }else if(opt==='2'){
+                if(confirm('متأكد من حذف المجموعة؟')){db.ref('groups/'+gid).remove();goBack();}
+            }
+        }
+        
+        function contactClick(phone,name){
+            if(phone===profile.phone) return;
+            if(confirm('👤 '+name+'\n📱 '+phone+'\n\n💬 فتح محادثة خاصة؟')) openScreen('private_'+phone);
+        }
+        
+        // ====== ACTIONS ======
+        function prevSetup(i){const f=i.files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;const a=el('avSetup');if(a)a.innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
+        function prevProf(i){const f=i.files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;};r.readAsDataURL(f);}}
+        function prevCreate(i){window._createAvatar=i.files[0];}
+        function saveSetup(){profile.phone=el('inPhone').value.trim();profile.name=el('inName').value.trim()||'مستخدم';profile.username=el('inUser').value.trim();if(!profile.phone){alert('من فضلك أدخل رقم الهاتف');return;}save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
+        function saveProfile(){profile.name=el('eName').value.trim()||profile.name;profile.phone=el('ePhone').value.trim()||profile.phone;profile.username=el('eUser').value.trim();save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
+        function doCreate(type){
+            const name=el('inCreateName').value.trim();if(!name){alert('أدخل اسماً');return;}
+            const f=window._createAvatar;
+            const saveGroup=(avatarUrl)=>{
+                const data={name,createdBy:profile.phone,members:type==='group'?[profile.phone]:[],avatar:avatarUrl||'',type};
+                const ref=type==='group'?db.ref('groups').push(data):db.ref('channels').push(data);
+                alert('✅ تم!');goBack();
+            };
+            if(f){const r=new FileReader();r.onload=function(e){saveGroup(e.target.result);};r.readAsDataURL(f);}else{saveGroup('');}
+        }
+        
+        function toggleFab(){showFabMenu=!showFabMenu;const m=document.getElementById('fabMenu');if(m)m.style.display=showFabMenu?'flex':'none';}
+        function newChat(){const q=prompt('🔍 رقم الهاتف أو اليوزر:');if(q) search(q);}
+        
+        function search(q){
+            if(!q)return;
+            db.ref('users').orderByChild('username').equalTo(q).once('value').then(s=>{
+                if(s.val()){const u=Object.values(s.val())[0];openContact(u);}
+                else{
+                    db.ref('users/'+btoa(q)).once('value').then(s2=>{
+                        if(s2.val()) openContact(s2.val());
+                        else alert('❌ لم يتم العثور');
+                    });
+                }
+            });
+        }
+        function openContact(u){if(confirm('👤 '+u.name+'\n📱 '+u.phone+'\n\n💬 فتح محادثة؟'))openScreen('private_'+u.phone);}
+        
         function copyCode(c){navigator.clipboard.writeText(c);}
         function copyNum(n){navigator.clipboard.writeText(n);}
         function openScreen(s){cur=s;save();if(otpTimer)clearInterval(otpTimer);render();}
         function openChat(t){cur=t;save();render();}
+        function openGroupChat(gid){cur='group_'+gid;save();render();}
         function goBack(){cur='main';save();if(otpTimer)clearInterval(otpTimer);render();}
         
         async function fetchOTP(){try{const d=await api('/api/otp?count=15');if(Array.isArray(d))d.forEach(i=>{const k=i[1]+'-'+i[2];if(!known.has(k)){known.add(k);db.ref('group_msgs').push({type:'otp',service:i[0],number:i[1],code:i[2].match(/\d{4,8}/)?.[0]||i[2],country:i[4]||'',time:new Date().toLocaleTimeString('ar-EG')});}});}catch(e){}}
+        
         function sendGroupMsg(){const inp=el('groupInput'),tx=inp.value.trim();if(!tx||!profile.name)return;db.ref('group_msgs').push({type:'user',text:tx,sender:profile.name,phone:profile.phone,avatar:profile.avatar,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
+        function sendGroupImg(){const f=el('imgInput').files[0];if(!f)return;const r=new FileReader();r.onload=function(e){db.ref('group_msgs').push({type:'user',text:'',img:e.target.result,sender:profile.name,phone:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});};r.readAsDataURL(f);}
         
-        function showFab(){
-            const opt=prompt('➕ ماذا تريد أن تنشئ؟\n\n1 - 👥 مجموعة\n2 - 📢 قناة\n3 - 💬 محادثة جديدة\n\nاكتب الرقم:');
-            if(opt==='1'){const n=prompt('اسم المجموعة:');if(n)alert('✅ تم إنشاء: '+n);}
-            else if(opt==='2'){const n=prompt('اسم القناة:');if(n)alert('✅ تم إنشاء: '+n);}
-            else if(opt==='3'){const p=prompt('رقم الهاتف (مع كود الدولة):');if(p){db.ref('users/'+btoa(p)).once('value').then(s=>{if(s.val()){if(confirm('👤 '+s.val().name+'\n📱 '+p+'\n\nفتح واتساب؟'))window.open('https://wa.me/'+p.replace(/\D/g,''),'_blank');}else{alert('❌ المستخدم غير مسجل');}});}}
-        }
-        
-        function search(q){if(!q)return;db.ref('users').orderByChild('username').equalTo(q).once('value').then(s=>{if(s.val()){const u=Object.values(s.val())[0];if(confirm('👤 '+u.name+'\n📱 '+u.phone+'\n\nفتح واتساب؟'))window.open('https://wa.me/'+u.phone.replace(/\D/g,''),'_blank');}else{alert('❌ لم يتم العثور');}});}
+        function sendGroupMsg2(gid){const inp=el('groupInput2'),tx=inp.value.trim();if(!tx)return;db.ref('groups/'+gid+'/messages').push({text:tx,sender:profile.name,from:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
+        function sendGroupImg2(gid){const f=el('imgInput').files[0];if(!f)return;const r=new FileReader();r.onload=function(e){db.ref('groups/'+gid+'/messages').push({text:'',img:e.target.result,sender:profile.name,from:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});};r.readAsDataURL(f);}
+        function sendPrivMsg(chatId,phone){const inp=el('privInput'),tx=inp.value.trim();if(!tx)return;db.ref('chats/'+chatId).push({text:tx,from:profile.phone,to:phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
         
         function showStart(){el('messages').innerHTML='<div class="msg msg-in">👋 أهلًا بك في NUMBER BOT!</div>';el('btnArea').innerHTML='<button class="btn btn-blue" style="width:100%;" onclick="loadServices()">▶️ START</button>';}
         async function loadServices(){el('btnArea').innerHTML='';try{const d=await api('/api/services');if(d.success){let btns='';d.services.slice(0,8).forEach((s,i)=>{if(i%2===0)btns+='<div class="btn-row">';btns+='<button class="btn btn-blue" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';if(i%2===1||i===d.services.length-1)btns+='</div>';});el('btnArea').innerHTML=btns;}}catch(e){}}
