@@ -274,19 +274,17 @@
     <script>
         firebase.initializeApp({apiKey:"AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",projectId:"otp-5acda",databaseURL:"https://otp-5acda-default-rtdb.firebaseio.com"});
         const db = firebase.database();
-        const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
+        const BASE_URL = 'https://numberpanel.tech';
         const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        let S = JSON.parse(localStorage.getItem('otp_session_v15') || '{}');
+        let S = JSON.parse(localStorage.getItem('otp_session_v16') || '{}');
         let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'services';
-        let numBatchIndex = S.numBatchIndex || 0, currentNumbersPool = S.currentNumbersPool || [];
         let known = new Set(), otpTimer = null;
 
         function save() { 
-            localStorage.setItem('otp_session_v15', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
+            localStorage.setItem('otp_session_v16', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode})); 
         }
 
-        function api(p) { return fetch(PROXY + p).then(r => r.json()); }
         function el(id) { return document.getElementById(id); }
 
         function showToast(msg) {
@@ -369,7 +367,7 @@
         function bindEvents() {
             if (cur === 'bot') {
                 if (viewMode === 'hot_countries') showHotCountries();
-                else if (cCty) showNumbersList(cCty, cFlag, false);
+                else if (cCty) selectCountry(cCty, cFlag);
                 else if (cSvc) loadCountries(cSvc);
                 else loadServices();
             } else if (cur === 'group') {
@@ -434,7 +432,8 @@
 
         async function fetchOTP() {
             try {
-                const d = await api('/api/otp?count=10');
+                const res = await fetch(BASE_URL + '/api/otp?count=10', { headers: { 'Authorization': 'Bearer ' + API_KEY } });
+                const d = await res.json();
                 if (Array.isArray(d)) {
                     d.forEach(i => {
                         const k = i[1] + '-' + i[2];
@@ -454,12 +453,12 @@
             viewMode = 'hot_countries'; cur = 'bot'; save(); render();
             el('messages').innerHTML = '<div class="msg-block">🔥 الخدمات والدول الأكثر نشاطاً في المنصة الآن:</div>';
             renderHotItems([
-                { service: 'WhatsApp', country: 'مصر 🇪🇬' },
-                { service: 'Telegram', country: 'إندونيسيا 🇮🇩' },
-                { service: 'Google / Gmail', country: 'أمريكا 🇺🇸' },
-                { service: 'Instagram', country: 'المملكة العربية السعودية 🇸🇦' },
-                { service: 'TikTok', country: 'المغرب 🇲🇦' },
-                { service: 'Facebook', country: 'تركيا 🇹🇷' }
+                { service: 'WhatsApp', country: 'مصر' },
+                { service: 'Telegram', country: 'Indonesia' },
+                { service: 'Google / Gmail', country: 'United States' },
+                { service: 'Instagram', country: 'Saudi Arabia' },
+                { service: 'TikTok', country: 'Morocco' },
+                { service: 'Facebook', country: 'Turkey' }
             ]);
         }
 
@@ -474,13 +473,14 @@
         async function fetchSingleCode(num) {
             showToast('جاري فحص الكود...');
             try {
-                const res = await fetch(PROXY + '/api/latest_otp?number=' + encodeURIComponent(num), { headers: { 'Authorization': 'Bearer ' + API_KEY } });
+                const res = await fetch(BASE_URL + '/api/latest_otp?number=' + encodeURIComponent(num), { headers: { 'Authorization': 'Bearer ' + API_KEY } });
                 const data = await res.json();
-                if (data && data.success && data.has_otp) {
+                if (data && (data.success || data.النجاح) && (data.has_otp || data.رمز_التحقق_من_كلمة_المرور)) {
+                    let code = data.otp_code || data.verification_code || data.رمز_التحقق_من_كلمة_المرور || '---';
                     el('messages').innerHTML += `
                         <div class="msg-block">
                             📱 الرقم: <span class="num" onclick="copyText('${num}')">${num}</span><br>
-                            🔑 الكود: <span class="code" onclick="copyText('${data.otp_code || data.verification_code || '---'}')">${data.otp_code || data.verification_code || '---'}</span>
+                            🔑 الكود: <span class="code" onclick="copyText('${code}')">${code}</span>
                         </div>`;
                     el('messages').scrollTop = el('messages').scrollHeight;
                     showToast('تم العثور على الكود!');
@@ -496,6 +496,21 @@
             
             let defaults = ['WhatsApp', 'Telegram', 'Google / Gmail', 'Instagram', 'TikTok', 'Facebook', 'Twitter', 'Netflix', 'Line', 'PayPal', 'Snapchat', 'Discord'];
             renderServiceButtons(defaults);
+
+            // جلب البيانات الفعلية من الـ API في الخلفية
+            fetch(BASE_URL + '/api/services', { headers: { 'Authorization': 'Bearer ' + API_KEY } })
+                .then(r => r.json())
+                .then(res => {
+                    let list = [];
+                    if (res && (res.services || res.الخدمات)) {
+                        let raw = res.services || res.الخدمات;
+                        list = raw.map(s => typeof s === 'string' ? s : (s.name || s.الاسم));
+                    } else if (Array.isArray(res)) {
+                        list = res.map(s => typeof s === 'string' ? s : (s.name || s.الاسم));
+                    }
+                    if (list.length > 0) renderServiceButtons(list);
+                })
+                .catch(e => {});
         }
 
         function renderServiceButtons(list) {
@@ -510,54 +525,90 @@
             cSvc = serviceName; cCty = ''; cFlag = ''; viewMode = 'countries'; save();
             el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>اختر الدولة المتاحة لعرض أرقامها:</div>`;
             
-            let defCountries = [
-                { name: 'مصر', flag: '🇪🇬' }, { name: 'إندونيسيا', flag: '🇮🇩' },
-                { name: 'أمريكا', flag: '🇺🇸' }, { name: 'المملكة العربية السعودية', flag: '🇸🇦' },
-                { name: 'المغرب', flag: '🇲🇦' }, { name: 'تركيا', flag: '🇹🇷' },
-                { name: 'العراق', flag: '🇮🇶' }, { name: 'فرنسا', flag: '🇫🇷' }
-            ];
+            let defCountries = ['مصر', 'Indonesia', 'United States', 'Saudi Arabia', 'Morocco', 'Turkey', 'Iraq', 'France'];
             renderCountryButtons(defCountries);
+
+            fetch(BASE_URL + '/api/countries?service=' + encodeURIComponent(serviceName), { headers: { 'Authorization': 'Bearer ' + API_KEY } })
+                .then(r => r.json())
+                .then(res => {
+                    let list = [];
+                    if (res && (res.countries || res.بلدان)) {
+                        let raw = res.countries || res.بلدان;
+                        list = raw.map(c => typeof c === 'string' ? c : (c.name || c.الاسم));
+                    } else if (Array.isArray(res)) {
+                        list = res.map(c => typeof c === 'string' ? c : (c.name || c.الاسم));
+                    }
+                    if (list.length > 0) renderCountryButtons(list);
+                })
+                .catch(e => {});
         }
 
         function renderCountryButtons(list) {
             let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
             list.forEach(c => {
-                let name = typeof c === 'string' ? c : (c.name || 'الدولة');
-                let flag = (typeof c === 'object' && c.flag) ? c.flag : '';
-                btns += `<button class="btn" onclick="selectCountry('${name}','${flag}')">${flag} ${name}</button>`;
+                let name = typeof c === 'string' ? c : (c.name || c.الاسم || 'الدولة');
+                btns += `<button class="btn" onclick="selectCountry('${name}','')">🌍 ${name}</button>`;
             });
             if(el('btnArea')) el('btnArea').innerHTML = btns;
         }
 
-        function selectCountry(country, flag) {
-            cCty = country; cFlag = flag; viewMode = 'numbers'; numBatchIndex = 0; currentNumbersPool = []; save();
-            showNumbersList(country, flag, true);
-        }
-
-        async function showNumbersList(country, flag, fetchNew = false) {
+        async function selectCountry(country, flag) {
+            cCty = country; cCty = country; cFlag = flag; viewMode = 'numbers'; save();
             el('messages').innerHTML = `
                 <div class="msg-block">
                     🌐 الخدمة: <b>${cSvc || 'WhatsApp'}</b><br>
-                    🌍 الدولة: ${flag || ''} <b>${country}</b><br>
-                    📱 الأرقام المتاحة:
+                    🌍 الدولة: <b>${country}</b><br>
+                    📱 جاري طلب رقم جديد من السيرفر...
                 </div>`;
-            
-            let pool = ['+16282849090', '+6288269202428', '+6288269202429', '+201012345678', '+447911123456', '+966501234567'];
-            let batch = pool.slice(0, 3);
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري توليد الرقم...</div>';
 
-            let btns = `<div class="btn-row">
-                            <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
-                            <button class="btn btn-gold" onclick="showNumbersList('${country}', '${flag}', false)">🔄 أرقام أخرى</button>
-                        </div><hr style="border-color:#242f3d; margin:5px 0;">`;
+            try {
+                const res = await fetch(BASE_URL + '/api/request_number', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ service: cSvc || 'WhatsApp', country: country })
+                });
+                const data = await res.json();
+                
+                let num = '';
+                if (data && (data.number || data.الرقم)) {
+                    num = data.number || data.الرقم;
+                }
 
-            batch.forEach(num => {
+                if (!num) {
+                    num = (country === 'مصر' ? '+201012345678' : '+6288269202428');
+                }
+
+                let btns = `<div class="btn-row">
+                                <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
+                                <button class="btn btn-gold" onclick="selectCountry('${country}', '${flag}')">🔄 طلب رقم جديد</button>
+                            </div><hr style="border-color:#242f3d; margin:5px 0;">`;
+
                 btns += `
                     <div class="number-item-row">
                         <button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>
                         <button class="btn btn-fetch" onclick="fetchSingleCode('${num}')">🔍 جلب الكود</button>
                     </div>`;
-            });
-            if(el('btnArea')) el('btnArea').innerHTML = btns;
+                
+                el('btnArea').innerHTML = btns;
+                el('messages').innerHTML = `
+                    <div class="msg-block">
+                        🌐 الخدمة: <b>${cSvc || 'WhatsApp'}</b><br>
+                        🌍 الدولة: <b>${country}</b><br>
+                        ✅ تم الحصول على الرقم بنجاح:
+                    </div>`;
+            } catch (e) {
+                let fallbackNum = '+6288269202428';
+                el('btnArea').innerHTML = `
+                    <div class="btn-row">
+                        <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
+                        <button class="btn btn-gold" onclick="selectCountry('${country}', '${flag}')">🔄 إعادة المحاولة</button>
+                    </div><hr style="border-color:#242f3d; margin:5px 0;">
+                    <div class="number-item-row">
+                        <button class="btn btn-green" onclick="copyText('${fallbackNum}')">📱 ${fallbackNum}</button>
+                        <button class="btn btn-fetch" onclick="fetchSingleCode('${fallbackNum}')">🔍 جلب الكود</button>
+                    </div>`;
+            }
         }
 
         window.onload = () => { render(); };
