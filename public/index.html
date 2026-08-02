@@ -3,594 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Live - Telegram</title>
+    <title>OTP Live</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: #0e1621;
-            color: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            touch-action: manipulation;
-        }
-
-        .telegram-container {
-            width: 100%;
-            max-width: 450px;
-            background-color: #17212b;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
-            transform: translateZ(0);
-            will-change: transform;
-        }
-
-        .screen {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            background-color: #0e1621;
-            transform: translateZ(0);
-            will-change: transform;
-        }
-
-        /* Header */
-        .tg-header {
-            background-color: #242f3d;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid #111822;
-            min-height: 60px;
-        }
-
-        .tg-header-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .tg-back-arrow {
-            color: #ffffff;
-            font-size: 26px;
-            cursor: pointer;
-            padding: 4px 10px;
-        }
-
-        .tg-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background-color: #2b5278;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: #fff;
-            flex-shrink: 0;
-        }
-
-        .tg-title-info h2 {
-            font-size: 17px;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .tg-title-info p {
-            font-size: 13px;
-            color: #7d8b99;
-        }
-
-        /* Main List */
-        .main-list {
-            flex: 1;
-            overflow-y: auto;
-            background-color: #0e1621;
-            -webkit-overflow-scrolling: touch;
-            transform: translateZ(0);
-        }
-
-        .chat-row {
-            display: flex;
-            align-items: center;
-            padding: 14px 18px;
-            gap: 16px;
-            cursor: pointer;
-            border-bottom: 1px solid rgba(255,255,255,0.02);
-        }
-
-        .chat-row:active { background-color: rgba(255,255,255,0.05); }
-        .chat-row .tg-avatar { width: 52px; height: 52px; font-size: 22px; }
-        .chat-row .info { flex: 1; min-width: 0; }
-        .chat-row .name { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 5px; }
-        .chat-row .preview { font-size: 14px; color: #7d8b99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Chat Body */
-        .chat-body {
-            flex: 1;
-            padding: 14px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background-color: #0e1621;
-            -webkit-overflow-scrolling: touch;
-            transform: translateZ(0);
-        }
-
-        .msg-block {
-            background-color: #182533;
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 15px;
-            line-height: 1.6;
-            color: #ffffff;
-        }
-
-        .msg-user { color: #64b5f6; font-weight: 600; }
-        .num { color: #60a5fa; font-weight: 600; font-size: 17px; cursor: pointer; }
-        .code { background-color: #f59e0b; color: #000; padding: 4px 12px; border-radius: 6px; font-weight: 700; display: inline-block; margin: 6px 0; font-size: 17px; cursor: pointer; }
-        .time-tag { font-size: 12px; color: #7d8b99; text-align: left; margin-top: 6px; }
-
-        /* Buttons */
-        .btn {
-            border: none;
-            border-radius: 10px;
-            padding: 13px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #fff;
-            cursor: pointer;
-            text-align: center;
-            background-color: #2b5278;
-            width: 100%;
-            margin-bottom: 8px;
-        }
-
-        .btn:active { opacity: 0.7; transform: scale(0.98); }
-        .btn-green { background-color: #2e8b57; }
-        .btn-gold { background-color: #f59e0b; color: #000; }
-        .btn-row { display: flex; gap: 10px; }
-        .btn-row .btn { flex: 1; margin-bottom: 0; }
-
-        .number-item-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-        .number-item-row .btn {
-            margin-bottom: 0;
-            flex: 2;
-            font-size: 15px;
-        }
-        .number-item-row .btn-fetch {
-            flex: 1;
-            background-color: #2675d3;
-            font-size: 14px;
-        }
-
-        .btn-area {
-            padding: 12px;
-            border-top: 1px solid #111822;
-            background-color: #17212b;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 55vh; 
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* Chat Input Bar */
-        .chat-input-bar {
-            display: flex;
-            padding: 10px 12px;
-            background-color: #17212b;
-            border-top: 1px solid #111822;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .chat-input-bar input {
-            flex: 1;
-            background-color: #0e1621;
-            border: 1px solid #2b5278;
-            border-radius: 22px;
-            padding: 10px 16px;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-        }
-
-        .chat-input-bar button {
-            background-color: #5288c1;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 42px;
-            height: 42px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        /* Toast */
-        #toast {
-            visibility: hidden;
-            min-width: 160px;
-            background-color: #f59e0b;
-            color: #000;
-            text-align: center;
-            border-radius: 8px;
-            padding: 10px;
-            position: absolute;
-            z-index: 99;
-            left: 50%;
-            bottom: 75px;
-            transform: translateX(-50%);
-            font-size: 15px;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            transition: opacity 0.15s;
-            opacity: 0;
-        }
-        #toast.show { visibility: visible; opacity: 1; }
-
-        /* Bottom Nav */
-        .bottom-nav { background-color: #17212b; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #111822; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #7d8b99; font-size: 13px; font-weight: 500; cursor: pointer; gap: 4px; background: none; border: none; flex: 1; }
-        .nav-item.active { color: #5288c1; }
-        .nav-icon { font-size: 22px; }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif}
+        body{background:#0e1621;color:#f5f5f5;display:flex;justify-content:center;align-items:center;min-height:100vh}
+        .app{width:100%;max-width:420px;background:#17212b;height:100vh;display:flex;flex-direction:column;box-shadow:0 0 15px rgba(0,0,0,0.5);overflow:hidden}
+        .h{background:#242f3d;padding:10px 15px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #111822;min-height:55px}
+        .h .back{color:#fff;font-size:20px;cursor:pointer}
+        .h .av{width:40px;height:40px;border-radius:50%;background:#2b5278;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0;border:1px solid #4e729a}
+        .h .info{flex:1}
+        .h .info .n{font-size:15px;color:#fff;font-weight:600}
+        .h .info .s{font-size:12px;color:#7d8b99}
+        .list{flex:1;overflow-y:auto;background:#0e1621}
+        .row{display:flex;align-items:center;padding:12px 15px;gap:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02)}
+        .row:active{background:rgba(255,255,255,0.03)}
+        .row .av{width:50px;height:50px;font-size:20px}
+        .row .info{flex:1}
+        .row .n{font-size:14px;font-weight:500;color:#fff;margin-bottom:4px}
+        .row .p{font-size:13px;color:#7d8b99;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .msgs{flex:1;padding:15px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;background:#0e1621}
+        .msg{background:#182533;border-radius:12px;padding:12px;font-size:13px;line-height:1.6;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.2)}
+        .msg .user{color:#64b5f6;font-weight:500}
+        .msg .num{color:#60a5fa;font-weight:600;font-size:16px;cursor:pointer}
+        .msg .code{background:#f59e0b;color:#000;padding:4px 12px;border-radius:5px;font-weight:600;display:inline-block;margin:6px 0;font-size:16px;cursor:pointer}
+        .msg .time{font-size:10px;color:#7d8b99;margin-top:6px}
+        .ba{padding:10px;border-top:1px solid #111822;background:#17212b;display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto}
+        .btn{border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;color:#fff;cursor:pointer;text-align:center;background:#2b5278;box-shadow:0 1px 3px rgba(0,0,0,0.3);width:100%;margin-bottom:8px}
+        .btn:active{opacity:0.8}
+        .bgreen{background:#2e8b57}
+        .bgold{background:#f59e0b;color:#000;font-weight:600}
+        .brow{display:flex;gap:8px}
+        .brow .btn{flex:1;margin-bottom:0}
+        .footer{background:#17212b;padding:12px;text-align:center;border-top:1px solid #111822;color:#7d8b99;font-size:13px}
+        .nav{display:flex;justify-content:space-around;padding:8px 0;background:#17212b;border-top:1px solid #111822}
+        .ni{display:flex;flex-direction:column;align-items:center;color:#7d8b99;font-size:11px;cursor:pointer;gap:4px;background:none;border:none;flex:1}
+        .ni.ac{color:#5288c1}
+        .nic{font-size:20px}
+        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
     </style>
 </head>
 <body>
-    <div class="telegram-container" id="app">
-        <div id="toast">تم النسخ!</div>
-    </div>
-
+    <div class="app" id="app"></div>
     <script>
         firebase.initializeApp({apiKey:"AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",projectId:"otp-5acda",databaseURL:"https://otp-5acda-default-rtdb.firebaseio.com"});
-        const db = firebase.database();
-        const BASE_URL = 'https://numberpanel.tech';
-        const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
+        const db=firebase.database();
+        const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
         
-        let S = JSON.parse(localStorage.getItem('otp_session_v18') || '{}');
-        let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', viewMode = S.viewMode || 'services';
-        let known = new Set(), otpTimer = null;
-
-        function save() { 
-            localStorage.setItem('otp_session_v18', JSON.stringify({cur, cSvc, cCty, viewMode})); 
+        let S=JSON.parse(localStorage.getItem('otp_fix2')||'{}');
+        let cur=S.cur||'main',cSvc=S.cSvc||'',cCty=S.cCty||'',cFlag=S.cFlag||'';
+        let known=new Set(),otpTimer=null;
+        const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
+        
+        function save(){S={cur,cSvc,cCty,cFlag};localStorage.setItem('otp_fix2',JSON.stringify(S));}
+        function api(p){return fetch(PROXY+p).then(r=>r.json());}
+        function el(id){return document.getElementById(id);}
+        function copyText(t){navigator.clipboard.writeText(t);}
+        
+        function render(){
+            const app=el('app');app.innerHTML='';
+            if(cur==='main'){app.innerHTML=mainHTML();}
+            else if(cur==='bot'||cur==='group'){app.innerHTML=chatHTML(cur);bindEvents();}
         }
-
-        function el(id) { return document.getElementById(id); }
-
-        function showToast(msg) {
-            let t = el('toast');
-            if(!t) {
-                t = document.createElement('div');
-                t.id = 'toast';
-                document.querySelector('.telegram-container').appendChild(t);
-            }
-            t.innerText = msg || "تم النسخ!";
-            t.className = "show";
-            setTimeout(() => { t.className = ""; }, 1400);
+        
+        function mainHTML(){
+            return '<div class="screen"><div class="h"><div class="av">✈️</div><div class="info"><div class="n">OTP Live</div><div class="s">Number Panel</div></div></div><div class="list"><div class="row" onclick="openChat(\'bot\')"><div class="av" style="background:#2b5278;">🤖</div><div class="info"><div class="n">🤖 NUMBER BOT</div><div class="p">بوت الأرقام والخدمات</div></div></div><div class="row" onclick="openChat(\'group\')"><div class="av" style="background:#2e8b57;">👥</div><div class="info"><div class="n">👥 ALL TECH OTP</div><div class="p">بث مباشر لأكواد التفعيل</div></div></div></div><div class="nav"><button class="ni ac" onclick="openScreen(\'main\')"><span class="nic">💬</span>محادثات</button></div></div>';
         }
-
-        function render() {
-            requestAnimationFrame(() => {
-                const app = el('app');
-                let toastHTML = '<div id="toast">تم النسخ!</div>';
-
-                if (cur === 'main') {
-                    app.innerHTML = toastHTML + `
-                        <div class="screen">
-                            <div class="tg-header">
-                                <div class="tg-header-left">
-                                    <div class="tg-avatar">✈️</div>
-                                    <div class="tg-title-info"><h2>Telegram</h2><p>Number Panel Live</p></div>
-                                </div>
-                            </div>
-                            <div class="main-list">
-                                <div class="chat-row" onclick="openChat('bot')">
-                                    <div class="tg-avatar" style="background:#2b5278;">🤖</div>
-                                    <div class="info">
-                                        <div class="name">🤖 NUMBER BOT</div>
-                                        <div class="preview">بوت جلب الخدمات والدول والأرقام من المنصة مباشرة</div>
-                                    </div>
-                                </div>
-                                <div class="chat-row" onclick="openChat('group')">
-                                    <div class="tg-avatar" style="background:#2e8b57;">👥</div>
-                                    <div class="info">
-                                        <div class="name">👥 ALL TECH OTP</div>
-                                        <div class="preview">بث مباشر ومراسلة جماعية لأكواد التفعيل</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bottom-nav">
-                                <button class="nav-item active" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
-                            </div>
-                        </div>`;
-                } else {
-                    app.innerHTML = toastHTML + `
-                        <div class="screen">
-                            <div class="tg-header">
-                                <div class="tg-header-left">
-                                    <div class="tg-back-arrow" onclick="goHomeDirect()">←</div>
-                                    <div class="tg-avatar">${cur === 'bot' ? '🤖' : '👥'}</div>
-                                    <div class="tg-title-info">
-                                        <h2>${cur === 'bot' ? '🤖 NUMBER BOT' : '👥 ALL TECH OTP'}</h2>
-                                        <p>${cur === 'bot' ? 'متصل الآن' : '٨٣٤٣ عضواً، ١٥٣١ متصلاً'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chat-body" id="messages"></div>
-                            ${cur === 'bot' ? '<div class="btn-area" id="btnArea"></div>' : `
-                                <div class="chat-input-bar">
-                                    <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." onkeypress="if(event.key==='Enter') sendGroupMsg()">
-                                    <button onclick="sendGroupMsg()">📤</button>
-                                </div>
-                            `}
-                            <div class="bottom-nav">
-                                <button class="nav-item active" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
-                            </div>
-                        </div>`;
-                }
-                bindEvents();
-            });
+        
+        function chatHTML(type){
+            const b=type==='bot';
+            return '<div class="screen"><div class="h"><div class="back" onclick="goBack()">←</div><div class="av">'+(b?'🤖':'👥')+'</div><div class="info"><div class="n">'+(b?'🤖 NUMBER BOT':'👥 ALL TECH OTP')+'</div><div class="s">'+(b?'online':'live')+'</div></div></div><div class="msgs" id="messages"></div>'+(b?'<div class="ba" id="btnArea"></div>':'<div class="footer">إرسال الرسائل غير مسموح به</div>')+'</div>';
         }
-
-        function bindEvents() {
-            if (cur === 'bot') {
-                if (cCty) selectCountry(cCty);
-                else if (cSvc) loadCountries(cSvc);
-                else loadServices();
-            } else if (cur === 'group') {
-                el('messages').innerHTML = '<div class="msg-block">📡 نظام البث المباشر لأكواد التفعيل.</div>';
-                db.ref('messages').off();
-                db.ref('messages').limitToLast(20).on('child_added', s => { if (cur === 'group') showGroupMessage(s.val()); });
-                if (otpTimer) clearInterval(otpTimer);
-                otpTimer = setInterval(fetchOTP, 3000);
+        
+        function bindEvents(){
+            if(cur==='bot'){
+                if(cCty&&cFlag){showNumbers(cCty,cFlag);}
+                else if(cSvc){loadCountries(cSvc);}
+                else{showStart();}
+            }else if(cur==='group'){
+                el('messages').innerHTML='<div class="msg">📡 numberpanel.tech - Live OTP</div>';
+                db.ref('messages').off();db.ref('messages').limitToLast(50).on('child_added',s=>{if(cur==='group')showOTP(s.val());});
+                if(otpTimer)clearInterval(otpTimer);
+                otpTimer=setInterval(()=>{fetchOTP();},3000);
                 fetchOTP();
             }
         }
-
-        function goHomeDirect() {
-            cur = 'main';
-            viewMode = 'services';
-            cSvc = ''; cCty = '';
-            save();
-            if (otpTimer) clearInterval(otpTimer);
-            render();
-        }
-
-        function openChat(t) { 
-            cur = t; 
-            save(); 
-            render(); 
+        
+        function openScreen(s){cur=s;save();if(otpTimer)clearInterval(otpTimer);render();}
+        function openChat(t){cur=t;cSvc='';cCty='';cFlag='';save();render();}
+        function goBack(){
+            if(cCty){cCty='';cFlag='';save();loadCountries(cSvc);}
+            else if(cSvc){cSvc='';save();showStart();}
+            else{cur='main';save();if(otpTimer)clearInterval(otpTimer);render();}
         }
         
-        function showGroupMessage(m) {
-            if (cur !== 'group') return;
-            const t = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute: '2-digit'});
-            if (m.type === 'otp') {
-                el('messages').innerHTML += `
-                    <div class="msg-block">
-                        <span class="msg-user">Alexender (المشرف)</span><br>
-                        🌐 الخدمة: <b>${m.service || 'OTP'}</b><br>
-                        📱 الرقم: <span class="num" onclick="copyText('${m.number}')">${m.number || ''}</span><br>
-                        🔑 الكود: <span class="code" onclick="copyText('${m.code}')">${m.code}</span>
-                        <div class="time-tag">${t}</div>
-                    </div>`;
-            } else if (m.type === 'chat') {
-                el('messages').innerHTML += `
-                    <div class="msg-block">
-                        <span class="msg-user">${m.user || 'عضو'}</span><br>
-                        ${m.text}
-                        <div class="time-tag">${t}</div>
-                    </div>`;
-            }
-            el('messages').scrollTop = el('messages').scrollHeight;
+        function showOTP(m){
+            if(cur!=='group')return;
+            const t=new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
+            const code=m.code||'---';
+            el('messages').innerHTML+='<div class="msg"><span class="user">Alexender</span><br>🌐 '+m.service+'<br>📱 <span class="num" onclick="copyText(\''+m.number+'\')">'+m.number+'</span><br>🔑 <span class="code" onclick="copyText(\''+code+'\')">'+code+'</span><div class="time">'+t+'</div></div>';
+            el('messages').scrollTop=el('messages').scrollHeight;
         }
-
-        function sendGroupMsg() {
-            const input = el('chatInput');
-            if(!input || !input.value.trim()) return;
-            db.ref('messages').push({ type: 'chat', user: 'مستخدم (أنت)', text: input.value.trim() });
-            input.value = '';
+        
+        async function fetchOTP(){
+            try{const d=await api('/api/otp?count=20');if(Array.isArray(d))d.forEach(i=>{const k=i[1]+'-'+i[2];if(!known.has(k)){known.add(k);db.ref('messages').push({type:'otp',service:i[0],number:i[1],code:i[2].match(/\d{4,8}/)?.[0]||i[2]});}});}catch(e){}
         }
-
-        function copyText(txt) {
-            navigator.clipboard.writeText(txt);
-            showToast('تم النسخ: ' + txt);
+        
+        function showStart(){
+            el('messages').innerHTML='<div class="msg">👋 أهلاً بك! اضغط START لاختيار الخدمة والدولة.</div>';
+            el('btnArea').innerHTML='<button class="btn bgreen" onclick="loadServices()">▶️ START</button>';
         }
-
-        async function fetchOTP() {
-            try {
-                const res = await fetch(BASE_URL + '/api/otp?count=10', { headers: { 'Authorization': 'Bearer ' + API_KEY } });
-                const d = await res.json();
-                if (Array.isArray(d)) {
-                    d.forEach(i => {
-                        const k = i[1] + '-' + i[2];
-                        if (!known.has(k)) {
-                            known.add(k);
-                            db.ref('messages').push({
-                                type: 'otp', service: i[0], number: i[1],
-                                code: i[2].match(/\d{4,8}/)?.[0] || i[2]
-                            });
-                        }
+        
+        async function loadServices(){
+            el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
+            try{
+                const d=await api('/api/services');
+                if(d.success&&d.services){
+                    let btns='';
+                    d.services.forEach(s=>{btns+='<button class="btn" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';});
+                    el('btnArea').innerHTML=btns;
+                }
+            }catch(e){el('btnArea').innerHTML='<button class="btn" onclick="showStart()">❌ خطأ</button>';}
+        }
+        
+        async function loadCountries(key,name){
+            cSvc=key;cCty='';cFlag='';save();
+            el('messages').innerHTML='<div class="msg">🌐 '+name+'<br>اختر الدولة:</div>';
+            el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
+            try{
+                const d=await api('/api/countries?service='+key);
+                if(d.success&&d.countries){
+                    let btns='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';
+                    d.countries.forEach(c=>{
+                        const cn=cNames[c.name]||c.name;
+                        btns+='<button class="btn" onclick="selectCountry(\''+c.name+'\',\''+(c.flag||'')+'\')">'+(c.flag||'')+' '+cn+' ('+c.count+')</button>';
                     });
+                    el('btnArea').innerHTML=btns;
+                }else{el('btnArea').innerHTML='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';}
+            }catch(e){}
+        }
+        
+        function selectCountry(country,flag){cCty=country;cFlag=flag;save();showNumbers(country,flag);}
+        
+        async function showNumbers(country,flag){
+            const cn=cNames[country]||country;
+            el('messages').innerHTML='<div class="msg">🌐 '+cSvc+'<br>🌍 '+flag+' '+cn+'<br>📱 اضغط على رقم لنسخه:</div>';
+            el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب الأرقام...</div>';
+            try{
+                const d=await api('/api/otp?count=200');
+                if(Array.isArray(d)){
+                    let flt=d.filter(i=>i.length>4&&i[4]&&String(i[4]).trim().toUpperCase()===String(country).trim().toUpperCase());
+                    if(flt.length===0)flt=d.filter(i=>i[0]&&String(i[0]).toLowerCase().includes(String(cSvc).toLowerCase()));
+                    if(flt.length===0)flt=d.slice(0,30);
+                    let nums=[...new Set(flt.map(i=>i[1]))].slice(0,30);
+                    let btns='<div class="brow"><button class="btn bgreen" onclick="showNumbers(\''+country+'\',\''+flag+'\')">🔄 تحديث</button><button class="btn bgold" onclick="checkCodes(\''+country+'\')">📩 أكواد</button></div><div class="brow"><button class="btn" onclick="loadCountries(\''+cSvc+'\')">🔙 دول</button><button class="btn" onclick="loadServices()">🌍 خدمات</button></div>';
+                    nums.forEach(num=>{btns+='<button class="btn bgreen" onclick="copyText(\''+num+'\')">📱 '+num+'</button>';});
+                    el('btnArea').innerHTML=btns;
                 }
-            } catch (e) {}
+            }catch(e){el('btnArea').innerHTML='<button class="btn" onclick="showNumbers(\''+country+'\',\''+flag+'\')">❌ إعادة</button>';}
         }
-
-        async function fetchSingleCode(num) {
-            showToast('جاري فحص الكود...');
-            try {
-                const res = await fetch(BASE_URL + '/api/latest_otp?number=' + encodeURIComponent(num), { headers: { 'Authorization': 'Bearer ' + API_KEY } });
-                const data = await res.json();
-                if (data && (data.success || data.النجاح || data.has_otp)) {
-                    let code = data.otp_code || data.verification_code || data.رمز_التحقق_من_كلمة_المرور || '---';
-                    el('messages').innerHTML += `
-                        <div class="msg-block">
-                            📱 الرقم: <span class="num" onclick="copyText('${num}')">${num}</span><br>
-                            🔑 الكود: <span class="code" onclick="copyText('${code}')">${code}</span>
-                        </div>`;
-                    el('messages').scrollTop = el('messages').scrollHeight;
-                    showToast('تم العثور على الكود!');
-                } else {
-                    showToast('لا يوجد كود جديد حالياً');
+        
+        async function checkCodes(country){
+            el('messages').innerHTML+='<div class="msg">🔍 جاري جلب الأكواد...</div>';
+            try{
+                const d=await api('/api/otp?count=50');
+                if(Array.isArray(d)){
+                    let flt=d.filter(i=>i.length>4&&i[4]&&String(i[4]).trim().toUpperCase()===String(country).trim().toUpperCase());
+                    if(flt.length===0)flt=d.slice(0,20);
+                    let html='<div class="msg"><b>📦 أكواد:</b><br>';
+                    flt.slice(0,20).forEach(i=>{const cd=i[2].match(/\d{4,8}/)?.[0]||i[2];html+='📱 <span class="num" onclick="copyText(\''+i[1]+'\')">'+i[1]+'</span> ⬅️ <span class="code" onclick="copyText(\''+cd+'\')">'+cd+'</span><br>';});
+                    html+='</div>';
+                    el('messages').innerHTML+=html;el('messages').scrollTop=el('messages').scrollHeight;
                 }
-            } catch(err) { showToast('خطأ أثناء فحص الكود'); }
+            }catch(e){}
         }
-
-        function loadServices() {
-            viewMode = 'services'; cur = 'bot'; cSvc = ''; cCty = ''; save(); render();
-            el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك! جاري جلب الخدمات المتاحة من السيرفر...</div>';
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:12px;">جاري التحميل...</div>';
-
-            fetch(BASE_URL + '/api/services', { headers: { 'Authorization': 'Bearer ' + API_KEY } })
-                .then(r => r.json())
-                .then(res => {
-                    let list = [];
-                    // دعم جميع أشكال الاستجابة المحتملة من الـ API
-                    let raw = res.services || res.الخدمات || res.data || res;
-                    if (Array.isArray(raw)) {
-                        list = raw.map(s => {
-                            if (typeof s === 'string') return s;
-                            return s.name || s.الاسم || s.service || s.الخدمة || '';
-                        }).filter(Boolean);
-                    }
-
-                    if (list.length > 0) {
-                        el('messages').innerHTML = '<div class="msg-block">👋 اختر الخدمة المطلوبة من القائمة أدناه:</div>';
-                        let btns = '';
-                        list.forEach(name => {
-                            btns += `<button class="btn" onclick="loadCountries('${name}')">${name}</button>`;
-                        });
-                        el('btnArea').innerHTML = btns;
-                    } else {
-                        el('messages').innerHTML = `<div class="msg-block">⚠️ لم يتم العثور على خدمات متاحة حالياً.<br><small style="color:#7d8b99;">استجابة السيرفر: ${JSON.stringify(res)}</small></div>`;
-                        el('btnArea').innerHTML = `<button class="btn" onclick="loadServices()">🔄 إعادة المحاولة</button>`;
-                    }
-                })
-                .catch(e => {
-                    el('messages').innerHTML = '<div class="msg-block">❌ حدث خطأ أثناء الاتصال بالـ API لجلب الخدمات. تأكد من الإنترنت أو السيرفر.</div>';
-                    el('btnArea').innerHTML = `<button class="btn" onclick="loadServices()">🔄 إعادة المحاولة</button>`;
-                });
-        }
-
-        function loadCountries(serviceName) {
-            cSvc = serviceName; cCty = ''; viewMode = 'countries'; save();
-            el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>جاري جلب الدول المتاحة لهذه الخدمة...</div>`;
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:12px;">جاري التحميل...</div>';
-
-            fetch(BASE_URL + '/api/countries?service=' + encodeURIComponent(serviceName), { headers: { 'Authorization': 'Bearer ' + API_KEY } })
-                .then(r => r.json())
-                .then(res => {
-                    let list = [];
-                    let raw = res.countries || res.بلدان || res.data || res;
-                    if (Array.isArray(raw)) {
-                        list = raw.map(c => {
-                            if (typeof c === 'string') return c;
-                            return c.name || c.الاسم || c.country || c.الدولة || '';
-                        }).filter(Boolean);
-                    }
-
-                    if (list.length > 0) {
-                        el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>اختر الدولة المطلوبة:</div>`;
-                        let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:6px 0;">`;
-                        list.forEach(c => {
-                            btns += `<button class="btn" onclick="selectCountry('${c}')">🌍 ${c}</button>`;
-                        });
-                        el('btnArea').innerHTML = btns;
-                    } else {
-                        el('messages').innerHTML = `<div class="msg-block">⚠️ لا توجد دول متاحة حالياً لهذه الخدمة.</div>`;
-                        el('btnArea').innerHTML = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div>`;
-                    }
-                })
-                .catch(e => {
-                    el('messages').innerHTML = `<div class="msg-block">❌ حدث خطأ أثناء جلب الدول.</div>`;
-                    el('btnArea').innerHTML = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div>`;
-                });
-        }
-
-        async function selectCountry(country) {
-            cCty = country; viewMode = 'numbers'; save();
-            el('messages').innerHTML = `
-                <div class="msg-block">
-                    🌐 الخدمة: <b>${cSvc}</b><br>
-                    🌍 الدولة: <b>${country}</b><br>
-                    📱 جاري طلب رقم جديد من السيرفر...
-                </div>`;
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:12px;">جاري توليد الرقم...</div>';
-
-            try {
-                const res = await fetch(BASE_URL + '/api/request_number', {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ service: cSvc, country: country })
-                });
-                const data = await res.json();
-                
-                let num = data.number || data.الرقم || data.phone || '';
-
-                if (num) {
-                    let btns = `<div class="btn-row">
-                                    <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
-                                    <button class="btn btn-gold" onclick="selectCountry('${country}')">🔄 طلب رقم جديد</button>
-                                </div><hr style="border-color:#242f3d; margin:6px 0;">`;
-
-                    btns += `
-                        <div class="number-item-row">
-                            <button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>
-                            <button class="btn btn-fetch" onclick="fetchSingleCode('${num}')">🔍 جلب الكود</button>
-                        </div>`;
-                    
-                    el('btnArea').innerHTML = btns;
-                    el('messages').innerHTML = `
-                        <div class="msg-block">
-                            🌐 الخدمة: <b>${cSvc}</b><br>
-                            🌍 الدولة: <b>${country}</b><br>
-                            ✅ تم الحصول على الرقم بنجاح:
-                        </div>`;
-                } else {
-                    let errText = data.message || data.خطأ || 'فشل توليد الرقم من السيرفر';
-                    el('messages').innerHTML = `
-                        <div class="msg-block">
-                            ❌ ${errText}
-                        </div>`;
-                    el('btnArea').innerHTML = `<div class="btn-row"><button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button></div>`;
-                }
-            } catch (e) {
-                el('messages').innerHTML = `<div class="msg-block">❌ خطأ في الاتصال بالشبكة أثناء طلب الرقم.</div>`;
-                el('btnArea').innerHTML = `<div class="btn-row"><button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button></div>`;
-            }
-        }
-
-        window.onload = () => { render(); };
+        
+        window.onload=()=>{
+            if(S.cur==='group'||S.cur==='bot'){cur=S.cur;render();}
+            else{cur='main';render();}
+        };
     </script>
 </body>
 </html>
