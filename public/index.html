@@ -172,7 +172,7 @@
             overflow-y: auto;
         }
 
-        /* Toast Notification (مربع أصفر صغير أسفل الصفحة) */
+        /* Toast Notification */
         #toast {
             visibility: hidden;
             min-width: 160px;
@@ -218,11 +218,11 @@
         const db = firebase.database();
         const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
         
-        let S = JSON.parse(localStorage.getItem('otp_new2') || '{}');
+        let S = JSON.parse(localStorage.getItem('otp_fixed_v3') || '{}');
         let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '';
         let known = new Set(), otpTimer = null;
 
-        function save() { localStorage.setItem('otp_new2', JSON.stringify({cur, cSvc, cCty, cFlag})); }
+        function save() { localStorage.setItem('otp_fixed_v3', JSON.stringify({cur, cSvc, cCty, cFlag})); }
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
         function el(id) { return document.getElementById(id); }
 
@@ -240,7 +240,6 @@
 
         function render() {
             const app = el('app');
-            // تأكد من بقاء التوست داخل الكونتينر
             let toastHTML = '<div id="toast">تم النسخ!</div>';
 
             if (cur === 'main') {
@@ -296,6 +295,8 @@
             if (cur === 'bot') {
                 if (cCty) {
                     showNumbersList(cCty, cFlag);
+                } else if (cSvc) {
+                    loadCountries(cSvc);
                 } else {
                     showStart();
                 }
@@ -312,8 +313,13 @@
         function openScreen(s) { cur = s; save(); if (otpTimer) clearInterval(otpTimer); render(); }
         function openChat(t) { cur = t; save(); render(); }
         function goBack() { 
-            if(cCty) { cCty = ''; cFlag = ''; save(); loadCountries(cSvc); }
-            else { cur = 'main'; save(); if (otpTimer) clearInterval(otpTimer); render(); }
+            if(cCty) { 
+                cCty = ''; cFlag = ''; save(); loadCountries(cSvc); 
+            } else if(cSvc) {
+                cSvc = ''; save(); showStart();
+            } else { 
+                cur = 'main'; save(); if (otpTimer) clearInterval(otpTimer); render(); 
+            }
         }
         
         function showOTP(m) {
@@ -362,7 +368,7 @@
         }
 
         async function loadServices() {
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل الخدمات...</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل جميع الخدمات...</div>';
             try {
                 const d = await api('/api/services');
                 if (d.success) {
@@ -378,14 +384,16 @@
         async function loadCountries(key) {
             cSvc = key; cCty = ''; cFlag = '';
             save();
-            el('messages').innerHTML = `<div class="msg-block">🌐 تم اختيار الخدمة. اختر الدولة لعرض أرقامها:</div>`;
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل الدول...</div>';
+            el('messages').innerHTML = `<div class="msg-block">🌐 تم اختيار الخدمة بنجاح. اختر الدولة لعرض أرقامها:</div>`;
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل الدول المتاحة...</div>';
             try {
                 const d = await api('/api/countries?service=' + key);
                 if (d.success) {
-                    let btns = '';
+                    let btns = `<div class="btn-row">
+                                    <button class="btn" onclick="showStart()">🔙 رجوع للخدمات</button>
+                                </div><hr style="border-color:#242f3d; margin:5px 0;">`;
                     d.countries.forEach(c => {
-                        btns += `<button class="btn" onclick="selectCountry('${c.name}','${c.flag}')">${c.flag} ${c.name} (${c.count})</button>`;
+                        btns += `<button class="btn" onclick="selectCountry('${c.name}','${c.flag}')">${c.flag || ''} ${c.name} (${c.count})</button>`;
                     });
                     el('btnArea').innerHTML = btns;
                 }
@@ -405,7 +413,7 @@
                     📱 اضغط على أي رقم أدناه لنسخه فوراً:
                 </div>`;
             
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب أرقام الدولة...</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب أرقام الدولة المحددة...</div>';
             
             try {
                 const d = await api(`/api/otp?count=200`);
@@ -416,14 +424,14 @@
                         return matchSvc || matchCty;
                     });
 
-                    if (flt.length === 0) flt = d.slice(0, 15);
+                    if (flt.length === 0) flt = d.slice(0, 20);
 
                     let btns = `<div class="btn-row">
                                     <button class="btn" onclick="loadCountries('${cSvc}')">🔙 تغيير الدولة</button>
                                     <button class="btn btn-gold" onclick="checkAllCodes()">📩 فحص كل الأكواد</button>
                                 </div><hr style="border-color:#242f3d; margin:5px 0;">`;
 
-                    let uniqueNums = [...new Set(flt.map(i => i[1]))].slice(0, 30);
+                    let uniqueNums = [...new Set(flt.map(i => i[1]))].slice(0, 40);
                     
                     uniqueNums.forEach(num => {
                         btns += `<button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>`;
