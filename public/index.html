@@ -45,7 +45,6 @@
             flex-direction: column;
             overflow: hidden;
             background-color: #0e1621;
-            will-change: transform;
         }
 
         /* Header */
@@ -190,7 +189,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            max-height: 50vh; 
+            max-height: 52vh; 
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -252,7 +251,7 @@
         }
         #toast.show { visibility: visible; opacity: 1; }
 
-        /* Bottom Nav */
+        /* Bottom Nav (2 buttons only) */
         .bottom-nav { background-color: #17212b; display: flex; justify-content: space-around; padding: 6px 0; border-top: 1px solid #111822; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #7d8b99; font-size: 12px; font-weight: 500; cursor: pointer; gap: 3px; background: none; border: none; flex: 1; }
         .nav-item.active { color: #5288c1; }
@@ -273,20 +272,44 @@
         const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
         const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        // استعادة الحالة الكاملة فوراً من الذاكرة للحفاظ على كل شيء عند الخروج والعودة
-        let S = JSON.parse(localStorage.getItem('otp_session_v10') || '{}');
+        // استعادة الحالة الكاملة مع حفظ كل خطوة والدولة والأرقام
+        let S = JSON.parse(localStorage.getItem('otp_session_v11') || '{}');
         let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'services';
         let numBatchIndex = S.numBatchIndex || 0, currentNumbersPool = S.currentNumbersPool || [];
         let known = new Set(), otpTimer = null;
 
+        // نظام المؤثرات الصوتية الفورية
+        function playSound(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(320, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
+                    osc.start(); osc.stop(ctx.currentTime + 0.04);
+                } else if (type === 'copy') {
+                    osc.frequency.setValueAtTime(580, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    osc.start(); osc.stop(ctx.currentTime + 0.08);
+                } else if (type === 'otp') {
+                    osc.frequency.setValueAtTime(750, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    osc.start(); osc.stop(ctx.currentTime + 0.12);
+                }
+            } catch(e) {}
+        }
+
         function save() { 
-            localStorage.setItem('otp_session_v10', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
+            localStorage.setItem('otp_session_v11', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
         }
 
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
         function el(id) { return document.getElementById(id); }
 
         function showToast(msg) {
+            playSound('copy');
             let t = el('toast');
             if(!t) {
                 t = document.createElement('div');
@@ -299,6 +322,7 @@
         }
 
         function render() {
+            playSound('click');
             const app = el('app');
             let toastHTML = '<div id="toast">تم النسخ!</div>';
 
@@ -328,9 +352,8 @@
                             </div>
                         </div>
                         <div class="bottom-nav">
-                            <button class="nav-item ${viewMode !== 'hot_countries' && viewMode !== 'my_numbers' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
+                            <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
                             <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
-                            <button class="nav-item ${viewMode === 'my_numbers' ? 'active' : ''}" onclick="showMyNumbers();"><span class="nav-icon">📱</span>أرقامي النشطة</button>
                         </div>
                     </div>`;
             } else {
@@ -354,9 +377,8 @@
                             </div>
                         `}
                         <div class="bottom-nav">
-                            <button class="nav-item ${viewMode !== 'hot_countries' && viewMode !== 'my_numbers' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
+                            <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
                             <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
-                            <button class="nav-item ${viewMode === 'my_numbers' ? 'active' : ''}" onclick="showMyNumbers();"><span class="nav-icon">📱</span>أرقامي النشطة</button>
                         </div>
                     </div>`;
             }
@@ -366,21 +388,20 @@
         function bindEvents() {
             if (cur === 'bot') {
                 if (viewMode === 'hot_countries') showHotCountries();
-                else if (viewMode === 'my_numbers') showMyNumbers();
                 else if (cCty) showNumbersList(cCty, cFlag, false);
                 else if (cSvc) loadCountries(cSvc);
                 else loadServices();
             } else if (cur === 'group') {
                 el('messages').innerHTML = '<div class="msg-block">📡 نظام البث المباشر لأكواد التفعيل.</div>';
                 db.ref('messages').off();
-                db.ref('messages').limitToLast(30).on('child_added', s => { if (cur === 'group') showGroupMessage(s.val()); });
+                db.ref('messages').limitToLast(20).on('child_added', s => { if (cur === 'group') showGroupMessage(s.val()); });
                 if (otpTimer) clearInterval(otpTimer);
                 otpTimer = setInterval(fetchOTP, 3000);
                 fetchOTP();
             }
         }
 
-        // عند الضغط علي زر الرجوع العلوي بالبوت يرجعك فوراً للمحادثات الرئيسية
+        // زر الخروج العلوي يرجعك للمحادثات الرئيسية علطول
         function goHomeDirect() {
             cur = 'main';
             viewMode = 'services';
@@ -397,7 +418,7 @@
         }
         
         function goBack() { 
-            if (viewMode === 'hot_countries' || viewMode === 'my_numbers') {
+            if (viewMode === 'hot_countries') {
                 viewMode = 'services'; save(); loadServices();
             } else if (cCty) { 
                 cCty = ''; cFlag = ''; save(); loadCountries(cSvc); 
@@ -412,6 +433,7 @@
             if (cur !== 'group') return;
             const t = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute: '2-digit'});
             if (m.type === 'otp') {
+                playSound('otp');
                 el('messages').innerHTML += `
                     <div class="msg-block">
                         <span class="msg-user">Alexender (المشرف)</span><br>
@@ -467,7 +489,7 @@
             el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
             
             try {
-                const d = await api('/api/otp?count=50');
+                const d = await api('/api/otp?count=40');
                 let counts = {};
                 if (Array.isArray(d)) {
                     d.forEach(i => { let c = i.length > 4 && i[4] ? i[4] : 'زيمبابوي 🇿🇼'; counts[c] = (counts[c] || 0) + 1; });
@@ -481,34 +503,13 @@
             } catch(e) { el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">🔙 رجوع</button>'; }
         }
 
-        async function showMyNumbers() {
-            viewMode = 'my_numbers'; cur = 'bot'; save(); render();
-            el('messages').innerHTML = '<div class="msg-block">📱 أرقامك النشطة والمربوطة بمفتاح الـ API:</div>';
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
-
-            try {
-                const res = await fetch(PROXY + '/api/my_numbers', { headers: { 'Authorization': 'Bearer ' + API_KEY } });
-                const data = await res.json();
-                let nums = (data && data.success && Array.isArray(data.numbers)) ? data.numbers : ['+16282849090', '+6288269202428'];
-
-                let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
-                nums.forEach(n => {
-                    btns += `
-                        <div class="number-item-row">
-                            <button class="btn btn-green" onclick="copyText('${n}')">📱 ${n}</button>
-                            <button class="btn btn-fetch" onclick="fetchSingleCode('${n}')">🔍 جلب الكود</button>
-                        </div>`;
-                });
-                el('btnArea').innerHTML = btns;
-            } catch(e) { el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">🔙 رجوع</button>'; }
-        }
-
         async function fetchSingleCode(num) {
             showToast('جاري فحص الكود...');
             try {
                 const res = await fetch(PROXY + '/api/latest_otp?number=' + encodeURIComponent(num), { headers: { 'Authorization': 'Bearer ' + API_KEY } });
                 const data = await res.json();
                 if (data && data.success && data.has_otp) {
+                    playSound('otp');
                     el('messages').innerHTML += `
                         <div class="msg-block">
                             📱 الرقم: <span class="num" onclick="copyText('${num}')">${num}</span><br>
@@ -577,7 +578,7 @@
                         if (reqData && reqData.success && reqData.number) currentNumbersPool.push(reqData.number);
                     } catch(err) {}
 
-                    const d = await api(`/api/otp?count=60`);
+                    const d = await api(`/api/otp?count=40`);
                     if (Array.isArray(d)) {
                         d.forEach(i => {
                             if (i.length > 4 && i[4] && i[4].toUpperCase().includes(country.toUpperCase()) && i[1]) {
@@ -593,7 +594,6 @@
                 let batch = currentNumbersPool.slice(numBatchIndex, numBatchIndex + 3);
                 if (batch.length === 0) { numBatchIndex = 0; batch = currentNumbersPool.slice(0, 3); }
 
-                // حفظ مؤشر الدُفعة لكي يظل محفوظاً عند الخروج والرجوع
                 S.numBatchIndex = numBatchIndex;
                 S.currentNumbersPool = currentNumbersPool;
                 save();
