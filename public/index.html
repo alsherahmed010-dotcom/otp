@@ -91,7 +91,7 @@
         
         function render(){
             const app=document.getElementById('app');app.innerHTML='';
-            if(!profile.name||!profile.phone){cur='setup';app.innerHTML=setupHTML();bindSetup();}
+            if(!profile.name||!profile.phone){app.innerHTML='<div class="setup"><h2>🚀 أهلاً بك</h2><div class="av" id="avSetup" onclick="document.getElementById(\'fSetup\').click()">📷</div><input type="file" id="fSetup" accept="image/*" onchange="prevSetup()"><input id="inPhone" placeholder="رقم الهاتف" value="'+profile.phone+'" onkeyup="if(this.value.length>10)document.getElementById(\'inName\').focus()"><input id="inName" placeholder="الاسم" value="'+profile.name+'"><input id="inUser" placeholder="يوزر نيم" value="'+profile.username+'"><button class="btn bblue" style="width:100%;padding:16px;font-size:18px;" onclick="saveSetup()">🚀 دخول</button></div>';setTimeout(function(){var b=document.querySelector('.setup .btn');if(b){b.onclick=saveSetup;b.style.pointerEvents='auto';}},500);}
             else if(cur==='main'){app.innerHTML=mainHTML();bindMain();}
             else if(cur==='bot'){app.innerHTML=chatHTML('bot');bindBot();}
             else if(cur==='group'){app.innerHTML=chatHTML('group');bindGroup();}
@@ -135,7 +135,7 @@
         function prevProf(){const f=document.getElementById('fProf').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;};r.readAsDataURL(f);}}
         function prevCreate(){const f=document.getElementById('fCreate').files[0];if(f){const r=new FileReader();r.onload=function(e){window._createAvatar=e.target.result;document.getElementById('avCreate').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
         
-        window.saveSetup=function(){profile.phone=document.getElementById('inPhone').value.trim();profile.name=document.getElementById('inName').value.trim()||'مستخدم';profile.username=document.getElementById('inUser').value.trim();if(!profile.phone){alert('أدخل رقم الهاتف');return;}save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
+        function saveSetup(){try{profile.phone=document.getElementById('inPhone').value.trim();profile.name=document.getElementById('inName').value.trim()||'مستخدم';profile.username=document.getElementById('inUser').value.trim();if(!profile.phone){alert('أدخل رقم الهاتف');return;}save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}catch(e){alert('خطأ: '+e.message);}
         function saveProfile(){profile.name=document.getElementById('eName').value.trim()||profile.name;profile.phone=document.getElementById('ePhone').value.trim()||profile.phone;profile.username=document.getElementById('eUser').value.trim();save();db.ref('users/'+btoa(profile.phone)).set(profile);goTo('main');}
         function doCreate(type){const name=document.getElementById('inCreateName').value.trim();if(!name){alert('أدخل اسماً');return;}const data={name,createdBy:profile.phone,members:type==='group'?[profile.phone]:[],avatar:window._createAvatar||'',type};db.ref('groups').push(data).then(ref=>{alert('✅ تم!');goTo('grp_'+ref.key);});}
         function doSearch(q){if(!q)return;const res=document.getElementById('searchResult');res.innerHTML='جاري البحث...';db.ref('users/'+btoa(q)).once('value').then(s=>{if(s.val()){const u=s.val();res.innerHTML='<div style="background:var(--card);padding:15px;border-radius:10px;cursor:pointer;" onclick="goTo(\'pv_'+u.phone+'\')"><b>'+u.name+'</b><br>📱 '+u.phone+'</div>';}else{res.innerHTML='❌ لم يتم العثور';}});}
