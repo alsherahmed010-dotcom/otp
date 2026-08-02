@@ -85,7 +85,7 @@
         
         function render(){
             const app=el('app');app.innerHTML='';
-            if(!profile.name||!profile.phone){app.innerHTML=setupHTML();setTimeout(()=>{const b=el('btnGo');if(b)b.onclick=saveSetup;},500);}
+            if(!profile.name||!profile.phone){app.innerHTML=setupHTML();setTimeout(function(){var b=document.getElementById('btnGo');if(b){b.onclick=saveSetup;b.addEventListener('click',saveSetup);}},300);}
             else if(cur==='main'){app.innerHTML=mainHTML();afterMain();}
             else if(cur==='bot'){app.innerHTML=chatHTML('bot');afterBot();}
             else if(cur==='group'){app.innerHTML=chatHTML('group');afterGroup();}
@@ -155,7 +155,7 @@
         function showOTPMsg(m){if(cur!=='group')return;const t=m.time||new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});if(m.type==='otp'){const cn=cNames[m.country]||m.country||'';el('messages').innerHTML+='<div class="msg motp">📩 '+m.service+' <span style="color:#10b981;font-size:11px;">'+cn+'</span><br>📱 <span class="num">'+m.number+'</span><br>🔑 <span class="code">'+m.code+'</span><div class="time">'+t+'</div><button class="btn bgold" style="margin-top:6px;width:100%;padding:8px;font-size:13px;" onclick="copyCode(\''+m.code+'\')">📋 نسخ الكود</button></div>';}else{el('messages').innerHTML+='<div class="msg '+(m.phone===profile.phone?'mo':'mi')+'">'+m.text+'<div class="time">'+t+'</div></div>';}el('messages').scrollTop=el('messages').scrollHeight;}
         
         function goTo(page){cur=page;save();if(otpTimer&&page!=='group'){clearInterval(otpTimer);otpTimer=null;}render();}
-        function prevSetup(){const f=el('fSetup').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;el('avSetup').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
+        function prevSetup(){var f=document.getElementById('fSetup').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;el('avSetup').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
         function prevProf(){const f=el('fProf').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;};r.readAsDataURL(f);}}
         function prevCreate(){const f=el('fCreate').files[0];if(f){const r=new FileReader();r.onload=function(e){window._createAvatar=e.target.result;el('avCreate').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
         
