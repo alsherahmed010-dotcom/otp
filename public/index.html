@@ -91,7 +91,7 @@
             color: #7d8b99;
         }
 
-        /* Main Screen List */
+        /* Main List */
         .main-list {
             flex: 1;
             overflow-y: auto;
@@ -113,7 +113,7 @@
         .chat-row .name { font-size: 15px; font-weight: 500; color: #fff; margin-bottom: 6px; }
         .chat-row .preview { font-size: 14px; color: #7d8b99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Chat Messages */
+        /* Chat Body */
         .chat-body {
             flex: 1;
             padding: 15px;
@@ -135,7 +135,7 @@
         }
 
         .msg-user { color: #64b5f6; font-weight: 500; }
-        .num { color: #60a5fa; font-weight: 600; font-size: 16px; }
+        .num { color: #60a5fa; font-weight: 600; font-size: 16px; cursor: pointer; }
         .code { background-color: #f59e0b; color: #000; padding: 4px 12px; border-radius: 5px; font-weight: 600; display: inline-block; margin: 6px 0; font-size: 16px; }
         .time-tag { font-size: 11px; color: #7d8b99; text-align: left; margin-top: 8px; }
 
@@ -151,15 +151,15 @@
             text-align: center;
             background-color: #2b5278;
             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            width: 100%;
+            margin-bottom: 8px;
         }
 
         .btn:active { opacity: 0.8; }
         .btn-green { background-color: #2e8b57; }
         .btn-gold { background-color: #f59e0b; color: #000; font-weight: 600; }
-        
         .btn-row { display: flex; gap: 10px; }
-        .btn-row .btn { flex: 1; }
-        .btn-full { width: 100%; }
+        .btn-row .btn { flex: 1; margin-bottom: 0; }
 
         .btn-area {
             padding: 12px;
@@ -167,7 +167,7 @@
             background-color: #17212b;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 6px;
             max-height: 50vh; 
             overflow-y: auto;
         }
@@ -190,11 +190,11 @@
         const db = firebase.database();
         const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
         
-        let S = JSON.parse(localStorage.getItem('otp_new') || '{}');
-        let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', curNum = S.curNum || '';
+        let S = JSON.parse(localStorage.getItem('otp_new2') || '{}');
+        let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '';
         let known = new Set(), otpTimer = null;
 
-        function save() { localStorage.setItem('otp_new', JSON.stringify({cur, cSvc, cCty, cFlag, curNum})); }
+        function save() { localStorage.setItem('otp_new2', JSON.stringify({cur, cSvc, cCty, cFlag})); }
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
         function el(id) { return document.getElementById(id); }
 
@@ -214,7 +214,7 @@
                                 <div class="tg-avatar" style="background:#2b5278;">🤖</div>
                                 <div class="info">
                                     <div class="name">🤖 NUMBER BOT</div>
-                                    <div class="preview">${curNum ? 'الرقم: ' + curNum : 'بوت إدارة الأرقام وطلب الـ OTP'}</div>
+                                    <div class="preview">بوت استعراض أرقام الدول وأكوادها</div>
                                 </div>
                             </div>
                             <div class="chat-row" onclick="openChat('group')">
@@ -251,23 +251,8 @@
 
         function bindEvents() {
             if (cur === 'bot') {
-                const ms = el('messages');
-                if (curNum) {
-                    ms.innerHTML = `
-                        <div class="msg-block">
-                            📱 الرقم الحالي: <span class="num">${curNum}</span>
-                            ${cCty ? `<br>🌍 الدولة المحددة: ${cFlag || ''} <b>${cCty}</b>` : ''}
-                        </div>`;
-                    
-                    el('btnArea').innerHTML = `
-                        <div class="btn-row">
-                            <button class="btn btn-green" onclick="copyNum('${curNum}')">📋 نسخ الرقم</button>
-                            <button class="btn" onclick="getNumber('${cCty}','${cFlag}')">🔄 تغيير الرقم</button>
-                        </div>
-                        <div class="btn-row">
-                            <button class="btn" onclick="loadServices()">🌍 اختيار دولة أخرى</button>
-                            <button class="btn btn-gold" onclick="checkCode('${curNum}')">📩 فحص الكود</button>
-                        </div>`;
+                if (cCty) {
+                    showNumbersList(cCty, cFlag);
                 } else {
                     showStart();
                 }
@@ -283,7 +268,10 @@
 
         function openScreen(s) { cur = s; save(); if (otpTimer) clearInterval(otpTimer); render(); }
         function openChat(t) { cur = t; save(); render(); }
-        function goBack() { cur = 'main'; save(); if (otpTimer) clearInterval(otpTimer); render(); }
+        function goBack() { 
+            if(cCty) { cCty = ''; cFlag = ''; save(); loadCountries(cSvc); }
+            else { cur = 'main'; save(); if (otpTimer) clearInterval(otpTimer); render(); }
+        }
         
         function showOTP(m) {
             if (cur !== 'group') return;
@@ -293,16 +281,17 @@
                 <div class="msg-block">
                     <span class="msg-user">Alexender (المشرف)</span><br>
                     🌐 الخدمة: <b>${m.service || 'OTP'}</b><br>
-                    📱 الرقم: <span class="num">${m.number || ''}</span><br>
-                    🔑 الكود: <span class="code">${code}</span>
+                    📱 الرقم: <span class="num" onclick="copyText('${m.number}')">${m.number || ''}</span><br>
+                    🔑 الكود: <span class="code" onclick="copyText('${code}')">${code}</span>
                     <div class="time-tag">${t}</div>
-                    <button class="btn btn-gold" style="margin-top:8px; width:100%;" onclick="copyCode('${code}')">📋 نسخ الكود</button>
                 </div>`;
             el('messages').scrollTop = el('messages').scrollHeight;
         }
 
-        function copyCode(c) { navigator.clipboard.writeText(c); alert('✅ تم نسخ الكود!'); }
-        function copyNum(n) { navigator.clipboard.writeText(n); alert('✅ تم نسخ الرقم!'); }
+        function copyText(txt) {
+            navigator.clipboard.writeText(txt);
+            alert('✅ تم النسخ: ' + txt);
+        }
 
         async function fetchOTP() {
             try {
@@ -325,121 +314,100 @@
         }
 
         function showStart() {
-            el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك في بوت الأرقام والتفعيل الفوري!<br>اضغط على START للبدء.</div>';
-            el('btnArea').innerHTML = '<button class="btn btn-green btn-full" onclick="loadServices()">▶️ START</button>';
+            el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك! اضغط على START لاختيار الخدمة والدولة واستعراض جميع الأرقام.</div>';
+            el('btnArea').innerHTML = '<button class="btn btn-green" onclick="loadServices()">▶️ START</button>';
         }
 
         async function loadServices() {
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل جميع الخدمات...</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل الخدمات...</div>';
             try {
                 const d = await api('/api/services');
                 if (d.success) {
                     let btns = '';
-                    d.services.forEach((s, i) => {
-                        if (i % 2 === 0) btns += '<div class="btn-row">';
-                        btns += `<button class="btn" onclick="loadCountries('${s.key}','${s.name}')">${s.name} (${s.count})</button>`;
-                        if (i % 2 === 1 || i === d.services.length - 1) btns += '</div>';
+                    d.services.forEach(s => {
+                        btns += `<button class="btn" onclick="loadCountries('${s.key}')">${s.name} (${s.count})</button>`;
                     });
                     el('btnArea').innerHTML = btns;
                 }
-            } catch (e) { el('btnArea').innerHTML = '<button class="btn btn-full" onclick="showStart()">❌ خطأ، إعادة المحاولة</button>'; }
+            } catch (e) { el('btnArea').innerHTML = '<button class="btn" onclick="showStart()">❌ خطأ، إعادة المحاولة</button>'; }
         }
 
-        async function loadCountries(key, name) {
-            cSvc = key; 
+        async function loadCountries(key) {
+            cSvc = key; cCty = ''; cFlag = '';
             save();
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل جميع الدول...</div>';
+            el('messages').innerHTML = `<div class="msg-block">🌐 تم اختيار الخدمة. اختر الدولة لعرض أرقامها:</div>`;
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل الدول...</div>';
             try {
                 const d = await api('/api/countries?service=' + key);
                 if (d.success) {
                     let btns = '';
-                    d.countries.forEach((c, i) => {
-                        if (i % 2 === 0) btns += '<div class="btn-row">';
-                        btns += `<button class="btn" onclick="getNumber('${c.name}','${c.flag}')">${c.flag} ${c.name} (${c.count})</button>`;
-                        if (i % 2 === 1 || i === d.countries.length - 1) btns += '</div>';
+                    d.countries.forEach(c => {
+                        btns += `<button class="btn" onclick="selectCountry('${c.name}','${c.flag}')">${c.flag} ${c.name} (${c.count})</button>`;
                     });
                     el('btnArea').innerHTML = btns;
                 }
             } catch (e) {}
         }
 
-        async function getNumber(country, flag) {
-            if(country) cCty = country;
-            if(flag) cFlag = flag;
+        function selectCountry(country, flag) {
+            cCty = country; cFlag = flag;
             save();
-            
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري استخراج الرقم مباشرة...</div>';
-            try {
-                // تعديل ذكي: طلب الأرقام المخصصة للدولة والخدمة مباشرة من السيرفر لمنع مشكلة الفلتر العام
-                const d = await api(`/api/otp?service=${cSvc}&country=${cCty}&count=100`); 
-                let list = Array.isArray(d) ? d : [];
-                
-                // فلترة تأكيدية لضمان أقصى حماية وثبات للدولة والخدمة
-                let flt = list.filter(i => {
-                    const matchSvc = i[0].toLowerCase().includes(cSvc.toLowerCase());
-                    const matchCty = i.length > 4 && i[4] && i[4].toUpperCase() === cCty.toUpperCase();
-                    return matchSvc || matchCty;
-                });
+            showNumbersList(country, flag);
+        }
 
-                // إذا لم نجد في الفلتر المخصص، نبحث في القائمة العامة كخطة احتياطية فائقة
-                if(flt.length === 0) {
-                    const backup = await api('/api/otp?count=200');
-                    if (Array.isArray(backup)) {
-                        flt = backup.filter(i => i[0].toLowerCase().includes(cSvc.toLowerCase()) && i.length > 4 && i[4] && i[4].toUpperCase() === cCty.toUpperCase());
-                    }
-                }
+        async function showNumbersList(country, flag) {
+            el('messages').innerHTML = `
+                <div class="msg-block">
+                    🌍 الدولة المحددة: ${flag || ''} <b>${country}</b><br>
+                    📱 اضغط على أي رقم أدناه لنسخه فوراً:
+                </div>`;
+            
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب أرقام الدولة...</div>';
+            
+            try {
+                const d = await api(`/api/otp?count=200`);
+                if (Array.isArray(d)) {
+                    let flt = d.filter(i => {
+                        const matchSvc = i[0].toLowerCase().includes(cSvc.toLowerCase());
+                        const matchCty = i.length > 4 && i[4] && i[4].toUpperCase() === country.toUpperCase();
+                        return matchSvc || matchCty;
+                    });
+
+                    if (flt.length === 0) flt = d.slice(0, 15); // احتياطي لو الفلتر فاضي
+
+                    let btns = `<div class="btn-row">
+                                    <button class="btn" onclick="loadCountries('${cSvc}')">🔙 تغيير الدولة</button>
+                                    <button class="btn btn-gold" onclick="checkAllCodes()">📩 فحص كل الأكواد</button>
+                                </div><hr style="border-color:#242f3d; margin:5px 0;">`;
+
+                    let uniqueNums = [...new Set(flt.map(i => i[1]))].slice(0, 30);
                     
-                if (flt.length > 0) {
-                    let available = flt.filter(i => i[1] !== curNum);
-                    if (available.length === 0) available = flt;
-                    
-                    curNum = available[Math.floor(Math.random() * available.length)][1];
-                    save();
-                    
-                    el('messages').innerHTML += `
-                        <div class="msg-block">
-                            📱 تم استخراج الرقم: <span class="num">${curNum}</span>
-                            <br>🌍 الدولة: ${cFlag || ''} <b>${cCty}</b>
-                        </div>`;
-                    el('messages').scrollTop = el('messages').scrollHeight;
-                    
-                    el('btnArea').innerHTML = `
-                        <div class="btn-row">
-                            <button class="btn btn-green" onclick="copyNum('${curNum}')">📋 نسخ الرقم</button>
-                            <button class="btn" onclick="getNumber('${cCty}','${cFlag}')">🔄 تغيير الرقم</button>
-                        </div>
-                        <div class="btn-row">
-                            <button class="btn" onclick="loadServices()">🌍 اختيار دولة أخرى</button>
-                            <button class="btn btn-gold" onclick="checkCode('${curNum}')">📩 فحص الكود</button>
-                        </div>`;
-                } else {
-                    // رسالة تفاعلية مع إتاحة إعادة طلب الرقم مباشرة
-                    el('btnArea').innerHTML = `
-                        <div style="text-align:center; padding:10px; color:#ef4444; font-size: 14px; margin-bottom: 8px;">
-                            ⚠️ عذراً، الـ Live Stream مزدحم حالياً بأرقام دول أخرى. اضغط إعادة المحاولة للسحب فوراً.
-                        </div>
-                        <div class="btn-row">
-                            <button class="btn" onclick="loadCountries(cSvc, '')">🔙 قائمة الدول</button>
-                            <button class="btn btn-gold" onclick="getNumber('${cCty}','${cFlag}')">🔄 إعادة محاولة السحب</button>
-                        </div>`;
+                    uniqueNums.forEach(num => {
+                        btns += `<button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>`;
+                    });
+
+                    el('btnArea').innerHTML = btns;
                 }
             } catch (e) {
-                el('btnArea').innerHTML = '<button class="btn btn-full" onclick="loadServices()">❌ حدث خطأ، رجوع</button>';
+                el('btnArea').innerHTML = '<button class="btn" onclick="showNumbersList(\''+country+'\',\''+flag+'\')">❌ إعادة المحاولة</button>';
             }
         }
 
-        async function checkCode(num) {
+        async function checkAllCodes() {
+            el('messages').innerHTML += `<div class="msg-block">🔍 جاري جلب جميع الأكواد الحديثة للدولة...</div>`;
             try {
-                const d = await api('/api/otp?count=100');
-                if (Array.isArray(d)) {
-                    const f = d.find(i => i[1] === num);
-                    if (f) {
-                        const cd = f[2].match(/\d{4,8}/)?.[0] || f[2];
-                        el('messages').innerHTML += `<div class="msg-block">✅ تم العثور على الكود: <span class="code">${cd}</span></div>`;
-                        el('messages').scrollTop = el('messages').scrollHeight;
-                    } else {
-                        alert('⏳ لم يصل الكود بعد، حاول مرة أخرى.');
-                    }
+                const d = await api('/api/otp?count=50');
+                if (Array.isArray(d) && d.length > 0) {
+                    let html = `<div class="msg-block"><b>📦 قائمة الأكواد المستخرجة:</b><br>`;
+                    d.forEach(i => {
+                        const cd = i[2].match(/\d{4,8}/)?.[0] || i[2];
+                        html += `📱 <span class="num" onclick="copyText('${i[1]}')">${i[1]}</span> ⬅️ الكود: <span class="code" onclick="copyText('${cd}')">${cd}</span><br>`;
+                    });
+                    html += `</div>`;
+                    el('messages').innerHTML += html;
+                    el('messages').scrollTop = el('messages').scrollHeight;
+                } else {
+                    alert('⏳ لا توجد أكواد متاحة حالياً.');
                 }
             } catch (e) {}
         }
