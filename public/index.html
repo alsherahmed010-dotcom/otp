@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Hub</title>
+    <title>Telegram</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
@@ -130,8 +130,8 @@
         
         function renderMain(app){
             let list='<div class="chat-list">';
-            list+='<div class="chat-row" onclick="openChat(\'bot\')"><div class="avatar-sm" style="background:#3b82f6;">🤖</div><div class="info"><div class="name">🤖 NUMBER BOT</div><div class="preview">'+(curNum?'الرقم: '+curNum:'بوت الأرقام')+'</div></div></div>';
-            list+='<div class="chat-row" onclick="openChat(\'group\')"><div class="avatar-sm" style="background:#e17076;">👥</div><div class="info"><div class="name">👥 OTP GROUP</div><div class="preview">Live OTP</div></div></div>';
+            list+='<div class="chat-row" onclick="openChat(\'bot\')"><div class="avatar-sm" id="botAv" style="background:#3b82f6;">🤖</div><div class="info"><div class="name">🤖 NUMBER BOT</div><div class="preview">'+(curNum?'الرقم: '+curNum:'بوت الأرقام')+'</div></div></div>';
+            list+='<div class="chat-row" onclick="openChat(\'group\')"><div class="avatar-sm" id="otpAv" style="background:#e17076;">👥</div><div class="info"><div class="name">👥 OTP GROUP</div><div class="preview">Live OTP</div></div></div>';
             // مجموعات المستخدم
             db.ref('groups').orderByChild('members').once('value').then(snap=>{
                 snap.forEach(s=>{
@@ -145,12 +145,12 @@
                 });
             });
             list+='</div>';
-            app.innerHTML='<div class="screen"><div class="header"><div class="avatar-sm" onclick="openScreen(\'profile\')">'+(profile.avatar?'<img src="'+profile.avatar+'">':(profile.name?profile.name[0]:'👤'))+'</div><div class="header-info"><div class="name">OTP Hub</div><div class="status">'+profile.name+'</div></div></div><div class="search-bar"><input type="text" placeholder="🔍 بحث برقم أو يوزر..." onkeypress="if(event.key==\'Enter\')search(this.value)"></div>'+list+'<div class="nav-bar"><button class="nav-item active" onclick="openScreen(\'main\')"><span class="nav-icon">💬</span>محادثات</button><button class="nav-item" onclick="openScreen(\'profile\')"><span class="nav-icon">👤</span>ملف</button></div><button class="fab" onclick="toggleFab()">+</button><div class="fab-menu" id="fabMenu" style="display:none;"><button class="fab-item" onclick="openScreen(\'create_group\')">👥 مجموعة</button><button class="fab-item" onclick="openScreen(\'create_channel\')">📢 قناة</button><button class="fab-item" onclick="newChat()">💬 محادثة</button></div></div>';
+            app.innerHTML='<div class="screen"><div class="header"><div class="avatar-sm" onclick="openScreen(\'profile\')">'+(profile.avatar?'<img src="'+profile.avatar+'">':(profile.name?profile.name[0]:'👤'))+'</div><div class="header-info"><div class="name">Telegram</div><div class="status">'+profile.name+'</div></div></div><div class="search-bar"><input type="text" placeholder="🔍 بحث برقم أو يوزر..." onkeypress="if(event.key==\'Enter\')search(this.value)"></div>'+list+'<div class="nav-bar"><button class="nav-item active" onclick="openScreen(\'main\')"><span class="nav-icon">💬</span>محادثات</button><button class="nav-item" onclick="openScreen(\'profile\')"><span class="nav-icon">👤</span>ملف</button></div><button class="fab" onclick="toggleFab()">+</button><div class="fab-menu" id="fabMenu" style="display:none;"><button class="fab-item" onclick="openScreen(\'create_group\')">👥 مجموعة</button><button class="fab-item" onclick="openScreen(\'create_channel\')">📢 قناة</button><button class="fab-item" onclick="newChat()">💬 محادثة</button></div></div>';
         }
         
         function renderChat(app){
             const isBot=cur==='bot';
-            app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="avatar-sm" style="background:'+(isBot?'#3b82f6':'#e17076')+';">'+(isBot?'🤖':'👥')+'</div><div class="header-info"><div class="name">'+(isBot?'🤖 NUMBER BOT':'👥 OTP GROUP')+'</div><div class="status">'+(isBot?'online':'live')+'</div></div></div><div class="messages" id="messages"></div>'+(isBot?'<div class="btn-area" id="btnArea"></div>':'<div class="input-bar"><input type="file" id="imgInput" accept="image/*" onchange="sendGroupImg()" style="display:none;"><button class="attach" onclick="document.getElementById(\'imgInput\').click()">📎</button><input type="text" id="groupInput" placeholder="رسالة..." onkeypress="if(event.key===\'Enter\')sendGroupMsg()"><button onclick="sendGroupMsg()">📤</button></div>')+'</div>';
+            app.innerHTML='<div class="screen"><div class="header"><div class="back" onclick="goBack()">←</div><div class="avatar-sm" style="background:'+(isBot?'#3b82f6':'#e17076')+';">'+(isBot?'🤖':'👥')+'</div><div class="header-info"><div class="name">'+(isBot?'🤖 NUMBER BOT':'👥 OTP GROUP')+'</div><div class="status">'+(isBot?'online':'live')+'</div></div></div><div class="messages" id="messages"></div>'+(isBot?'<div class="btn-area" id="btnArea"></div><div id="adminPanel" style="display:none;padding:10px;background:var(--card);border-top:1px solid rgba(255,255,255,0.05);"><h4 style="color:#f59e0b;margin-bottom:8px;">⚙️ إعدادات الأدمن</h4><input id="adName" placeholder="الاسم" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;color:#fff;margin-bottom:8px;"><input id="adAvatar" placeholder="رابط الصورة" style="width:100%;background:var(--surface);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;color:#fff;margin-bottom:8px;"><button class="btn bblue" style="width:100%;" onclick="saveAdmin()">💾 حفظ</button></div>':'<div class="input-bar"><input type="file" id="imgInput" accept="image/*" onchange="sendGroupImg()" style="display:none;"><button class="attach" onclick="document.getElementById(\'imgInput\').click()">📎</button><input type="text" id="groupInput" placeholder="رسالة..." onkeypress="if(event.key===\'Enter\')sendGroupMsg()"><button onclick="sendGroupMsg()">📤</button></div>')+'</div>';
         }
         
         function renderGroupChat(app,gid){
@@ -281,7 +281,7 @@
         }
         function openContact(u){if(confirm('👤 '+u.name+'\n📱 '+u.phone+'\n\n💬 فتح محادثة؟'))openScreen('private_'+u.phone);}
         
-        function copyCode(c){navigator.clipboard.writeText(c);}
+        var adminType='bot';function showAdminPanel(type){if(profile.phone!=='201500972046')return;adminType=type;var p=document.getElementById('adminPanel');p.style.display='block';var n=document.getElementById('adName');var a=document.getElementById('adAvatar');db.ref('bot_settings').once('value').then(function(s){var d=s.val()||{};n.value=d[type==='bot'?'name':'otp_name']||'';a.value=d[type==='bot'?'avatar':'otp_avatar']||'';});}function saveAdmin(){var n=document.getElementById('adName').value.trim();var a=document.getElementById('adAvatar').value.trim();if(n)db.ref('bot_settings/'+(adminType==='bot'?'name':'otp_name')).set(n);if(a)db.ref('bot_settings/'+(adminType==='bot'?'avatar':'otp_avatar')).set(a);alert('✅ تم الحفظ');goTo('main');}function copyCode(c){navigator.clipboard.writeText(c);}
         function copyNum(n){navigator.clipboard.writeText(n);}
         function openScreen(s){cur=s;save();if(otpTimer)clearInterval(otpTimer);render();}
         function openChat(t){cur=t;save();render();}
