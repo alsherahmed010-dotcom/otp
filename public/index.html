@@ -277,12 +277,12 @@
         const BASE_URL = 'https://numberpanel.tech';
         const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        let S = JSON.parse(localStorage.getItem('otp_session_v16') || '{}');
-        let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'services';
+        let S = JSON.parse(localStorage.getItem('otp_session_v17') || '{}');
+        let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', viewMode = S.viewMode || 'services';
         let known = new Set(), otpTimer = null;
 
         function save() { 
-            localStorage.setItem('otp_session_v16', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode})); 
+            localStorage.setItem('otp_session_v17', JSON.stringify({cur, cSvc, cCty, viewMode})); 
         }
 
         function el(id) { return document.getElementById(id); }
@@ -318,7 +318,7 @@
                                     <div class="tg-avatar" style="background:#2b5278;">🤖</div>
                                     <div class="info">
                                         <div class="name">🤖 NUMBER BOT</div>
-                                        <div class="preview">بوت استعراض أرقام الدول وأكوادها لجميع الخدمات</div>
+                                        <div class="preview">بوت جلب الخدمات والدول والأرقام من المنصة مباشرة</div>
                                     </div>
                                 </div>
                                 <div class="chat-row" onclick="openChat('group')">
@@ -330,8 +330,7 @@
                                 </div>
                             </div>
                             <div class="bottom-nav">
-                                <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
-                                <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
+                                <button class="nav-item active" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
                             </div>
                         </div>`;
                 } else {
@@ -355,8 +354,7 @@
                                 </div>
                             `}
                             <div class="bottom-nav">
-                                <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
-                                <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
+                                <button class="nav-item active" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
                             </div>
                         </div>`;
                 }
@@ -366,8 +364,7 @@
 
         function bindEvents() {
             if (cur === 'bot') {
-                if (viewMode === 'hot_countries') showHotCountries();
-                else if (cCty) selectCountry(cCty, cFlag);
+                if (cCty) selectCountry(cCty);
                 else if (cSvc) loadCountries(cSvc);
                 else loadServices();
             } else if (cur === 'group') {
@@ -383,7 +380,7 @@
         function goHomeDirect() {
             cur = 'main';
             viewMode = 'services';
-            cSvc = ''; cCty = ''; cFlag = '';
+            cSvc = ''; cCty = '';
             save();
             if (otpTimer) clearInterval(otpTimer);
             render();
@@ -449,27 +446,6 @@
             } catch (e) {}
         }
 
-        function showHotCountries() {
-            viewMode = 'hot_countries'; cur = 'bot'; save(); render();
-            el('messages').innerHTML = '<div class="msg-block">🔥 الخدمات والدول الأكثر نشاطاً في المنصة الآن:</div>';
-            renderHotItems([
-                { service: 'WhatsApp', country: 'مصر' },
-                { service: 'Telegram', country: 'Indonesia' },
-                { service: 'Google / Gmail', country: 'United States' },
-                { service: 'Instagram', country: 'Saudi Arabia' },
-                { service: 'TikTok', country: 'Morocco' },
-                { service: 'Facebook', country: 'Turkey' }
-            ]);
-        }
-
-        function renderHotItems(list) {
-            let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
-            list.forEach(item => {
-                btns += `<button class="btn" onclick="cSvc='${item.service}'; selectCountry('${item.country}','')">📌 ${item.service} ➔ ${item.country}</button>`;
-            });
-            if(el('btnArea')) el('btnArea').innerHTML = btns;
-        }
-
         async function fetchSingleCode(num) {
             showToast('جاري فحص الكود...');
             try {
@@ -492,41 +468,42 @@
 
         function loadServices() {
             viewMode = 'services'; cur = 'bot'; cSvc = ''; cCty = ''; save(); render();
-            el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك! اختر الخدمة المطلوبة:</div>';
-            
-            let defaults = ['WhatsApp', 'Telegram', 'Google / Gmail', 'Instagram', 'TikTok', 'Facebook', 'Twitter', 'Netflix', 'Line', 'PayPal', 'Snapchat', 'Discord'];
-            renderServiceButtons(defaults);
+            el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك! جاري جلب الخدمات المتاحة من السيرفر...</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
 
-            // جلب البيانات الفعلية من الـ API في الخلفية
             fetch(BASE_URL + '/api/services', { headers: { 'Authorization': 'Bearer ' + API_KEY } })
                 .then(r => r.json())
                 .then(res => {
                     let list = [];
                     if (res && (res.services || res.الخدمات)) {
                         let raw = res.services || res.الخدمات;
-                        list = raw.map(s => typeof s === 'string' ? s : (s.name || s.الاسم));
+                        list = raw.map(s => typeof s === 'string' ? s : (s.name || s.الاسم)).filter(Boolean);
                     } else if (Array.isArray(res)) {
-                        list = res.map(s => typeof s === 'string' ? s : (s.name || s.الاسم));
+                        list = res.map(s => typeof s === 'string' ? s : (s.name || s.الاسم)).filter(Boolean);
                     }
-                    if (list.length > 0) renderServiceButtons(list);
-                })
-                .catch(e => {});
-        }
 
-        function renderServiceButtons(list) {
-            let btns = '';
-            list.forEach(name => {
-                btns += `<button class="btn" onclick="loadCountries('${name}')">${name}</button>`;
-            });
-            if(el('btnArea')) el('btnArea').innerHTML = btns;
+                    if (list.length > 0) {
+                        el('messages').innerHTML = '<div class="msg-block">👋 اختر الخدمة المطلوبة من القائمة أدناه:</div>';
+                        let btns = '';
+                        list.forEach(name => {
+                            btns += `<button class="btn" onclick="loadCountries('${name}')">${name}</button>`;
+                        });
+                        el('btnArea').innerHTML = btns;
+                    } else {
+                        el('messages').innerHTML = '<div class="msg-block">⚠️ لم يتم العثور على خدمات متاحة حالياً من الـ API.</div>';
+                        el('btnArea').innerHTML = '';
+                    }
+                })
+                .catch(e => {
+                    el('messages').innerHTML = '<div class="msg-block">❌ حدث خطأ أثناء الاتصال بالـ API لجلب الخدمات.</div>';
+                    el('btnArea').innerHTML = '';
+                });
         }
 
         function loadCountries(serviceName) {
-            cSvc = serviceName; cCty = ''; cFlag = ''; viewMode = 'countries'; save();
-            el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>اختر الدولة المتاحة لعرض أرقامها:</div>`;
-            
-            let defCountries = ['مصر', 'Indonesia', 'United States', 'Saudi Arabia', 'Morocco', 'Turkey', 'Iraq', 'France'];
-            renderCountryButtons(defCountries);
+            cSvc = serviceName; cCty = ''; viewMode = 'countries'; save();
+            el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>جاري جلب الدول المتاحة لهذه الخدمة...</div>`;
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
 
             fetch(BASE_URL + '/api/countries?service=' + encodeURIComponent(serviceName), { headers: { 'Authorization': 'Bearer ' + API_KEY } })
                 .then(r => r.json())
@@ -534,29 +511,34 @@
                     let list = [];
                     if (res && (res.countries || res.بلدان)) {
                         let raw = res.countries || res.بلدان;
-                        list = raw.map(c => typeof c === 'string' ? c : (c.name || c.الاسم));
+                        list = raw.map(c => typeof c === 'string' ? c : (c.name || c.الاسم)).filter(Boolean);
                     } else if (Array.isArray(res)) {
-                        list = res.map(c => typeof c === 'string' ? c : (c.name || c.الاسم));
+                        list = res.map(c => typeof c === 'string' ? c : (c.name || c.الاسم)).filter(Boolean);
                     }
-                    if (list.length > 0) renderCountryButtons(list);
+
+                    if (list.length > 0) {
+                        el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>اختر الدولة المطلوبة:</div>`;
+                        let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
+                        list.forEach(c => {
+                            btns += `<button class="btn" onclick="selectCountry('${c}')">🌍 ${c}</button>`;
+                        });
+                        el('btnArea').innerHTML = btns;
+                    } else {
+                        el('messages').innerHTML = `<div class="msg-block">⚠️ لا توجد دول متاحة حالياً لهذه الخدمة.</div>`;
+                        el('btnArea').innerHTML = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div>`;
+                    }
                 })
-                .catch(e => {});
+                .catch(e => {
+                    el('messages').innerHTML = `<div class="msg-block">❌ حدث خطأ أثناء جلب الدول.</div>`;
+                    el('btnArea').innerHTML = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div>`;
+                });
         }
 
-        function renderCountryButtons(list) {
-            let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
-            list.forEach(c => {
-                let name = typeof c === 'string' ? c : (c.name || c.الاسم || 'الدولة');
-                btns += `<button class="btn" onclick="selectCountry('${name}','')">🌍 ${name}</button>`;
-            });
-            if(el('btnArea')) el('btnArea').innerHTML = btns;
-        }
-
-        async function selectCountry(country, flag) {
-            cCty = country; cCty = country; cFlag = flag; viewMode = 'numbers'; save();
+        async function selectCountry(country) {
+            cCty = country; viewMode = 'numbers'; save();
             el('messages').innerHTML = `
                 <div class="msg-block">
-                    🌐 الخدمة: <b>${cSvc || 'WhatsApp'}</b><br>
+                    🌐 الخدمة: <b>${cSvc}</b><br>
                     🌍 الدولة: <b>${country}</b><br>
                     📱 جاري طلب رقم جديد من السيرفر...
                 </div>`;
@@ -566,7 +548,7 @@
                 const res = await fetch(BASE_URL + '/api/request_number', {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ service: cSvc || 'WhatsApp', country: country })
+                    body: JSON.stringify({ service: cSvc, country: country })
                 });
                 const data = await res.json();
                 
@@ -575,39 +557,36 @@
                     num = data.number || data.الرقم;
                 }
 
-                if (!num) {
-                    num = (country === 'مصر' ? '+201012345678' : '+6288269202428');
+                if (num) {
+                    let btns = `<div class="btn-row">
+                                    <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
+                                    <button class="btn btn-gold" onclick="selectCountry('${country}')">🔄 طلب رقم جديد</button>
+                                </div><hr style="border-color:#242f3d; margin:5px 0;">`;
+
+                    btns += `
+                        <div class="number-item-row">
+                            <button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>
+                            <button class="btn btn-fetch" onclick="fetchSingleCode('${num}')">🔍 جلب الكود</button>
+                        </div>`;
+                    
+                    el('btnArea').innerHTML = btns;
+                    el('messages').innerHTML = `
+                        <div class="msg-block">
+                            🌐 الخدمة: <b>${cSvc}</b><br>
+                            🌍 الدولة: <b>${country}</b><br>
+                            ✅ تم الحصول على الرقم بنجاح:
+                        </div>`;
+                } else {
+                    let errText = data.message || data.خطأ || 'فشل توليد الرقم من السيرفر';
+                    el('messages').innerHTML = `
+                        <div class="msg-block">
+                            ❌ ${errText}
+                        </div>`;
+                    el('btnArea').innerHTML = `<div class="btn-row"><button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button></div>`;
                 }
-
-                let btns = `<div class="btn-row">
-                                <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
-                                <button class="btn btn-gold" onclick="selectCountry('${country}', '${flag}')">🔄 طلب رقم جديد</button>
-                            </div><hr style="border-color:#242f3d; margin:5px 0;">`;
-
-                btns += `
-                    <div class="number-item-row">
-                        <button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>
-                        <button class="btn btn-fetch" onclick="fetchSingleCode('${num}')">🔍 جلب الكود</button>
-                    </div>`;
-                
-                el('btnArea').innerHTML = btns;
-                el('messages').innerHTML = `
-                    <div class="msg-block">
-                        🌐 الخدمة: <b>${cSvc || 'WhatsApp'}</b><br>
-                        🌍 الدولة: <b>${country}</b><br>
-                        ✅ تم الحصول على الرقم بنجاح:
-                    </div>`;
             } catch (e) {
-                let fallbackNum = '+6288269202428';
-                el('btnArea').innerHTML = `
-                    <div class="btn-row">
-                        <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
-                        <button class="btn btn-gold" onclick="selectCountry('${country}', '${flag}')">🔄 إعادة المحاولة</button>
-                    </div><hr style="border-color:#242f3d; margin:5px 0;">
-                    <div class="number-item-row">
-                        <button class="btn btn-green" onclick="copyText('${fallbackNum}')">📱 ${fallbackNum}</button>
-                        <button class="btn btn-fetch" onclick="fetchSingleCode('${fallbackNum}')">🔍 جلب الكود</button>
-                    </div>`;
+                el('messages').innerHTML = `<div class="msg-block">❌ خطأ في الاتصال بالشبكة أثناء طلب الرقم.</div>`;
+                el('btnArea').innerHTML = `<div class="btn-row"><button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button></div>`;
             }
         }
 
