@@ -37,6 +37,7 @@
             position: relative;
             overflow: hidden;
             transform: translateZ(0);
+            will-change: transform;
         }
 
         .screen {
@@ -45,6 +46,8 @@
             flex-direction: column;
             overflow: hidden;
             background-color: #0e1621;
+            transform: translateZ(0);
+            will-change: transform;
         }
 
         /* Header */
@@ -101,6 +104,7 @@
             overflow-y: auto;
             background-color: #0e1621;
             -webkit-overflow-scrolling: touch;
+            transform: translateZ(0);
         }
 
         .chat-row {
@@ -128,6 +132,7 @@
             gap: 10px;
             background-color: #0e1621;
             -webkit-overflow-scrolling: touch;
+            transform: translateZ(0);
         }
 
         .msg-block {
@@ -246,12 +251,12 @@
             font-size: 14px;
             font-weight: 700;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: opacity 0.2s;
+            transition: opacity 0.15s;
             opacity: 0;
         }
         #toast.show { visibility: visible; opacity: 1; }
 
-        /* Bottom Nav (2 buttons only) */
+        /* Bottom Nav */
         .bottom-nav { background-color: #17212b; display: flex; justify-content: space-around; padding: 6px 0; border-top: 1px solid #111822; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #7d8b99; font-size: 12px; font-weight: 500; cursor: pointer; gap: 3px; background: none; border: none; flex: 1; }
         .nav-item.active { color: #5288c1; }
@@ -272,44 +277,19 @@
         const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
         const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        // استعادة الحالة الكاملة مع حفظ كل خطوة والدولة والأرقام
-        let S = JSON.parse(localStorage.getItem('otp_session_v11') || '{}');
+        let S = JSON.parse(localStorage.getItem('otp_session_v12') || '{}');
         let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'services';
         let numBatchIndex = S.numBatchIndex || 0, currentNumbersPool = S.currentNumbersPool || [];
         let known = new Set(), otpTimer = null;
 
-        // نظام المؤثرات الصوتية الفورية
-        function playSound(type) {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain); gain.connect(ctx.destination);
-                if (type === 'click') {
-                    osc.frequency.setValueAtTime(320, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.04, ctx.currentTime);
-                    osc.start(); osc.stop(ctx.currentTime + 0.04);
-                } else if (type === 'copy') {
-                    osc.frequency.setValueAtTime(580, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-                    osc.start(); osc.stop(ctx.currentTime + 0.08);
-                } else if (type === 'otp') {
-                    osc.frequency.setValueAtTime(750, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-                    osc.start(); osc.stop(ctx.currentTime + 0.12);
-                }
-            } catch(e) {}
-        }
-
         function save() { 
-            localStorage.setItem('otp_session_v11', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
+            localStorage.setItem('otp_session_v12', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
         }
 
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
         function el(id) { return document.getElementById(id); }
 
         function showToast(msg) {
-            playSound('copy');
             let t = el('toast');
             if(!t) {
                 t = document.createElement('div');
@@ -318,71 +298,73 @@
             }
             t.innerText = msg || "تم النسخ!";
             t.className = "show";
-            setTimeout(() => { t.className = ""; }, 1500);
+            setTimeout(() => { t.className = ""; }, 1200);
         }
 
+        // محرك 144Hz لتنفيذ التحديثات بسلاسة فائقة تزامناً مع شاشة الجهاز
         function render() {
-            playSound('click');
-            const app = el('app');
-            let toastHTML = '<div id="toast">تم النسخ!</div>';
+            requestAnimationFrame(() => {
+                const app = el('app');
+                let toastHTML = '<div id="toast">تم النسخ!</div>';
 
-            if (cur === 'main') {
-                app.innerHTML = toastHTML + `
-                    <div class="screen">
-                        <div class="tg-header">
-                            <div class="tg-header-left">
-                                <div class="tg-avatar">✈️</div>
-                                <div class="tg-title-info"><h2>Telegram</h2><p>Number Panel Live</p></div>
-                            </div>
-                        </div>
-                        <div class="main-list">
-                            <div class="chat-row" onclick="openChat('bot')">
-                                <div class="tg-avatar" style="background:#2b5278;">🤖</div>
-                                <div class="info">
-                                    <div class="name">🤖 NUMBER BOT</div>
-                                    <div class="preview">بوت استعراض أرقام الدول وأكوادها لجميع الخدمات</div>
+                if (cur === 'main') {
+                    app.innerHTML = toastHTML + `
+                        <div class="screen">
+                            <div class="tg-header">
+                                <div class="tg-header-left">
+                                    <div class="tg-avatar">✈️</div>
+                                    <div class="tg-title-info"><h2>Telegram</h2><p>Number Panel Live</p></div>
                                 </div>
                             </div>
-                            <div class="chat-row" onclick="openChat('group')">
-                                <div class="tg-avatar" style="background:#2e8b57;">👥</div>
-                                <div class="info">
-                                    <div class="name">👥 ALL TECH OTP</div>
-                                    <div class="preview">بث مباشر ومراسلة جماعية لأكواد التفعيل</div>
+                            <div class="main-list">
+                                <div class="chat-row" onclick="openChat('bot')">
+                                    <div class="tg-avatar" style="background:#2b5278;">🤖</div>
+                                    <div class="info">
+                                        <div class="name">🤖 NUMBER BOT</div>
+                                        <div class="preview">بوت استعراض أرقام الدول وأكوادها لجميع الخدمات</div>
+                                    </div>
+                                </div>
+                                <div class="chat-row" onclick="openChat('group')">
+                                    <div class="tg-avatar" style="background:#2e8b57;">👥</div>
+                                    <div class="info">
+                                        <div class="name">👥 ALL TECH OTP</div>
+                                        <div class="preview">بث مباشر ومراسلة جماعية لأكواد التفعيل</div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="bottom-nav">
-                            <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
-                            <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
-                        </div>
-                    </div>`;
-            } else {
-                app.innerHTML = toastHTML + `
-                    <div class="screen">
-                        <div class="tg-header">
-                            <div class="tg-header-left">
-                                <div class="tg-back-arrow" onclick="goHomeDirect()">←</div>
-                                <div class="tg-avatar">${cur === 'bot' ? '🤖' : '👥'}</div>
-                                <div class="tg-title-info">
-                                    <h2>${cur === 'bot' ? '🤖 NUMBER BOT' : '👥 ALL TECH OTP'}</h2>
-                                    <p>${cur === 'bot' ? 'متصل الآن' : '٨٣٤٣ عضواً، ١٥٣١ متصلاً'}</p>
+                            <div class="bottom-nav">
+                                <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
+                                <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
+                            </div>
+                        </div>`;
+                } else {
+                    app.innerHTML = toastHTML + `
+                        <div class="screen">
+                            <div class="tg-header">
+                                <div class="tg-header-left">
+                                    <div class="tg-back-arrow" onclick="goHomeDirect()">←</div>
+                                    <div class="tg-avatar">${cur === 'bot' ? '🤖' : '👥'}</div>
+                                    <div class="tg-title-info">
+                                        <h2>${cur === 'bot' ? '🤖 NUMBER BOT' : '👥 ALL TECH OTP'}</h2>
+                                        <p>${cur === 'bot' ? 'متصل الآن' : '٨٣٤٣ عضواً، ١٥٣١ متصلاً'}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="chat-body" id="messages"></div>
-                        ${cur === 'bot' ? '<div class="btn-area" id="btnArea"></div>' : `
-                            <div class="chat-input-bar">
-                                <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." onkeypress="if(event.key==='Enter') sendGroupMsg()">
-                                <button onclick="sendGroupMsg()">📤</button>
+                            <div class="chat-body" id="messages"></div>
+                            ${cur === 'bot' ? '<div class="btn-area" id="btnArea"></div>' : `
+                                <div class="chat-input-bar">
+                                    <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." onkeypress="if(event.key==='Enter') sendGroupMsg()">
+                                    <button onclick="sendGroupMsg()">📤</button>
+                                </div>
+                            `}
+                            <div class="bottom-nav">
+                                <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
+                                <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
                             </div>
-                        `}
-                        <div class="bottom-nav">
-                            <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
-                            <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
-                        </div>
-                    </div>`;
-            }
-            bindEvents();
+                        </div>`;
+                }
+                bindEvents();
+            });
         }
 
         function bindEvents() {
@@ -401,7 +383,6 @@
             }
         }
 
-        // زر الخروج العلوي يرجعك للمحادثات الرئيسية علطول
         function goHomeDirect() {
             cur = 'main';
             viewMode = 'services';
@@ -433,7 +414,6 @@
             if (cur !== 'group') return;
             const t = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute: '2-digit'});
             if (m.type === 'otp') {
-                playSound('otp');
                 el('messages').innerHTML += `
                     <div class="msg-block">
                         <span class="msg-user">Alexender (المشرف)</span><br>
@@ -489,7 +469,7 @@
             el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
             
             try {
-                const d = await api('/api/otp?count=40');
+                const d = await api('/api/otp?count=30');
                 let counts = {};
                 if (Array.isArray(d)) {
                     d.forEach(i => { let c = i.length > 4 && i[4] ? i[4] : 'زيمبابوي 🇿🇼'; counts[c] = (counts[c] || 0) + 1; });
@@ -509,7 +489,6 @@
                 const res = await fetch(PROXY + '/api/latest_otp?number=' + encodeURIComponent(num), { headers: { 'Authorization': 'Bearer ' + API_KEY } });
                 const data = await res.json();
                 if (data && data.success && data.has_otp) {
-                    playSound('otp');
                     el('messages').innerHTML += `
                         <div class="msg-block">
                             📱 الرقم: <span class="num" onclick="copyText('${num}')">${num}</span><br>
@@ -578,7 +557,7 @@
                         if (reqData && reqData.success && reqData.number) currentNumbersPool.push(reqData.number);
                     } catch(err) {}
 
-                    const d = await api(`/api/otp?count=40`);
+                    const d = await api(`/api/otp?count=30`);
                     if (Array.isArray(d)) {
                         d.forEach(i => {
                             if (i.length > 4 && i[4] && i[4].toUpperCase().includes(country.toUpperCase()) && i[1]) {
