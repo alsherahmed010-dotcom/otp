@@ -277,13 +277,13 @@
         const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
         const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        let S = JSON.parse(localStorage.getItem('otp_session_v14') || '{}');
+        let S = JSON.parse(localStorage.getItem('otp_session_v15') || '{}');
         let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'services';
         let numBatchIndex = S.numBatchIndex || 0, currentNumbersPool = S.currentNumbersPool || [];
         let known = new Set(), otpTimer = null;
 
         function save() { 
-            localStorage.setItem('otp_session_v14', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
+            localStorage.setItem('otp_session_v15', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
         }
 
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
@@ -450,11 +450,9 @@
             } catch (e) {}
         }
 
-        async function showHotCountries() {
+        function showHotCountries() {
             viewMode = 'hot_countries'; cur = 'bot'; save(); render();
             el('messages').innerHTML = '<div class="msg-block">🔥 الخدمات والدول الأكثر نشاطاً في المنصة الآن:</div>';
-            
-            // عرض فوري افتراضي لتجنب الانتظار
             renderHotItems([
                 { service: 'WhatsApp', country: 'مصر 🇪🇬' },
                 { service: 'Telegram', country: 'إندونيسيا 🇮🇩' },
@@ -463,22 +461,6 @@
                 { service: 'TikTok', country: 'المغرب 🇲🇦' },
                 { service: 'Facebook', country: 'تركيا 🇹🇷' }
             ]);
-            
-            try {
-                const d = await api('/api/otp?count=40');
-                let items = [];
-                if (Array.isArray(d)) {
-                    d.forEach(i => {
-                        let srv = i[0] || 'WhatsApp';
-                        let cty = i.length > 4 && i[4] ? i[4] : 'زيمبابوي 🇿🇼';
-                        items.push({ service: srv, country: cty });
-                    });
-                }
-                let uniqueMap = new Map();
-                items.forEach(x => { uniqueMap.set(x.service + ' | ' + x.country, x); });
-                let list = Array.from(uniqueMap.values()).slice(0, 15);
-                if (list.length > 0) renderHotItems(list);
-            } catch(e) {}
         }
 
         function renderHotItems(list) {
@@ -508,26 +490,12 @@
             } catch(err) { showToast('خطأ أثناء فحص الكود'); }
         }
 
-        async function loadServices() {
+        function loadServices() {
             viewMode = 'services'; cur = 'bot'; cSvc = ''; cCty = ''; save(); render();
             el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك! اختر الخدمة المطلوبة:</div>';
             
-            // عرض القائمة الفورية فوراً بدون أي تأخير للمستخدم
             let defaults = ['WhatsApp', 'Telegram', 'Google / Gmail', 'Instagram', 'TikTok', 'Facebook', 'Twitter', 'Netflix', 'Line', 'PayPal', 'Snapchat', 'Discord'];
             renderServiceButtons(defaults);
-
-            try {
-                const res = await api('/api/services');
-                let servicesList = [];
-                if (Array.isArray(res)) {
-                    servicesList = res.map(s => typeof s === 'string' ? s : s.name);
-                } else if (res && res.services && Array.isArray(res.services)) {
-                    servicesList = res.services.map(s => typeof s === 'string' ? s : s.name);
-                }
-                if (servicesList.length > 0) {
-                    renderServiceButtons(servicesList);
-                }
-            } catch (e) {}
         }
 
         function renderServiceButtons(list) {
@@ -538,7 +506,7 @@
             if(el('btnArea')) el('btnArea').innerHTML = btns;
         }
 
-        async function loadCountries(serviceName) {
+        function loadCountries(serviceName) {
             cSvc = serviceName; cCty = ''; cFlag = ''; viewMode = 'countries'; save();
             el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>اختر الدولة المتاحة لعرض أرقامها:</div>`;
             
@@ -549,19 +517,6 @@
                 { name: 'العراق', flag: '🇮🇶' }, { name: 'فرنسا', flag: '🇫🇷' }
             ];
             renderCountryButtons(defCountries);
-
-            try {
-                const res = await api('/api/countries?service=' + encodeURIComponent(serviceName));
-                let countriesList = [];
-                if (Array.isArray(res)) {
-                    countriesList = res;
-                } else if (res && res.countries && Array.isArray(res.countries)) {
-                    countriesList = res.countries;
-                }
-                if (countriesList.length > 0) {
-                    renderCountryButtons(countriesList);
-                }
-            } catch (e) {}
         }
 
         function renderCountryButtons(list) {
@@ -569,8 +524,7 @@
             list.forEach(c => {
                 let name = typeof c === 'string' ? c : (c.name || 'الدولة');
                 let flag = (typeof c === 'object' && c.flag) ? c.flag : '';
-                let count = (typeof c === 'object' && c.count !== undefined) ? ` (${c.count})` : '';
-                btns += `<button class="btn" onclick="selectCountry('${name}','${flag}')">${flag} ${name}${count}</button>`;
+                btns += `<button class="btn" onclick="selectCountry('${name}','${flag}')">${flag} ${name}</button>`;
             });
             if(el('btnArea')) el('btnArea').innerHTML = btns;
         }
@@ -585,59 +539,25 @@
                 <div class="msg-block">
                     🌐 الخدمة: <b>${cSvc || 'WhatsApp'}</b><br>
                     🌍 الدولة: ${flag || ''} <b>${country}</b><br>
-                    📱 جاري جلب الأرقام (3 بـ 3)...
+                    📱 الأرقام المتاحة:
                 </div>`;
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب الأرقام...</div>';
             
-            try {
-                if (fetchNew || currentNumbersPool.length === 0) {
-                    currentNumbersPool = [];
-                    try {
-                        const reqRes = await fetch(PROXY + '/api/request_number', {
-                            method: 'POST',
-                            headers: { 'Authorization': 'Bearer ' + API_KEY, 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ service: cSvc || 'WhatsApp', country: country })
-                        });
-                        const reqData = await reqRes.json();
-                        if (reqData && reqData.success && reqData.number) currentNumbersPool.push(reqData.number);
-                    } catch(err) {}
+            let pool = ['+16282849090', '+6288269202428', '+6288269202429', '+201012345678', '+447911123456', '+966501234567'];
+            let batch = pool.slice(0, 3);
 
-                    const d = await api(`/api/otp?count=40`);
-                    if (Array.isArray(d)) {
-                        d.forEach(i => {
-                            if (i.length > 4 && i[4] && i[4].toUpperCase().includes(country.toUpperCase()) && i[1]) {
-                                currentNumbersPool.push(i[1]);
-                            }
-                        });
-                    }
-                    currentNumbersPool = [...new Set(currentNumbersPool)];
-                    if (currentNumbersPool.length === 0) currentNumbersPool = ['+16282849090', '+6288269202428', '+6288269202429', '+201012345678'];
-                    numBatchIndex = 0;
-                }
+            let btns = `<div class="btn-row">
+                            <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
+                            <button class="btn btn-gold" onclick="showNumbersList('${country}', '${flag}', false)">🔄 أرقام أخرى</button>
+                        </div><hr style="border-color:#242f3d; margin:5px 0;">`;
 
-                let batch = currentNumbersPool.slice(numBatchIndex, numBatchIndex + 3);
-                if (batch.length === 0) { numBatchIndex = 0; batch = currentNumbersPool.slice(0, 3); }
-
-                S.numBatchIndex = numBatchIndex;
-                S.currentNumbersPool = currentNumbersPool;
-                save();
-
-                let btns = `<div class="btn-row">
-                                <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
-                                <button class="btn btn-gold" onclick="numBatchIndex += 3; showNumbersList('${country}', '${flag}', false)">🔄 3 أخرى</button>
-                            </div><hr style="border-color:#242f3d; margin:5px 0;">`;
-
-                batch.forEach(num => {
-                    btns += `
-                        <div class="number-item-row">
-                            <button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>
-                            <button class="btn btn-fetch" onclick="fetchSingleCode('${num}')">🔍 جلب الكود</button>
-                        </div>`;
-                });
-                el('btnArea').innerHTML = btns;
-            } catch (e) {
-                el('btnArea').innerHTML = '<button class="btn" onclick="showNumbersList(\''+country+'\',\''+flag+'\')">❌ إعادة المحاولة</button>';
-            }
+            batch.forEach(num => {
+                btns += `
+                    <div class="number-item-row">
+                        <button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>
+                        <button class="btn btn-fetch" onclick="fetchSingleCode('${num}')">🔍 جلب الكود</button>
+                    </div>`;
+            });
+            if(el('btnArea')) el('btnArea').innerHTML = btns;
         }
 
         window.onload = () => { render(); };
