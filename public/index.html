@@ -12,6 +12,8 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -21,6 +23,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            touch-action: manipulation;
         }
 
         .telegram-container {
@@ -33,6 +36,7 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.5);
             position: relative;
             overflow: hidden;
+            transform: translateZ(0);
         }
 
         .screen {
@@ -41,17 +45,18 @@
             flex-direction: column;
             overflow: hidden;
             background-color: #0e1621;
+            will-change: transform;
         }
 
         /* Header */
         .tg-header {
             background-color: #242f3d;
-            padding: 12px 15px;
+            padding: 10px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #111822;
-            min-height: 60px;
+            min-height: 56px;
         }
 
         .tg-header-left {
@@ -64,30 +69,30 @@
             color: #ffffff;
             font-size: 24px;
             cursor: pointer;
-            padding: 0 5px;
+            padding: 4px 8px;
         }
 
         .tg-avatar {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background-color: #2b5278;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 18px;
             color: #fff;
             flex-shrink: 0;
         }
 
         .tg-title-info h2 {
-            font-size: 17px;
+            font-size: 16px;
             color: #ffffff;
             font-weight: 600;
         }
 
         .tg-title-info p {
-            font-size: 13px;
+            font-size: 12px;
             color: #7d8b99;
         }
 
@@ -96,105 +101,107 @@
             flex: 1;
             overflow-y: auto;
             background-color: #0e1621;
+            -webkit-overflow-scrolling: touch;
         }
 
         .chat-row {
             display: flex;
             align-items: center;
-            padding: 14px 16px;
+            padding: 12px 16px;
             gap: 14px;
             cursor: pointer;
             border-bottom: 1px solid rgba(255,255,255,0.02);
         }
 
-        .chat-row:hover { background-color: rgba(255,255,255,0.03); }
-        .chat-row .tg-avatar { width: 50px; height: 50px; font-size: 22px; }
+        .chat-row:active { background-color: rgba(255,255,255,0.05); }
+        .chat-row .tg-avatar { width: 48px; height: 48px; font-size: 20px; }
         .chat-row .info { flex: 1; min-width: 0; }
-        .chat-row .name { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-        .chat-row .preview { font-size: 14px; color: #7d8b99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-row .name { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .chat-row .preview { font-size: 13px; color: #7d8b99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Chat Body */
         .chat-body {
             flex: 1;
-            padding: 15px;
+            padding: 12px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             background-color: #0e1621;
+            -webkit-overflow-scrolling: touch;
         }
 
         .msg-block {
             background-color: #182533;
-            border-radius: 12px;
-            padding: 14px;
-            font-size: 15px;
-            line-height: 1.6;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            line-height: 1.5;
             color: #ffffff;
         }
 
         .msg-user { color: #64b5f6; font-weight: 600; }
-        .num { color: #60a5fa; font-weight: 600; font-size: 17px; cursor: pointer; }
-        .code { background-color: #f59e0b; color: #000; padding: 4px 12px; border-radius: 6px; font-weight: 700; display: inline-block; margin: 6px 0; font-size: 17px; cursor: pointer; }
-        .time-tag { font-size: 12px; color: #7d8b99; text-align: left; margin-top: 6px; }
+        .num { color: #60a5fa; font-weight: 600; font-size: 16px; cursor: pointer; }
+        .code { background-color: #f59e0b; color: #000; padding: 3px 10px; border-radius: 5px; font-weight: 700; display: inline-block; margin: 4px 0; font-size: 16px; cursor: pointer; }
+        .time-tag { font-size: 11px; color: #7d8b99; text-align: left; margin-top: 4px; }
 
         /* Buttons */
         .btn {
             border: none;
             border-radius: 8px;
-            padding: 13px;
-            font-size: 16px;
+            padding: 11px;
+            font-size: 15px;
             font-weight: 600;
             color: #fff;
             cursor: pointer;
             text-align: center;
             background-color: #2b5278;
             width: 100%;
-            margin-bottom: 8px;
-            transition: opacity 0.2s;
+            margin-bottom: 6px;
         }
 
-        .btn:active { opacity: 0.7; }
+        .btn:active { opacity: 0.7; transform: scale(0.98); }
         .btn-green { background-color: #2e8b57; }
         .btn-gold { background-color: #f59e0b; color: #000; }
-        .btn-row { display: flex; gap: 10px; }
+        .btn-row { display: flex; gap: 8px; }
         .btn-row .btn { flex: 1; margin-bottom: 0; }
 
         .number-item-row {
             display: flex;
             gap: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             align-items: center;
         }
         .number-item-row .btn {
             margin-bottom: 0;
             flex: 2;
-            font-size: 15px;
+            font-size: 14px;
         }
         .number-item-row .btn-fetch {
             flex: 1;
             background-color: #2675d3;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .btn-area {
-            padding: 12px;
+            padding: 10px;
             border-top: 1px solid #111822;
             background-color: #17212b;
             display: flex;
             flex-direction: column;
             gap: 6px;
-            max-height: 52vh; 
+            max-height: 50vh; 
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* Chat Input Bar */
         .chat-input-bar {
             display: flex;
-            padding: 10px;
+            padding: 8px 10px;
             background-color: #17212b;
             border-top: 1px solid #111822;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
         }
 
@@ -203,9 +210,9 @@
             background-color: #0e1621;
             border: 1px solid #2b5278;
             border-radius: 20px;
-            padding: 10px 16px;
+            padding: 8px 14px;
             color: #fff;
-            font-size: 15px;
+            font-size: 14px;
             outline: none;
         }
 
@@ -214,45 +221,45 @@
             color: #fff;
             border: none;
             border-radius: 50%;
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
         }
 
         /* Toast */
         #toast {
             visibility: hidden;
-            min-width: 170px;
+            min-width: 150px;
             background-color: #f59e0b;
             color: #000;
             text-align: center;
             border-radius: 6px;
-            padding: 10px;
+            padding: 8px;
             position: absolute;
             z-index: 99;
             left: 50%;
-            bottom: 75px;
+            bottom: 70px;
             transform: translateX(-50%);
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: opacity 0.3s;
+            transition: opacity 0.2s;
             opacity: 0;
         }
         #toast.show { visibility: visible; opacity: 1; }
 
         /* Bottom Nav */
-        .bottom-nav { background-color: #17212b; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #111822; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #7d8b99; font-size: 13px; font-weight: 500; cursor: pointer; gap: 4px; background: none; border: none; flex: 1; }
+        .bottom-nav { background-color: #17212b; display: flex; justify-content: space-around; padding: 6px 0; border-top: 1px solid #111822; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #7d8b99; font-size: 12px; font-weight: 500; cursor: pointer; gap: 3px; background: none; border: none; flex: 1; }
         .nav-item.active { color: #5288c1; }
-        .nav-icon { font-size: 22px; }
+        .nav-icon { font-size: 20px; }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
     </style>
 </head>
 <body>
@@ -266,34 +273,20 @@
         const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
         const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        let S = JSON.parse(localStorage.getItem('otp_session_v9') || '{}');
+        // استعادة الحالة الكاملة فوراً من الذاكرة للحفاظ على كل شيء عند الخروج والعودة
+        let S = JSON.parse(localStorage.getItem('otp_session_v10') || '{}');
         let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'services';
-        let known = new Set(), otpTimer = null, numBatchIndex = 0, currentNumbersPool = [];
+        let numBatchIndex = S.numBatchIndex || 0, currentNumbersPool = S.currentNumbersPool || [];
+        let known = new Set(), otpTimer = null;
 
-        function playSound(type) {
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain); gain.connect(ctx.destination);
-                if (type === 'click') {
-                    osc.frequency.setValueAtTime(350, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.03, ctx.currentTime);
-                    osc.start(); osc.stop(ctx.currentTime + 0.04);
-                } else if (type === 'copy' || type === 'otp') {
-                    osc.frequency.setValueAtTime(600, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-                    osc.start(); osc.stop(ctx.currentTime + 0.08);
-                }
-            } catch(e) {}
+        function save() { 
+            localStorage.setItem('otp_session_v10', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
         }
 
-        function save() { localStorage.setItem('otp_session_v9', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode})); }
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
         function el(id) { return document.getElementById(id); }
 
         function showToast(msg) {
-            playSound('copy');
             let t = el('toast');
             if(!t) {
                 t = document.createElement('div');
@@ -302,11 +295,10 @@
             }
             t.innerText = msg || "تم النسخ!";
             t.className = "show";
-            setTimeout(() => { t.className = ""; }, 1800);
+            setTimeout(() => { t.className = ""; }, 1500);
         }
 
         function render() {
-            playSound('click');
             const app = el('app');
             let toastHTML = '<div id="toast">تم النسخ!</div>';
 
@@ -336,7 +328,7 @@
                             </div>
                         </div>
                         <div class="bottom-nav">
-                            <button class="nav-item ${viewMode !== 'hot_countries' && viewMode !== 'my_numbers' ? 'active' : ''}" onclick="openScreen('main'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
+                            <button class="nav-item ${viewMode !== 'hot_countries' && viewMode !== 'my_numbers' ? 'active' : ''}" onclick="openChat('bot'); loadServices();"><span class="nav-icon">💬</span>محادثات</button>
                             <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="showHotCountries();"><span class="nav-icon">🔥</span>الأكثر نشاطاً</button>
                             <button class="nav-item ${viewMode === 'my_numbers' ? 'active' : ''}" onclick="showMyNumbers();"><span class="nav-icon">📱</span>أرقامي النشطة</button>
                         </div>
@@ -346,7 +338,7 @@
                     <div class="screen">
                         <div class="tg-header">
                             <div class="tg-header-left">
-                                <div class="tg-back-arrow" onclick="goBack()">←</div>
+                                <div class="tg-back-arrow" onclick="goHomeDirect()">←</div>
                                 <div class="tg-avatar">${cur === 'bot' ? '🤖' : '👥'}</div>
                                 <div class="tg-title-info">
                                     <h2>${cur === 'bot' ? '🤖 NUMBER BOT' : '👥 ALL TECH OTP'}</h2>
@@ -375,21 +367,34 @@
             if (cur === 'bot') {
                 if (viewMode === 'hot_countries') showHotCountries();
                 else if (viewMode === 'my_numbers') showMyNumbers();
-                else if (cCty) showNumbersList(cCty, cFlag);
+                else if (cCty) showNumbersList(cCty, cFlag, false);
                 else if (cSvc) loadCountries(cSvc);
                 else loadServices();
             } else if (cur === 'group') {
-                el('messages').innerHTML = '<div class="msg-block">📡 نظام البث المباشر لأكواد التفعيل والمراسلة الحية.</div>';
+                el('messages').innerHTML = '<div class="msg-block">📡 نظام البث المباشر لأكواد التفعيل.</div>';
                 db.ref('messages').off();
-                db.ref('messages').limitToLast(40).on('child_added', s => { if (cur === 'group') showGroupMessage(s.val()); });
+                db.ref('messages').limitToLast(30).on('child_added', s => { if (cur === 'group') showGroupMessage(s.val()); });
                 if (otpTimer) clearInterval(otpTimer);
                 otpTimer = setInterval(fetchOTP, 3000);
                 fetchOTP();
             }
         }
 
-        function openScreen(s) { cur = s; save(); if (otpTimer) clearInterval(otpTimer); render(); }
-        function openChat(t) { cur = t; save(); render(); }
+        // عند الضغط علي زر الرجوع العلوي بالبوت يرجعك فوراً للمحادثات الرئيسية
+        function goHomeDirect() {
+            cur = 'main';
+            viewMode = 'services';
+            cSvc = ''; cCty = ''; cFlag = '';
+            save();
+            if (otpTimer) clearInterval(otpTimer);
+            render();
+        }
+
+        function openChat(t) { 
+            cur = t; 
+            save(); 
+            render(); 
+        }
         
         function goBack() { 
             if (viewMode === 'hot_countries' || viewMode === 'my_numbers') {
@@ -399,7 +404,7 @@
             } else if (cSvc) {
                 cSvc = ''; viewMode = 'services'; save(); loadServices();
             } else { 
-                cur = 'main'; save(); if (otpTimer) clearInterval(otpTimer); render(); 
+                goHomeDirect();
             }
         }
         
@@ -407,7 +412,6 @@
             if (cur !== 'group') return;
             const t = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute: '2-digit'});
             if (m.type === 'otp') {
-                playSound('otp');
                 el('messages').innerHTML += `
                     <div class="msg-block">
                         <span class="msg-user">Alexender (المشرف)</span><br>
@@ -441,7 +445,7 @@
 
         async function fetchOTP() {
             try {
-                const d = await api('/api/otp?count=15');
+                const d = await api('/api/otp?count=10');
                 if (Array.isArray(d)) {
                     d.forEach(i => {
                         const k = i[1] + '-' + i[2];
@@ -463,7 +467,7 @@
             el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
             
             try {
-                const d = await api('/api/otp?count=80');
+                const d = await api('/api/otp?count=50');
                 let counts = {};
                 if (Array.isArray(d)) {
                     d.forEach(i => { let c = i.length > 4 && i[4] ? i[4] : 'زيمبابوي 🇿🇼'; counts[c] = (counts[c] || 0) + 1; });
@@ -505,7 +509,6 @@
                 const res = await fetch(PROXY + '/api/latest_otp?number=' + encodeURIComponent(num), { headers: { 'Authorization': 'Bearer ' + API_KEY } });
                 const data = await res.json();
                 if (data && data.success && data.has_otp) {
-                    playSound('otp');
                     el('messages').innerHTML += `
                         <div class="msg-block">
                             📱 الرقم: <span class="num" onclick="copyText('${num}')">${num}</span><br>
@@ -574,7 +577,7 @@
                         if (reqData && reqData.success && reqData.number) currentNumbersPool.push(reqData.number);
                     } catch(err) {}
 
-                    const d = await api(`/api/otp?count=100`);
+                    const d = await api(`/api/otp?count=60`);
                     if (Array.isArray(d)) {
                         d.forEach(i => {
                             if (i.length > 4 && i[4] && i[4].toUpperCase().includes(country.toUpperCase()) && i[1]) {
@@ -589,6 +592,11 @@
 
                 let batch = currentNumbersPool.slice(numBatchIndex, numBatchIndex + 3);
                 if (batch.length === 0) { numBatchIndex = 0; batch = currentNumbersPool.slice(0, 3); }
+
+                // حفظ مؤشر الدُفعة لكي يظل محفوظاً عند الخروج والرجوع
+                S.numBatchIndex = numBatchIndex;
+                S.currentNumbersPool = currentNumbersPool;
+                save();
 
                 let btns = `<div class="btn-row">
                                 <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
