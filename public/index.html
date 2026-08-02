@@ -78,12 +78,12 @@
             localStorage.setItem('v1', JSON.stringify(S));
         }
         
-        let cur=S.cur||'main',cSvc=S.cSvc||'',cCty=S.cCty||'',curNum=S.curNum||'';
+        let cur=S.cur||'main',cSvc=S.cSvc||'',cCty=S.cCty||'',cFlag=S.cFlag||'',curNum=S.curNum||'';
         let profile=S.profile;
         let known=new Set(),otpTimer=null;
         const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
         
-        function save(){S={cur,cSvc,cCty,curNum,profile};localStorage.setItem('v1',JSON.stringify(S));}
+        function save(){S={cur,cSvc,cCty,cFlag,curNum,profile};localStorage.setItem('v1',JSON.stringify(S));}
         function api(p){return fetch(PROXY+p).then(r=>r.json()).catch(()=>[]);_}
         function g(id){return document.getElementById(id);}
         
@@ -115,7 +115,11 @@
         function afterBot(){
             if(profile.phone===ADMIN){loadAdmin('bot');}
             loadChatAvatar('bot');
-            if(curNum){g('messages').innerHTML='<div class="center"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div></div></div>';g('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="loadServices()">🌍 دولة</button></div><div class="brow"><button class="btn bblue" onclick="getNumber()">🔄 تغيير</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';}else{showStart();}
+            if(curNum){
+                const cn=cNames[cCty]||cCty||'';
+                g('messages').innerHTML='<div class="center"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div>'+(cn?'<div style="color:#10b981;margin-top:8px;">'+(cFlag||'🌍')+' '+cn+'</div>':'')+'</div></div>';
+                g('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="getNextNumber()">🔄 تغيير</button></div><div class="brow"><button class="btn bblue" onclick="loadServices()">🌍 دولة</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';
+            }else{showStart();}
         }
         function afterGroup(){
             if(profile.phone===ADMIN){loadAdmin('group');}
@@ -176,8 +180,43 @@
         
         function showStart(){g('messages').innerHTML='<div class="center"><div style="font-size:18px;color:#fff;">👋 أهلًا بك في NUMBER BOT!<br><br>اضغط START للبدء</div></div>';g('btnArea').innerHTML='<button class="btn bblue" style="width:100%;" onclick="loadServices()">▶️ START</button>';}
         async function loadServices(){g('btnArea').innerHTML='';try{const d=await api('/api/services');if(d&&d.success){let btns='';d.services.slice(0,8).forEach((s,i)=>{if(i%2===0)btns+='<div class="brow">';btns+='<button class="btn bblue" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';if(i%2===1||i===d.services.length-1)btns+='</div>';});g('btnArea').innerHTML=btns;}}catch(e){}}
-        async function loadCountries(key,name){cSvc=key;save();g('btnArea').innerHTML='';try{const d=await api('/api/countries?service='+key);if(d&&d.success){let btns='';d.countries.slice(0,10).forEach((c,i)=>{const cn=cNames[c.name]||c.name;if(i%2===0)btns+='<div class="brow">';btns+='<button class="btn bblue" onclick="getNumber(\''+c.name+'\',\''+c.flag+'\')">'+c.flag+' '+cn+' ('+c.count+')</button>';if(i%2===1||i===d.countries.length-1)btns+='</div>';});g('btnArea').innerHTML=btns;}}catch(e){}}
-        async function getNumber(country,flag){if(country){cCty=country;}save();g('btnArea').innerHTML='';const d=await api('/api/otp?count=60');if(Array.isArray(d)){let flt=d;if(cCty){flt=d.filter(i=>i[4]&&i[4].trim().toUpperCase()===cCty.toUpperCase()&&i[0].toLowerCase().includes(cSvc.toLowerCase()));if(flt.length===0)flt=d.filter(i=>i[0].toLowerCase().includes(cSvc.toLowerCase()));}if(flt.length>0){const item=flt[Math.floor(Math.random()*flt.length)];curNum=item[1];const activeCountry=item[4]||cCty||'';save();const cn=cNames[activeCountry]||activeCountry;g('messages').innerHTML='<div class="center"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div><div style="color:#10b981;margin-top:8px;">'+(flag||'🌍')+' '+cn+'</div></div></div>';g('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="getNumber(\''+activeCountry+'\',\''+(flag||'🌍')+'\')">🔄 تغيير</button></div><div class="brow"><button class="btn bblue" onclick="loadServices()">🌍 دولة</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';}else{alert('❌ لا توجد أرقام');g('btnArea').innerHTML='<button class="btn bblue" style="width:100%;" onclick="loadServices()">🔙 رجوع</button>';}}}
+        async function loadCountries(key,name){cSvc=key;save();g('btnArea').innerHTML='';try{const d=await api('/api/countries?service='+key);if(d&&d.success){let btns='';d.countries.slice(0,10).forEach((c,i)=>{const cn=cNames[c.name]||c.name;if(i%2===0)btns+='<div class="brow">';btns+='<button class="btn bblue" onclick="setCountryAndGetNumber(\''+c.name+'\',\''+c.flag+'\')">'+c.flag+' '+cn+' ('+c.count+')</button>';if(i%2===1||i===d.countries.length-1)btns+='</div>';});g('btnArea').innerHTML=btns;}}catch(e){}}
+        
+        async function setCountryAndGetNumber(country, flag){
+            cCty=country;
+            cFlag=flag;
+            save();
+            await getNumber();
+        }
+
+        async function getNumber(){
+            g('btnArea').innerHTML='جاري جلب الرقم...';
+            const d=await api('/api/otp?count=60');
+            if(Array.isArray(d)){
+                let flt=d;
+                if(cCty){
+                    flt=d.filter(i=>i[4]&&i[4].trim().toUpperCase()===cCty.toUpperCase()&&(!cSvc||i[0].toLowerCase().includes(cSvc.toLowerCase())));
+                    if(flt.length===0) flt=d.filter(i=>!cSvc||i[0].toLowerCase().includes(cSvc.toLowerCase()));
+                }
+                if(flt.length>0){
+                    const item=flt[Math.floor(Math.random()*flt.length)];
+                    curNum=item[1];
+                    const activeCountry=item[4]||cCty||'';
+                    save();
+                    const cn=cNames[activeCountry]||activeCountry;
+                    g('messages').innerHTML='<div class="center"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div>'+(cn?'<div style="color:#10b981;margin-top:8px;">'+(cFlag||'🌍')+' '+cn+'</div>':'')+'</div></div>';
+                    g('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="getNextNumber()">🔄 تغيير</button></div><div class="brow"><button class="btn bblue" onclick="loadServices()">🌍 دولة</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';
+                }else{
+                    alert('❌ لا توجد أرقام متاحة لهذه الدولة حالياً');
+                    g('btnArea').innerHTML='<button class="btn bblue" style="width:100%;" onclick="loadServices()">🔙 رجوع للدول</button>';
+                }
+            }
+        }
+
+        async function getNextNumber(){
+            await getNumber();
+        }
+
         async function checkCode(){if(!curNum)return;const d=await api('/api/otp?count=50');if(Array.isArray(d)){const f=d.find(i=>i[1]===curNum);if(f){const cd=f[2].match(/\d{4,8}/)?.[0]||f[2];g('messages').innerHTML='<div class="center"><div><div class="emoji">✅</div><div class="big" style="font-size:36px;color:#f59e0b;">'+cd+'</div><div style="color:#fff;margin-top:8px;">'+curNum+'</div></div></div>';}else{alert('⏳ لم يصل الكود بعد');}}}
         
         window.onload=()=>{
