@@ -136,7 +136,7 @@
 
         .msg-user { color: #64b5f6; font-weight: 500; }
         .num { color: #60a5fa; font-weight: 600; font-size: 16px; cursor: pointer; }
-        .code { background-color: #f59e0b; color: #000; padding: 4px 12px; border-radius: 5px; font-weight: 600; display: inline-block; margin: 6px 0; font-size: 16px; }
+        .code { background-color: #f59e0b; color: #000; padding: 4px 12px; border-radius: 5px; font-weight: 600; display: inline-block; margin: 6px 0; font-size: 16px; cursor: pointer; }
         .time-tag { font-size: 11px; color: #7d8b99; text-align: left; margin-top: 8px; }
 
         /* Buttons Style */
@@ -172,6 +172,32 @@
             overflow-y: auto;
         }
 
+        /* Toast Notification (مربع أصفر صغير أسفل الصفحة) */
+        #toast {
+            visibility: hidden;
+            min-width: 160px;
+            background-color: #f59e0b;
+            color: #000;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 99;
+            left: 50%;
+            bottom: 70px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: opacity 0.3s, visibility 0.3s;
+            opacity: 0;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
         .footer-locked { background-color: #17212b; padding: 15px; text-align: center; border-top: 1px solid #111822; color: #7d8b99; font-size: 14px; }
         .bottom-nav { background-color: #17212b; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #111822; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: #7d8b99; font-size: 13px; cursor: pointer; gap: 5px; background: none; border: none; flex: 1; }
@@ -183,7 +209,9 @@
     </style>
 </head>
 <body>
-    <div class="telegram-container" id="app"></div>
+    <div class="telegram-container" id="app">
+        <div id="toast">تم النسخ بنجاح!</div>
+    </div>
 
     <script>
         firebase.initializeApp({apiKey:"AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",projectId:"otp-5acda",databaseURL:"https://otp-5acda-default-rtdb.firebaseio.com"});
@@ -198,10 +226,25 @@
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
         function el(id) { return document.getElementById(id); }
 
+        function showToast(msg) {
+            let t = el('toast');
+            if(!t) {
+                t = document.createElement('div');
+                t.id = 'toast';
+                document.querySelector('.telegram-container').appendChild(t);
+            }
+            t.innerText = msg || "تم النسخ!";
+            t.className = "show";
+            setTimeout(() => { t.className = t.className.replace("show", ""); }, 2000);
+        }
+
         function render() {
             const app = el('app');
+            // تأكد من بقاء التوست داخل الكونتينر
+            let toastHTML = '<div id="toast">تم النسخ!</div>';
+
             if (cur === 'main') {
-                app.innerHTML = `
+                app.innerHTML = toastHTML + `
                     <div class="screen">
                         <div class="tg-header">
                             <div class="tg-header-left">
@@ -230,7 +273,7 @@
                         </div>
                     </div>`;
             } else if (cur === 'bot' || cur === 'group') {
-                app.innerHTML = `
+                app.innerHTML = toastHTML + `
                     <div class="screen">
                         <div class="tg-header">
                             <div class="tg-header-left">
@@ -290,7 +333,7 @@
 
         function copyText(txt) {
             navigator.clipboard.writeText(txt);
-            alert('✅ تم النسخ: ' + txt);
+            showToast('تم النسخ: ' + txt);
         }
 
         async function fetchOTP() {
@@ -373,7 +416,7 @@
                         return matchSvc || matchCty;
                     });
 
-                    if (flt.length === 0) flt = d.slice(0, 15); // احتياطي لو الفلتر فاضي
+                    if (flt.length === 0) flt = d.slice(0, 15);
 
                     let btns = `<div class="btn-row">
                                     <button class="btn" onclick="loadCountries('${cSvc}')">🔙 تغيير الدولة</button>
@@ -407,7 +450,7 @@
                     el('messages').innerHTML += html;
                     el('messages').scrollTop = el('messages').scrollHeight;
                 } else {
-                    alert('⏳ لا توجد أكواد متاحة حالياً.');
+                    showToast('لا توجد أكواد متاحة حالياً');
                 }
             } catch (e) {}
         }
