@@ -7,62 +7,62 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background: #0e1621; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app { width: 100%; max-width: 430px; height: 100vh; background: #17212b; display: flex; flex-direction: column; overflow: hidden; }
-        .h { background: #1e293b; padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .h .back { color: #fff; font-size: 22px; cursor: pointer; }
-        .h .av { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; overflow: hidden; background: #3b82f6; flex-shrink: 0; font-weight: bold; }
-        .h .av img { width: 100%; height: 100%; object-fit: cover; }
-        .h .info { flex: 1; }
-        .h .info .n { font-size: 16px; font-weight: 600; color: #fff; }
-        .h .info .s { font-size: 12px; color: #94a3b8; }
-        .list { flex: 1; overflow-y: auto; }
-        .row { display: flex; align-items: center; padding: 14px 16px; gap: 12px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); }
-        .row:active { background: rgba(255,255,255,0.03); }
-        .row .av { width: 52px; height: 52px; font-size: 22px; }
-        .row .info { flex: 1; }
-        .row .n { font-size: 16px; color: #fff; margin-bottom: 3px; }
-        .row .p { font-size: 14px; color: #94a3b8; }
-        .msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; background: #0e1621; }
-        .msg { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 15px; line-height: 1.5; }
-        .mi { align-self: flex-start; background: #1e293b; }
-        .mo { align-self: flex-end; background: #3b82f6; }
-        .motp { align-self: flex-start; background: #1e293b; border-right: 3px solid #f59e0b; }
-        .msg .num { color: #60a5fa; font-weight: 700; font-size: 15px; }
-        .msg .code { background: #f59e0b; color: #000; padding: 3px 10px; border-radius: 5px; font-weight: 700; display: inline-block; margin: 4px 0; font-size: 16px; }
-        .msg .time { font-size: 11px; color: #94a3b8; margin-top: 4px; }
-        .center { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; }
-        .center .big { font-size: 32px; font-weight: 700; color: #60a5fa; word-break: break-all; }
-        .center .emoji { font-size: 50px; }
-        .ba { padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); background: #17212b; display: flex; flex-direction: column; gap: 8px; }
-        .btn { padding: 14px; border-radius: 22px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; text-align: center; }
-        .bblue { background: #3b82f6; color: #fff; }
-        .bgreen { background: #10b981; color: #fff; }
-        .bgold { background: #f59e0b; color: #000; }
-        .brow { display: flex; gap: 8px; }
-        .brow .btn { flex: 1; }
-        .ibar { padding: 12px; background: #17212b; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px; }
-        .ibar input { flex: 1; background: #1e293b; border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
-        .ibar button { background: #3b82f6; color: #fff; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 18px; }
-        .nav { display: flex; background: #17212b; border-top: 1px solid rgba(255,255,255,0.05); padding: 8px 0; }
-        .ni { flex: 1; display: flex; flex-direction: column; align-items: center; color: #94a3b8; font-size: 11px; cursor: pointer; gap: 3px; background: none; border: none; }
-        .ni.ac { color: #3b82f6; }
-        .nic { font-size: 20px; }
-        .fab { position: absolute; bottom: 85px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: #3b82f6; color: #fff; font-size: 24px; border: none; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 12px rgba(59,130,246,0.4); }
-        .fabm { position: absolute; bottom: 145px; right: 20px; display: none; flex-direction: column; gap: 8px; z-index: 10; }
-        .fabm button { background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 25px; font-size: 14px; cursor: pointer; border: none; }
-        .search { padding: 10px 16px; }
-        .search input { width: 100%; background: #1e293b; border: none; border-radius: 20px; padding: 12px 16px; color: #fff; font-size: 15px; outline: none; }
-        .setup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; gap: 18px; background: #17212b; }
-        .setup h2 { color: #fff; font-size: 22px; }
-        .setup .av { width: 85px; height: 85px; font-size: 38px; cursor: pointer; }
-        .setup input { width: 100%; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); padding: 16px; border-radius: 12px; color: #fff; font-size: 16px; text-align: center; outline: none; }
-        .setup input[type="file"] { display: none; }
-        .admin { padding: 12px; background: #1e293b; border-top: 1px solid rgba(255,255,255,0.05); }
-        .admin h4 { color: #f59e0b; margin-bottom: 8px; }
-        .admin input { width: 100%; background: #17212b; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; color: #fff; margin-bottom: 8px; }
-        ::-webkit-scrollbar { width: 3px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+        *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif}
+        body{background:#0e1621;display:flex;justify-content:center;align-items:center;min-height:100vh}
+        .app{width:100%;max-width:430px;height:100vh;background:#17212b;display:flex;flex-direction:column;overflow:hidden}
+        .h{background:#1e293b;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.05)}
+        .h .back{color:#fff;font-size:22px;cursor:pointer}
+        .h .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;overflow:hidden;background:#3b82f6;flex-shrink:0;font-weight:bold}
+        .h .av img{width:100%;height:100%;object-fit:cover}
+        .h .info{flex:1}
+        .h .info .n{font-size:16px;font-weight:600;color:#fff}
+        .h .info .s{font-size:12px;color:#94a3b8}
+        .list{flex:1;overflow-y:auto}
+        .row{display:flex;align-items:center;padding:14px 16px;gap:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03)}
+        .row:active{background:rgba(255,255,255,0.03)}
+        .row .av{width:52px;height:52px;font-size:22px}
+        .row .info{flex:1}
+        .row .n{font-size:16px;color:#fff;margin-bottom:3px}
+        .row .p{font-size:14px;color:#94a3b8}
+        .msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;background:#0e1621}
+        .msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:15px;line-height:1.5}
+        .mi{align-self:flex-start;background:#1e293b}
+        .mo{align-self:flex-end;background:#3b82f6}
+        .motp{align-self:flex-start;background:#1e293b;border-right:3px solid #f59e0b}
+        .msg .num{color:#60a5fa;font-weight:700;font-size:15px}
+        .msg .code{background:#f59e0b;color:#000;padding:3px 10px;border-radius:5px;font-weight:700;display:inline-block;margin:4px 0;font-size:16px}
+        .msg .time{font-size:11px;color:#94a3b8;margin-top:4px}
+        .center{flex:1;display:flex;align-items:center;justify-content:center;text-align:center}
+        .center .big{font-size:32px;font-weight:700;color:#60a5fa;word-break:break-all}
+        .center .emoji{font-size:50px}
+        .ba{padding:12px;border-top:1px solid rgba(255,255,255,0.05);background:#17212b;display:flex;flex-direction:column;gap:8px}
+        .btn{padding:14px;border-radius:22px;font-size:15px;font-weight:600;cursor:pointer;border:none;text-align:center}
+        .bblue{background:#3b82f6;color:#fff}
+        .bgreen{background:#10b981;color:#fff}
+        .bgold{background:#f59e0b;color:#000}
+        .brow{display:flex;gap:8px}
+        .brow .btn{flex:1}
+        .ibar{padding:12px;background:#17212b;border-top:1px solid rgba(255,255,255,0.05);display:flex;gap:10px}
+        .ibar input{flex:1;background:#1e293b;border:none;border-radius:20px;padding:12px 16px;color:#fff;font-size:15px;outline:none}
+        .ibar button{background:#3b82f6;color:#fff;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:18px}
+        .nav{display:flex;background:#17212b;border-top:1px solid rgba(255,255,255,0.05);padding:8px 0}
+        .ni{flex:1;display:flex;flex-direction:column;align-items:center;color:#94a3b8;font-size:11px;cursor:pointer;gap:3px;background:none;border:none}
+        .ni.ac{color:#3b82f6}
+        .nic{font-size:20px}
+        .fab{position:absolute;bottom:85px;right:20px;width:50px;height:50px;border-radius:50%;background:#3b82f6;color:#fff;font-size:24px;border:none;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(59,130,246,0.4)}
+        .fabm{position:absolute;bottom:145px;right:20px;display:none;flex-direction:column;gap:8px;z-index:10}
+        .fabm button{background:#1e293b;color:#fff;padding:12px 20px;border-radius:25px;font-size:14px;cursor:pointer;border:none}
+        .search{padding:10px 16px}
+        .search input{width:100%;background:#1e293b;border:none;border-radius:20px;padding:12px 16px;color:#fff;font-size:15px;outline:none}
+        .setup{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:18px;background:#17212b}
+        .setup h2{color:#fff;font-size:22px}
+        .setup .av{width:85px;height:85px;font-size:38px;cursor:pointer}
+        .setup input{width:100%;background:#1e293b;border:1px solid rgba(255,255,255,0.1);padding:16px;border-radius:12px;color:#fff;font-size:16px;text-align:center;outline:none}
+        .setup input[type="file"]{display:none}
+        .admin{padding:12px;background:#1e293b;border-top:1px solid rgba(255,255,255,0.05)}
+        .admin h4{color:#f59e0b;margin-bottom:8px}
+        .admin input{width:100%;background:#17212b;border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:8px;color:#fff;margin-bottom:8px}
+        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
     </style>
 </head>
 <body>
@@ -73,132 +73,115 @@
         const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
         const ADMIN='201500972046';
         
-        let S=JSON.parse(localStorage.getItem('tf')||'{}');
+        let S=JSON.parse(localStorage.getItem('final')||'{}');
         let cur=S.cur||'setup',cSvc=S.cSvc||'',cCty=S.cCty||'',curNum=S.curNum||'';
         let profile=S.profile||{name:'',phone:'',avatar:'',username:''};
         let known=new Set(),otpTimer=null;
         const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
         
-        function save(){S={cur,cSvc,cCty,curNum,profile};localStorage.setItem('tf',JSON.stringify(S));}
+        function save(){S={cur,cSvc,cCty,curNum,profile};localStorage.setItem('final',JSON.stringify(S));}
         function api(p){return fetch(PROXY+p).then(r=>r.json());}
+        function el(id){return document.getElementById(id);}
         
         function render(){
-            const app=document.getElementById('app');app.innerHTML='';
-            if(!profile.name||!profile.phone){app.innerHTML=setupHTML();}
+            const app=el('app');app.innerHTML='';
+            if(!profile.name||!profile.phone){app.innerHTML=setupHTML();setTimeout(()=>{const b=el('btnGo');if(b)b.onclick=saveSetup;},500);}
             else if(cur==='main'){app.innerHTML=mainHTML();afterMain();}
             else if(cur==='bot'){app.innerHTML=chatHTML('bot');afterBot();}
             else if(cur==='group'){app.innerHTML=chatHTML('group');afterGroup();}
             else if(cur==='search'){app.innerHTML=searchHTML();afterSearch();}
-            else if(cur==='profile'){app.innerHTML=profileHTML();}
-            else if(cur==='create_group'||cur==='create_channel'){app.innerHTML=createHTML(cur.replace('create_',''));}
+            else if(cur==='profile'){app.innerHTML=profileHTML();afterProfile();}
+            else if(cur==='create_group'||cur==='create_channel'){app.innerHTML=createHTML(cur.replace('create_',''));afterCreate();}
             else if(cur.startsWith('grp_')){app.innerHTML=groupChatHTML(cur.replace('grp_',''));afterGroupChat(cur.replace('grp_',''));}
             else if(cur.startsWith('pv_')){app.innerHTML=privateHTML(cur.replace('pv_',''));afterPrivate(cur.replace('pv_',''));}
         }
         
-        function setupHTML(){return '<div class="setup"><h2>🚀 أهلاً بك</h2><div class="av" id="avSetup" onclick="document.getElementById(\'fSetup\').click()">📷</div><input type="file" id="fSetup" accept="image/*" onchange="prevSetup()"><input id="inPhone" placeholder="رقم الهاتف" value="'+profile.phone+'" onkeyup="if(this.value.length>8)document.getElementById(\'inName\').focus()"><input id="inName" placeholder="الاسم" value="'+profile.name+'"><input id="inUser" placeholder="يوزر نيم" value="'+profile.username+'"><button class="btn bblue" style="width:100%;padding:16px;font-size:18px;" id="btnGo">🚀 دخول</button></div>';}
+        function setupHTML(){return '<div class="setup"><h2>🚀 أهلاً بك</h2><div class="av" id="avSetup" onclick="el(\'fSetup\').click()">📷</div><input type="file" id="fSetup" accept="image/*" onchange="prevSetup()"><input id="inPhone" placeholder="رقم الهاتف" value="'+profile.phone+'"><input id="inName" placeholder="الاسم" value="'+profile.name+'"><input id="inUser" placeholder="يوزر نيم" value="'+profile.username+'"><button class="btn bblue" style="width:100%;padding:16px;font-size:18px;" id="btnGo">🚀 دخول</button></div>';}
         function mainHTML(){return '<div class="screen"><div class="h"><div class="av">'+(profile.avatar?'<img src="'+profile.avatar+'">':(profile.name?profile.name[0]:'👤'))+'</div><div class="info"><div class="n">Telegram</div><div class="s">'+profile.name+'</div></div></div><div class="search"><input type="text" id="searchInput" placeholder="🔍 بحث برقم أو يوزر..." onkeypress="if(event.key==\'Enter\')doSearch()"></div><div class="list" id="mainList"><div class="row" onclick="goTo(\'bot\')"><div class="av" style="background:#3b82f6;">🤖</div><div class="info"><div class="n">🤖 NUMBER BOT</div><div class="p">'+(curNum?'الرقم: '+curNum:'بوت الأرقام')+'</div></div></div><div class="row" onclick="goTo(\'group\')"><div class="av" style="background:#e17076;">👥</div><div class="info"><div class="n">👥 OTP GROUP</div><div class="p">Live OTP</div></div></div></div><div class="nav"><button class="ni ac" onclick="goTo(\'main\')"><span class="nic">💬</span>محادثات</button><button class="ni" onclick="goTo(\'search\')"><span class="nic">🔍</span>بحث</button><button class="ni" onclick="goTo(\'profile\')"><span class="nic">👤</span>ملف</button></div><button class="fab" id="fabBtn">+</button><div class="fabm" id="fabMenu"><button onclick="goTo(\'create_group\')">👥 مجموعة</button><button onclick="goTo(\'create_channel\')">📢 قناة</button></div></div>';}
         function chatHTML(type){const b=type==='bot';return '<div class="screen"><div class="h"><div class="back" onclick="goTo(\'main\')">←</div><div class="av" id="chatAv" style="background:'+(b?'#3b82f6':'#e17076')+';">'+(b?'🤖':'👥')+'</div><div class="info"><div class="n" id="chatName">'+(b?'🤖 NUMBER BOT':'👥 OTP GROUP')+'</div><div class="s">'+(b?'online':'live')+'</div></div></div><div class="msgs" id="messages" style="'+(b?'':'display:flex;')+'"></div>'+(b?'<div class="ba" id="btnArea"></div>':'<div class="ibar"><input type="text" id="groupInput" placeholder="رسالة..." onkeypress="if(event.key==\'Enter\')sendGroupMsg()"><button id="btnGroupSend">📤</button></div>')+(profile.phone===ADMIN?'<div class="admin" id="adminPanel"><h4>⚙️ إعدادات الأدمن</h4><input id="adName" placeholder="الاسم"><input id="adAvatar" placeholder="رابط الصورة"><button class="btn bblue" style="width:100%;" id="btnSaveAdmin">💾 حفظ</button></div>':'')+'</div>';}
         function searchHTML(){return '<div class="screen"><div class="h"><div class="back" onclick="goTo(\'main\')">←</div><div class="info"><div class="n">🔍 بحث</div></div></div><div style="flex:1;padding:20px;"><input type="text" id="searchInput2" placeholder="رقم أو يوزر..." style="width:100%;background:#1e293b;border:none;border-radius:12px;padding:14px;color:#fff;font-size:15px;margin-bottom:15px;"><button class="btn bblue" style="width:100%;" id="btnSearch">🔍 بحث</button><div id="searchResult" style="margin-top:15px;"></div></div></div>';}
-        function profileHTML(){return '<div class="screen"><div class="h"><div class="back" onclick="goTo(\'main\')">←</div><div class="info"><div class="n">👤 الملف الشخصي</div></div></div><div style="padding:25px;text-align:center;flex:1;overflow-y:auto;"><div class="av" style="width:80px;height:80px;font-size:35px;margin:0 auto 15px;cursor:pointer;" onclick="document.getElementById(\'fProf\').click()">'+(profile.avatar?'<img src="'+profile.avatar+'">':'📷')+'</div><input type="file" id="fProf" accept="image/*" onchange="prevProf()" style="display:none;"><input id="eName" value="'+profile.name+'" style="width:100%;background:#1e293b;border:1px solid rgba(255,255,255,0.1);padding:14px;border-radius:10px;color:#fff;font-size:15px;text-align:center;margin:8px 0;"><input id="ePhone" value="'+profile.phone+'" style="width:100%;background:#1e293b;border:1px solid rgba(255,255,255,0.1);padding:14px;border-radius:10px;color:#fff;font-size:15px;text-align:center;margin:8px 0;"><input id="eUser" value="'+profile.username+'" style="width:100%;background:#1e293b;border:1px solid rgba(255,255,255,0.1);padding:14px;border-radius:10px;color:#fff;font-size:15px;text-align:center;margin:8px 0;"><button class="btn bblue" style="width:100%;margin-top:10px;" id="btnSaveProfile">💾 حفظ</button></div></div>';}
-        function createHTML(type){return '<div class="screen"><div class="h"><div class="back" onclick="goTo(\'main\')">←</div><div class="info"><div class="n">'+(type==='group'?'👥 مجموعة جديدة':'📢 قناة جديدة')+'</div></div></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:18px;"><div class="av" id="avCreate" style="width:80px;height:80px;font-size:35px;cursor:pointer;" onclick="document.getElementById(\'fCreate\').click()">📷</div><input type="file" id="fCreate" accept="image/*" onchange="prevCreate()" style="display:none;"><input id="inCreateName" placeholder="الاسم" style="width:100%;background:#1e293b;border:1px solid rgba(255,255,255,0.1);padding:15px;border-radius:12px;color:#fff;font-size:16px;text-align:center;"><button class="btn bblue" style="width:100%;" id="btnCreate">✅ إنشاء</button></div></div>';}
+        function profileHTML(){return '<div class="screen"><div class="h"><div class="back" onclick="goTo(\'main\')">←</div><div class="info"><div class="n">👤 الملف الشخصي</div></div></div><div style="padding:25px;text-align:center;flex:1;overflow-y:auto;"><div class="av" style="width:80px;height:80px;font-size:35px;margin:0 auto 15px;cursor:pointer;" onclick="el(\'fProf\').click()">'+(profile.avatar?'<img src="'+profile.avatar+'">':'📷')+'</div><input type="file" id="fProf" accept="image/*" onchange="prevProf()" style="display:none;"><input id="eName" value="'+profile.name+'" style="width:100%;background:#1e293b;border:1px solid rgba(255,255,255,0.1);padding:14px;border-radius:10px;color:#fff;font-size:15px;text-align:center;margin:8px 0;"><input id="ePhone" value="'+profile.phone+'" style="width:100%;background:#1e293b;border:1px solid rgba(255,255,255,0.1);padding:14px;border-radius:10px;color:#fff;font-size:15px;text-align:center;margin:8px 0;"><input id="eUser" value="'+profile.username+'" style="width:100%;background:#1e293b;border:1px solid rgba(255,255,255,0.1);padding:14px;border-radius:10px;color:#fff;font-size:15px;text-align:center;margin:8px 0;"><button class="btn bblue" style="width:100%;margin-top:10px;" id="btnSaveProfile">💾 حفظ</button></div></div>';}
+        function createHTML(type){return '<div class="screen"><div class="h"><div class="back" onclick="goTo(\'main\')">←</div><div class="info"><div class="n">'+(type==='group'?'👥 مجموعة جديدة':'📢 قناة جديدة')+'</div></div></div><div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:18px;"><div class="av" id="avCreate" style="width:80px;height:80px;font-size:35px;cursor:pointer;" onclick="el(\'fCreate\').click()">📷</div><input type="file" id="fCreate" accept="image/*" onchange="prevCreate()" style="display:none;"><input id="inCreateName" placeholder="الاسم" style="width:100%;background:#1e293b;border:1px solid rgba(255,255,255,0.1);padding:15px;border-radius:12px;color:#fff;font-size:16px;text-align:center;"><button class="btn bblue" style="width:100%;" id="btnCreate">✅ إنشاء</button></div></div>';}
         function groupChatHTML(gid){return '<div class="screen"><div class="h"><div class="back" onclick="goTo(\'main\')">←</div><div class="av" id="gAv" style="background:#8b5cf6;cursor:pointer;" onclick="groupSettings(\''+gid+'\')">👥</div><div class="info"><div class="n" id="gName">...</div><div class="s" id="gStatus">...</div></div></div><div class="msgs" id="messages"></div><div class="ibar"><input type="text" id="groupInput2" placeholder="رسالة..." onkeypress="if(event.key==\'Enter\')sendGroupMsg2(\''+gid+'\')"><button id="btnGroupSend2">📤</button></div></div>';}
         function privateHTML(phone){return '<div class="screen"><div class="h"><div class="back" onclick="goTo(\'main\')">←</div><div class="av" id="pAv">👤</div><div class="info"><div class="n" id="pName">...</div><div class="s" id="pStatus">...</div></div></div><div class="msgs" id="messages"></div><div class="ibar"><input type="text" id="privInput" placeholder="رسالة..." onkeypress="if(event.key==\'Enter\')sendPrivMsg(\''+phone+'\')"><button id="btnPrivSend">📤</button></div></div>';}
         
         function afterMain(){
-            const fb=document.getElementById('fabBtn');if(fb)fb.onclick=()=>{const m=document.getElementById('fabMenu');m.style.display=m.style.display==='flex'?'none':'flex';};
-            setTimeout(()=>{db.ref('groups').once('value').then(snap=>{const list=document.getElementById('mainList');if(!list)return;snap.forEach(s=>{const g=s.val();const gid=s.key;if(g.members&&g.members.includes(profile.phone)&&!document.getElementById('grp_'+gid)){list.innerHTML+='<div class="row" id="grp_'+gid+'" onclick="goTo(\'grp_'+gid+'\')"><div class="av" style="background:#8b5cf6;">'+(g.avatar?'<img src="'+g.avatar+'">':'👥')+'</div><div class="info"><div class="n">'+g.name+'</div><div class="p">مجموعة</div></div></div>';}});});},500);
+            const fb=el('fabBtn');if(fb)fb.onclick=()=>{const m=el('fabMenu');m.style.display=m.style.display==='flex'?'none':'flex';};
+            setTimeout(()=>{db.ref('groups').once('value').then(snap=>{const list=el('mainList');if(!list)return;snap.forEach(s=>{const g=s.val();const gid=s.key;if(g.members&&g.members.includes(profile.phone)&&!el('grp_'+gid)){list.innerHTML+='<div class="row" id="grp_'+gid+'" onclick="goTo(\'grp_'+gid+'\')"><div class="av" style="background:#8b5cf6;">'+(g.avatar?'<img src="'+g.avatar+'">':'👥')+'</div><div class="info"><div class="n">'+g.name+'</div><div class="p">مجموعة</div></div></div>';}});});},500);
         }
         function afterBot(){
-            const btn=document.getElementById('btnGo');if(btn)btn.onclick=saveSetup;
             if(profile.phone===ADMIN){loadAdmin('bot');}
             loadChatAvatar('bot');
-            if(curNum){document.getElementById('messages').innerHTML='<div class="center"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div></div></div>';document.getElementById('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="loadServices()">🌍 دولة</button></div><div class="brow"><button class="btn bblue" onclick="getNumber()">🔄 تغيير</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';}else{showStart();}
+            if(curNum){el('messages').innerHTML='<div class="center"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div></div></div>';el('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="loadServices()">🌍 دولة</button></div><div class="brow"><button class="btn bblue" onclick="getNumber()">🔄 تغيير</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';}else{showStart();}
         }
         function afterGroup(){
             if(profile.phone===ADMIN){loadAdmin('group');}
             loadChatAvatar('group');
-            document.getElementById('messages').innerHTML='';
-            const btn=document.getElementById('btnGroupSend');if(btn)btn.onclick=sendGroupMsg;
+            el('messages').innerHTML='';
+            const btn=el('btnGroupSend');if(btn)btn.onclick=sendGroupMsg;
             db.ref('group_msgs').off();db.ref('group_msgs').limitToLast(50).on('child_added',s=>showOTPMsg(s.val()));
             if(otpTimer)clearInterval(otpTimer);otpTimer=setInterval(fetchOTP,2000);fetchOTP();
         }
-        function afterSearch(){const btn=document.getElementById('btnSearch');if(btn)btn.onclick=()=>doSearch(document.getElementById('searchInput2').value);}
+        function afterSearch(){const btn=el('btnSearch');if(btn)btn.onclick=()=>doSearch(el('searchInput2').value);}
+        function afterProfile(){const btn=el('btnSaveProfile');if(btn)btn.onclick=saveProfile;}
+        function afterCreate(){const btn=el('btnCreate');if(btn)btn.onclick=()=>doCreate(cur.replace('create_',''));}
         function afterGroupChat(gid){
-            db.ref('groups/'+gid).once('value').then(snap=>{const g=snap.val();if(!g)return goTo('main');const a=document.getElementById('gAv');if(a){if(g.avatar)a.innerHTML='<img src="'+g.avatar+'">';else a.textContent='👥';}document.getElementById('gName').textContent=g.name;document.getElementById('gStatus').textContent=(g.members?g.members.length:0)+' أعضاء';});
-            document.getElementById('messages').innerHTML='';
-            const btn=document.getElementById('btnGroupSend2');if(btn)btn.onclick=()=>sendGroupMsg2(gid);
-            db.ref('groups/'+gid+'/messages').off();db.ref('groups/'+gid+'/messages').limitToLast(50).on('child_added',snap=>{const m=snap.val();const isMe=m.from===profile.phone;document.getElementById('messages').innerHTML+='<div class="msg '+(isMe?'mo':'mi')+'">'+(m.text||'')+'<div class="time">'+(m.time||'')+'</div></div>';document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;});
+            db.ref('groups/'+gid).once('value').then(snap=>{const g=snap.val();if(!g)return goTo('main');const a=el('gAv');if(a){if(g.avatar)a.innerHTML='<img src="'+g.avatar+'">';else a.textContent='👥';}el('gName').textContent=g.name;el('gStatus').textContent=(g.members?g.members.length:0)+' أعضاء';});
+            el('messages').innerHTML='';
+            const btn=el('btnGroupSend2');if(btn)btn.onclick=()=>sendGroupMsg2(gid);
+            db.ref('groups/'+gid+'/messages').off();db.ref('groups/'+gid+'/messages').limitToLast(50).on('child_added',snap=>{const m=snap.val();const isMe=m.from===profile.phone;el('messages').innerHTML+='<div class="msg '+(isMe?'mo':'mi')+'">'+(m.text||'')+'<div class="time">'+(m.time||'')+'</div></div>';el('messages').scrollTop=el('messages').scrollHeight;});
         }
         function afterPrivate(phone){
-            db.ref('users/'+btoa(phone)).once('value').then(snap=>{const u=snap.val();if(!u)return goTo('main');const a=document.getElementById('pAv');if(a){if(u.avatar)a.innerHTML='<img src="'+u.avatar+'">';else a.textContent='👤';}document.getElementById('pName').textContent=u.name;document.getElementById('pStatus').textContent=u.phone;});
-            const chatId=[profile.phone,phone].sort().join('_');document.getElementById('messages').innerHTML='';
-            const btn=document.getElementById('btnPrivSend');if(btn)btn.onclick=()=>sendPrivMsg(phone);
-            db.ref('chats/'+chatId).off();db.ref('chats/'+chatId).limitToLast(50).on('child_added',snap=>{const m=snap.val();const isMe=m.from===profile.phone;document.getElementById('messages').innerHTML+='<div class="msg '+(isMe?'mo':'mi')+'">'+(m.text||'')+'<div class="time">'+(m.time||'')+'</div></div>';document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;});
+            db.ref('users/'+btoa(phone)).once('value').then(snap=>{const u=snap.val();if(!u)return goTo('main');const a=el('pAv');if(a){if(u.avatar)a.innerHTML='<img src="'+u.avatar+'">';else a.textContent='👤';}el('pName').textContent=u.name;el('pStatus').textContent=u.phone;});
+            const chatId=[profile.phone,phone].sort().join('_');el('messages').innerHTML='';
+            const btn=el('btnPrivSend');if(btn)btn.onclick=()=>sendPrivMsg(phone);
+            db.ref('chats/'+chatId).off();db.ref('chats/'+chatId).limitToLast(50).on('child_added',snap=>{const m=snap.val();const isMe=m.from===profile.phone;el('messages').innerHTML+='<div class="msg '+(isMe?'mo':'mi')+'">'+(m.text||'')+'<div class="time">'+(m.time||'')+'</div></div>';el('messages').scrollTop=el('messages').scrollHeight;});
         }
         
         function loadAdmin(type){
-            db.ref('bot_settings').once('value').then(snap=>{
-                const s=snap.val()||{};
-                document.getElementById('adName').value=s[type==='bot'?'name':'otp_name']||'';
-                document.getElementById('adAvatar').value=s[type==='bot'?'avatar':'otp_avatar']||'';
-            });
-            const btn=document.getElementById('btnSaveAdmin');if(btn)btn.onclick=()=>saveAdmin(type);
+            db.ref('bot_settings').once('value').then(snap=>{const s=snap.val()||{};el('adName').value=s[type==='bot'?'name':'otp_name']||'';el('adAvatar').value=s[type==='bot'?'avatar':'otp_avatar']||'';});
+            const btn=el('btnSaveAdmin');if(btn)btn.onclick=()=>saveAdmin(type);
         }
         function saveAdmin(type){
-            const n=document.getElementById('adName').value.trim();
-            const a=document.getElementById('adAvatar').value.trim();
-            if(n){db.ref('bot_settings/'+(type==='bot'?'name':'otp_name')).set(n);document.getElementById('chatName').textContent=n;}
-            if(a){db.ref('bot_settings/'+(type==='bot'?'avatar':'otp_avatar')).set(a);document.getElementById('chatAv').innerHTML='<img src="'+a+'">';}
+            const n=el('adName').value.trim(),a=el('adAvatar').value.trim();
+            if(n){db.ref('bot_settings/'+(type==='bot'?'name':'otp_name')).set(n);el('chatName').textContent=n;}
+            if(a){db.ref('bot_settings/'+(type==='bot'?'avatar':'otp_avatar')).set(a);el('chatAv').innerHTML='<img src="'+a+'">';}
             alert('✅ تم الحفظ');
         }
         function loadChatAvatar(type){
-            db.ref('bot_settings').once('value').then(snap=>{
-                const s=snap.val()||{};
-                const key=type==='bot'?'avatar':'otp_avatar';
-                const nk=type==='bot'?'name':'otp_name';
-                if(s[key]){const a=document.getElementById('chatAv');if(a)a.innerHTML='<img src="'+s[key]+'">';}
-                if(s[nk]){const n=document.getElementById('chatName');if(n)n.textContent=s[nk];}
-            });
+            db.ref('bot_settings').once('value').then(snap=>{const s=snap.val()||{};const key=type==='bot'?'avatar':'otp_avatar',nk=type==='bot'?'name':'otp_name';if(s[key]){const a=el('chatAv');if(a)a.innerHTML='<img src="'+s[key]+'">';}if(s[nk]){const n=el('chatName');if(n)n.textContent=s[nk];}});
         }
         
-        function showOTPMsg(m){if(cur!=='group')return;const t=m.time||new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});if(m.type==='otp'){const cn=cNames[m.country]||m.country||'';document.getElementById('messages').innerHTML+='<div class="msg motp">📩 '+m.service+' <span style="color:#10b981;font-size:11px;">'+cn+'</span><br>📱 <span class="num">'+m.number+'</span><br>🔑 <span class="code">'+m.code+'</span><div class="time">'+t+'</div><button class="btn bgold" style="margin-top:6px;width:100%;padding:8px;font-size:13px;" onclick="copyCode(\''+m.code+'\')">📋 نسخ الكود</button></div>';}else{document.getElementById('messages').innerHTML+='<div class="msg '+(m.phone===profile.phone?'mo':'mi')+'">'+m.text+'<div class="time">'+t+'</div></div>';}document.getElementById('messages').scrollTop=document.getElementById('messages').scrollHeight;}
+        function showOTPMsg(m){if(cur!=='group')return;const t=m.time||new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});if(m.type==='otp'){const cn=cNames[m.country]||m.country||'';el('messages').innerHTML+='<div class="msg motp">📩 '+m.service+' <span style="color:#10b981;font-size:11px;">'+cn+'</span><br>📱 <span class="num">'+m.number+'</span><br>🔑 <span class="code">'+m.code+'</span><div class="time">'+t+'</div><button class="btn bgold" style="margin-top:6px;width:100%;padding:8px;font-size:13px;" onclick="copyCode(\''+m.code+'\')">📋 نسخ الكود</button></div>';}else{el('messages').innerHTML+='<div class="msg '+(m.phone===profile.phone?'mo':'mi')+'">'+m.text+'<div class="time">'+t+'</div></div>';}el('messages').scrollTop=el('messages').scrollHeight;}
         
         function goTo(page){cur=page;save();if(otpTimer&&page!=='group'){clearInterval(otpTimer);otpTimer=null;}render();}
-        function prevSetup(){const f=document.getElementById('fSetup').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;document.getElementById('avSetup').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
-        function prevProf(){const f=document.getElementById('fProf').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;};r.readAsDataURL(f);}}
-        function prevCreate(){const f=document.getElementById('fCreate').files[0];if(f){const r=new FileReader();r.onload=function(e){window._createAvatar=e.target.result;document.getElementById('avCreate').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
+        function prevSetup(){const f=el('fSetup').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;el('avSetup').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
+        function prevProf(){const f=el('fProf').files[0];if(f){const r=new FileReader();r.onload=function(e){profile.avatar=e.target.result;};r.readAsDataURL(f);}}
+        function prevCreate(){const f=el('fCreate').files[0];if(f){const r=new FileReader();r.onload=function(e){window._createAvatar=e.target.result;el('avCreate').innerHTML='<img src="'+e.target.result+'">';};r.readAsDataURL(f);}}
         
-        function saveSetup(){profile.phone=document.getElementById('inPhone').value.trim();profile.name=document.getElementById('inName').value.trim()||'مستخدم';profile.username=document.getElementById('inUser').value.trim();if(!profile.phone){alert('أدخل رقم الهاتف');return;}save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
-        function saveProfile(){profile.name=document.getElementById('eName').value.trim()||profile.name;profile.phone=document.getElementById('ePhone').value.trim()||profile.phone;profile.username=document.getElementById('eUser').value.trim();save();db.ref('users/'+btoa(profile.phone)).set(profile);goTo('main');}
-        function doCreate(type){const name=document.getElementById('inCreateName').value.trim();if(!name){alert('أدخل اسماً');return;}const data={name,createdBy:profile.phone,members:type==='group'?[profile.phone]:[],avatar:window._createAvatar||'',type};db.ref('groups').push(data).then(ref=>{alert('✅ تم!');goTo('grp_'+ref.key);});}
-        function doSearch(q){if(!q)return;const res=document.getElementById('searchResult');res.innerHTML='جاري البحث...';db.ref('users/'+btoa(q)).once('value').then(s=>{if(s.val()){const u=s.val();res.innerHTML='<div style="background:#1e293b;padding:15px;border-radius:10px;cursor:pointer;" onclick="goTo(\'pv_'+u.phone+'\')"><b>'+u.name+'</b><br>📱 '+u.phone+'</div>';}else{res.innerHTML='❌ لم يتم العثور';}});}
+        function saveSetup(){profile.phone=el('inPhone').value.trim();profile.name=el('inName').value.trim()||'مستخدم';profile.username=el('inUser').value.trim();if(!profile.phone){alert('أدخل رقم الهاتف');return;}save();db.ref('users/'+btoa(profile.phone)).set(profile);cur='main';render();}
+        function saveProfile(){profile.name=el('eName').value.trim()||profile.name;profile.phone=el('ePhone').value.trim()||profile.phone;profile.username=el('eUser').value.trim();save();db.ref('users/'+btoa(profile.phone)).set(profile);goTo('main');}
+        function doCreate(type){const name=el('inCreateName').value.trim();if(!name){alert('أدخل اسماً');return;}const data={name,createdBy:profile.phone,members:type==='group'?[profile.phone]:[],avatar:window._createAvatar||'',type};db.ref('groups').push(data).then(ref=>{alert('✅ تم!');goTo('grp_'+ref.key);});}
+        function doSearch(q){if(!q)return;const res=el('searchResult');res.innerHTML='جاري البحث...';db.ref('users/'+btoa(q)).once('value').then(s=>{if(s.val()){const u=s.val();res.innerHTML='<div style="background:#1e293b;padding:15px;border-radius:10px;cursor:pointer;" onclick="goTo(\'pv_'+u.phone+'\')"><b>'+u.name+'</b><br>📱 '+u.phone+'</div>';}else{res.innerHTML='❌ لم يتم العثور';}});}
         function groupSettings(gid){if(!confirm('⚙️ إعدادات المجموعة'))return;const opt=prompt('1 - إضافة عضو\n2 - حذف المجموعة');if(opt==='1'){const q=prompt('يوزر العضو:');if(q)db.ref('users').orderByChild('username').equalTo(q).once('value').then(s=>{if(s.val()){const u=Object.values(s.val())[0];db.ref('groups/'+gid+'/members').once('value').then(s2=>{const m=s2.val()||[];if(!m.includes(u.phone)){m.push(u.phone);db.ref('groups/'+gid+'/members').set(m);alert('✅ تم');}else alert('موجود');});}else alert('❌');});}else if(opt==='2'){if(confirm('حذف؟')){db.ref('groups/'+gid).remove();goTo('main');}}}
         
         function copyCode(c){navigator.clipboard.writeText(c);}
         function copyNum(){if(curNum)navigator.clipboard.writeText(curNum);}
         
         async function fetchOTP(){try{const d=await api('/api/otp?count=15');if(Array.isArray(d))d.forEach(i=>{const k=i[1]+'-'+i[2];if(!known.has(k)){known.add(k);db.ref('group_msgs').push({type:'otp',service:i[0],number:i[1],code:i[2].match(/\d{4,8}/)?.[0]||i[2],country:i[4]||'',time:new Date().toLocaleTimeString('ar-EG')});}});}catch(e){}}
-        function sendGroupMsg(){const inp=document.getElementById('groupInput');const tx=inp.value.trim();if(!tx)return;db.ref('group_msgs').push({type:'user',text:tx,sender:profile.name,phone:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
-        function sendGroupMsg2(gid){const inp=document.getElementById('groupInput2');const tx=inp.value.trim();if(!tx)return;db.ref('groups/'+gid+'/messages').push({text:tx,sender:profile.name,from:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
-        function sendPrivMsg(phone){const inp=document.getElementById('privInput');const tx=inp.value.trim();if(!tx)return;const chatId=[profile.phone,phone].sort().join('_');db.ref('chats/'+chatId).push({text:tx,from:profile.phone,to:phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
+        function sendGroupMsg(){const inp=el('groupInput');const tx=inp.value.trim();if(!tx)return;db.ref('group_msgs').push({type:'user',text:tx,sender:profile.name,phone:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
+        function sendGroupMsg2(gid){const inp=el('groupInput2');const tx=inp.value.trim();if(!tx)return;db.ref('groups/'+gid+'/messages').push({text:tx,sender:profile.name,from:profile.phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
+        function sendPrivMsg(phone){const inp=el('privInput');const tx=inp.value.trim();if(!tx)return;const chatId=[profile.phone,phone].sort().join('_');db.ref('chats/'+chatId).push({text:tx,from:profile.phone,to:phone,time:new Date().toLocaleTimeString('ar-EG')});inp.value='';}
         
-        function showStart(){document.getElementById('messages').innerHTML='<div class="center"><div style="font-size:18px;color:#fff;">👋 أهلًا بك في NUMBER BOT!<br><br>اضغط START للبدء</div></div>';document.getElementById('btnArea').innerHTML='<button class="btn bblue" style="width:100%;" onclick="loadServices()">▶️ START</button>';}
-        async function loadServices(){document.getElementById('btnArea').innerHTML='';try{const d=await api('/api/services');if(d.success){let btns='';d.services.slice(0,8).forEach((s,i)=>{if(i%2===0)btns+='<div class="brow">';btns+='<button class="btn bblue" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';if(i%2===1||i===d.services.length-1)btns+='</div>';});document.getElementById('btnArea').innerHTML=btns;}}catch(e){}}
-        async function loadCountries(key,name){cSvc=key;save();document.getElementById('btnArea').innerHTML='';try{const d=await api('/api/countries?service='+key);if(d.success){let btns='';d.countries.slice(0,10).forEach((c,i)=>{const cn=cNames[c.name]||c.name;if(i%2===0)btns+='<div class="brow">';btns+='<button class="btn bblue" onclick="getNumber(\''+c.name+'\',\''+c.flag+'\')">'+c.flag+' '+cn+' ('+c.count+')</button>';if(i%2===1||i===d.countries.length-1)btns+='</div>';});document.getElementById('btnArea').innerHTML=btns;}}catch(e){}}
-        async function getNumber(country,flag){cCty=country;save();document.getElementById('btnArea').innerHTML='';const d=await api('/api/otp?count=60');if(Array.isArray(d)){let flt=d.filter(i=>i[4]&&i[4].trim().toUpperCase()===country.toUpperCase()&&i[0].toLowerCase().includes(cSvc.toLowerCase()));if(flt.length===0)flt=d.filter(i=>i[0].toLowerCase().includes(cSvc.toLowerCase()));if(flt.length>0){curNum=flt[Math.floor(Math.random()*flt.length)][1];save();const cn=cNames[country]||country;document.getElementById('messages').innerHTML='<div class="center"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div><div style="color:#10b981;margin-top:8px;">'+flag+' '+cn+'</div></div></div>';document.getElementById('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="getNumber(\''+country+'\',\''+flag+'\')">🔄 تغيير</button></div><div class="brow"><button class="btn bblue" onclick="loadServices()">🌍 دولة</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';}else{alert('❌ لا توجد أرقام');document.getElementById('btnArea').innerHTML='<button class="btn bblue" style="width:100%;" onclick="loadServices()">🔙 رجوع</button>';}}}
-        async function checkCode(){if(!curNum)return;const d=await api('/api/otp?count=50');if(Array.isArray(d)){const f=d.find(i=>i[1]===curNum);if(f){const cd=f[2].match(/\d{4,8}/)?.[0]||f[2];document.getElementById('messages').innerHTML='<div class="center"><div><div class="emoji">✅</div><div class="big" style="font-size:36px;color:#f59e0b;">'+cd+'</div><div style="color:#fff;margin-top:8px;">'+curNum+'</div></div></div>';}else{alert('⏳ لم يصل الكود بعد');}}}
+        function showStart(){el('messages').innerHTML='<div class="center"><div style="font-size:18px;color:#fff;">👋 أهلًا بك في NUMBER BOT!<br><br>اضغط START للبدء</div></div>';el('btnArea').innerHTML='<button class="btn bblue" style="width:100%;" onclick="loadServices()">▶️ START</button>';}
+        async function loadServices(){el('btnArea').innerHTML='';try{const d=await api('/api/services');if(d.success){let btns='';d.services.slice(0,8).forEach((s,i)=>{if(i%2===0)btns+='<div class="brow">';btns+='<button class="btn bblue" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';if(i%2===1||i===d.services.length-1)btns+='</div>';});el('btnArea').innerHTML=btns;}}catch(e){}}
+        async function loadCountries(key,name){cSvc=key;save();el('btnArea').innerHTML='';try{const d=await api('/api/countries?service='+key);if(d.success){let btns='';d.countries.slice(0,10).forEach((c,i)=>{const cn=cNames[c.name]||c.name;if(i%2===0)btns+='<div class="brow">';btns+='<button class="btn bblue" onclick="getNumber(\''+c.name+'\',\''+c.flag+'\')">'+c.flag+' '+cn+' ('+c.count+')</button>';if(i%2===1||i===d.countries.length-1)btns+='</div>';});el('btnArea').innerHTML=btns;}}catch(e){}}
+        async function getNumber(country,flag){cCty=country;save();el('btnArea').innerHTML='';const d=await api('/api/otp?count=60');if(Array.isArray(d)){let flt=d.filter(i=>i[4]&&i[4].trim().toUpperCase()===country.toUpperCase()&&i[0].toLowerCase().includes(cSvc.toLowerCase()));if(flt.length===0)flt=d.filter(i=>i[0].toLowerCase().includes(cSvc.toLowerCase()));if(flt.length>0){curNum=flt[Math.floor(Math.random()*flt.length)][1];save();const cn=cNames[country]||country;el('messages').innerHTML='<div class="center"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div><div style="color:#10b981;margin-top:8px;">'+flag+' '+cn+'</div></div></div>';el('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyNum()">📋 نسخ</button><button class="btn bblue" onclick="getNumber(\''+country+'\',\''+flag+'\')">🔄 تغيير</button></div><div class="brow"><button class="btn bblue" onclick="loadServices()">🌍 دولة</button><button class="btn bgold" onclick="checkCode()">📩 كود</button></div>';}else{alert('❌ لا توجد أرقام');el('btnArea').innerHTML='<button class="btn bblue" style="width:100%;" onclick="loadServices()">🔙 رجوع</button>';}}}
+        async function checkCode(){if(!curNum)return;const d=await api('/api/otp?count=50');if(Array.isArray(d)){const f=d.find(i=>i[1]===curNum);if(f){const cd=f[2].match(/\d{4,8}/)?.[0]||f[2];el('messages').innerHTML='<div class="center"><div><div class="emoji">✅</div><div class="big" style="font-size:36px;color:#f59e0b;">'+cd+'</div><div style="color:#fff;margin-top:8px;">'+curNum+'</div></div></div>';}else{alert('⏳ لم يصل الكود بعد');}}}
         
         window.onload=()=>{
             if(!profile.name||!profile.phone){cur='setup';render();}
             else{cur=S.cur||'main';render();}
-            setTimeout(()=>{
-                const b=document.getElementById('btnGo');
-                if(b){b.onclick=saveSetup;b.addEventListener('click',saveSetup);}
-                const bp=document.getElementById('btnSaveProfile');
-                if(bp){bp.onclick=saveProfile;bp.addEventListener('click',saveProfile);}
-                const bc=document.getElementById('btnCreate');
-                if(bc){bc.onclick=()=>doCreate(cur.replace('create_',''));}
-            },800);
         };
     </script>
 </body>
