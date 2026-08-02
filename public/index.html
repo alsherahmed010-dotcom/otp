@@ -10,37 +10,39 @@
         *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif}
         body{background:#0e1621;color:#f5f5f5;display:flex;justify-content:center;align-items:center;min-height:100vh}
         .app{width:100%;max-width:420px;background:#17212b;height:100vh;display:flex;flex-direction:column;box-shadow:0 0 15px rgba(0,0,0,0.5);overflow:hidden}
-        .h{background:#242f3d;padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #111822;min-height:60px}
-        .h .back{color:#fff;font-size:22px;cursor:pointer}
-        .h .av{width:42px;height:42px;border-radius:50%;background:#2b5278;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0;border:1px solid #4e729a}
+        .h{background:#242f3d;padding:10px 15px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #111822;min-height:55px}
+        .h .back{color:#fff;font-size:20px;cursor:pointer}
+        .h .av{width:40px;height:40px;border-radius:50%;background:#2b5278;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0}
         .h .info{flex:1}
-        .h .info .n{font-size:16px;color:#fff;font-weight:600}
-        .h .info .s{font-size:13px;color:#7d8b99}
+        .h .info .n{font-size:15px;color:#fff;font-weight:600}
+        .h .info .s{font-size:12px;color:#7d8b99}
         .list{flex:1;overflow-y:auto;background:#0e1621}
-        .row{display:flex;align-items:center;padding:14px 16px;gap:14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02)}
+        .row{display:flex;align-items:center;padding:12px 15px;gap:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02)}
         .row:active{background:rgba(255,255,255,0.03)}
-        .row .av{width:50px;height:50px;font-size:22px}
+        .row .av{width:50px;height:50px;font-size:20px}
         .row .info{flex:1}
-        .row .n{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px}
-        .row .p{font-size:13px;color:#7d8b99;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .msgs{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;background:#0e1621}
-        .msg{background:#182533;border-radius:12px;padding:14px;font-size:14px;line-height:1.6;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.2)}
-        .msg .user{color:#64b5f6;font-weight:600}
-        .msg .num{color:#60a5fa;font-weight:600;font-size:17px;cursor:pointer}
-        .msg .code{background:#f59e0b;color:#000;padding:4px 12px;border-radius:6px;font-weight:700;display:inline-block;margin:6px 0;font-size:17px;cursor:pointer}
-        .msg .time{font-size:11px;color:#7d8b99;margin-top:6px}
-        .ba{padding:12px;border-top:1px solid #111822;background:#17212b;display:flex;flex-direction:column;gap:8px;max-height:55vh;overflow-y:auto}
-        .btn{border:none;border-radius:10px;padding:13px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;text-align:center;background:#2b5278;box-shadow:0 1px 3px rgba(0,0,0,0.3);width:100%;margin-bottom:8px}
+        .row .n{font-size:14px;font-weight:500;color:#fff;margin-bottom:4px}
+        .row .p{font-size:13px;color:#7d8b99}
+        .msgs{flex:1;padding:15px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;background:#0e1621}
+        .msg{background:#182533;border-radius:12px;padding:12px;font-size:13px;line-height:1.6;color:#fff}
+        .msg .num{color:#60a5fa;font-weight:600;font-size:18px;cursor:pointer}
+        .msg .code{background:#f59e0b;color:#000;padding:4px 12px;border-radius:5px;font-weight:700;display:inline-block;margin:6px 0;font-size:18px;cursor:pointer}
+        .msg .time{font-size:10px;color:#7d8b99;margin-top:6px}
+        .ba{padding:10px;border-top:1px solid #111822;background:#17212b;display:flex;flex-direction:column;gap:8px;max-height:55vh;overflow-y:auto}
+        .btn{border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;color:#fff;cursor:pointer;text-align:center;background:#2b5278;width:100%;margin-bottom:8px}
         .btn:active{opacity:0.8}
         .bgreen{background:#2e8b57}
-        .bgold{background:#f59e0b;color:#000;font-weight:700}
+        .bgold{background:#f59e0b;color:#000;font-weight:600}
         .brow{display:flex;gap:8px}
         .brow .btn{flex:1;margin-bottom:0}
         .footer{background:#17212b;padding:12px;text-align:center;border-top:1px solid #111822;color:#7d8b99;font-size:13px}
         .nav{display:flex;justify-content:space-around;padding:8px 0;background:#17212b;border-top:1px solid #111822}
-        .ni{display:flex;flex-direction:column;align-items:center;color:#7d8b99;font-size:12px;cursor:pointer;gap:4px;background:none;border:none;flex:1}
+        .ni{display:flex;flex-direction:column;align-items:center;color:#7d8b99;font-size:11px;cursor:pointer;gap:4px;background:none;border:none;flex:1}
         .ni.ac{color:#5288c1}
-        .nic{font-size:22px}
+        .nic{font-size:20px}
+        .center-num{flex:1;display:flex;align-items:center;justify-content:center;text-align:center}
+        .center-num .big{font-size:30px;font-weight:700;color:#60a5fa;word-break:break-all}
+        .center-num .emoji{font-size:50px}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
     </style>
 </head>
@@ -48,171 +50,134 @@
     <div class="app" id="app"></div>
     <script>
         firebase.initializeApp({apiKey:"AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",projectId:"otp-5acda",databaseURL:"https://otp-5acda-default-rtdb.firebaseio.com"});
-        const db = firebase.database();
-        const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
+        const db=firebase.database();
+        const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
         
-        let S = JSON.parse(localStorage.getItem('otp_fix_proxy') || '{}');
-        let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '';
-        let known = new Set(), otpTimer = null;
-        const cNames = {MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
+        let S=JSON.parse(localStorage.getItem('otp_v100')||'{}');
+        let cur=S.cur||'main',cSvc=S.cSvc||'',cCty=S.cCty||'',cFlag=S.cFlag||'',curNum=S.curNum||'';
+        let known=new Set(),otpTimer=null;
+        const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
         
-        function save() { S = {cur, cSvc, cCty, cFlag}; localStorage.setItem('otp_fix_proxy', JSON.stringify(S)); }
-        function api(p) { return fetch(PROXY + p).then(r => r.json()); }
-        function el(id) { return document.getElementById(id); }
-        function copyText(t) { 
-            navigator.clipboard.writeText(t); 
-            alert('تم النسخ: ' + t);
+        function save(){S={cur,cSvc,cCty,cFlag,curNum};localStorage.setItem('otp_v100',JSON.stringify(S));}
+        function api(p){return fetch(PROXY+p).then(r=>r.json());}
+        function el(id){return document.getElementById(id);}
+        function copyText(t){navigator.clipboard.writeText(t);}
+        
+        function render(){
+            const app=el('app');app.innerHTML='';
+            if(cur==='main'){app.innerHTML=mainHTML();}
+            else if(cur==='bot'||cur==='group'){app.innerHTML=chatHTML(cur);bindEvents();}
         }
         
-        function render() {
-            const app = el('app'); app.innerHTML = '';
-            if(cur === 'main') { app.innerHTML = mainHTML(); }
-            else if(cur === 'bot' || cur === 'group') { app.innerHTML = chatHTML(cur); bindEvents(); }
+        function mainHTML(){
+            return '<div class="screen"><div class="h"><div class="av">✈️</div><div class="info"><div class="n">OTP Live</div><div class="s">Number Panel</div></div></div><div class="list"><div class="row" onclick="openChat(\'bot\')"><div class="av" style="background:#2b5278;">🤖</div><div class="info"><div class="n">🤖 NUMBER BOT</div><div class="p">'+(curNum?'الرقم: '+curNum:'بوت الأرقام والخدمات')+'</div></div></div><div class="row" onclick="openChat(\'group\')"><div class="av" style="background:#2e8b57;">👥</div><div class="info"><div class="n">👥 ALL TECH OTP</div><div class="p">بث مباشر لأكواد التفعيل</div></div></div></div><div class="nav"><button class="ni ac" onclick="openScreen(\'main\')"><span class="nic">💬</span>محادثات</button></div></div>';
         }
         
-        function mainHTML() {
-            return '<div class="screen"><div class="h"><div class="av">✈️</div><div class="info"><div class="n">OTP Live</div><div class="s">Number Panel Proxy</div></div></div><div class="list"><div class="row" onclick="openChat(\'bot\')"><div class="av" style="background:#2b5278;">🤖</div><div class="info"><div class="n">🤖 NUMBER BOT</div><div class="p">بوت الأرقام والخدمات عبر البروكسي</div></div></div><div class="row" onclick="openChat(\'group\')"><div class="av" style="background:#2e8b57;">👥</div><div class="info"><div class="n">👥 ALL TECH OTP</div><div class="p">بث مباشر لأكواد التفعيل</div></div></div></div><div class="nav"><button class="ni ac" onclick="openScreen(\'main\')"><span class="nic">💬</span>محادثات</button></div></div>';
+        function chatHTML(type){
+            const b=type==='bot';
+            return '<div class="screen"><div class="h"><div class="back" onclick="goBack()">←</div><div class="av">'+(b?'🤖':'👥')+'</div><div class="info"><div class="n">'+(b?'🤖 NUMBER BOT':'👥 ALL TECH OTP')+'</div><div class="s">'+(b?'online':'live')+'</div></div></div><div class="msgs" id="messages" style="'+(b&&curNum?'':'display:flex;')+'"></div>'+(b?'<div class="ba" id="btnArea"></div>':'<div class="footer">إرسال الرسائل غير مسموح به</div>')+'</div>';
         }
         
-        function chatHTML(type) {
-            const b = type === 'bot';
-            return '<div class="screen"><div class="h"><div class="back" onclick="goBack()">←</div><div class="av">' + (b ? '🤖' : '👥') + '</div><div class="info"><div class="n">' + (b ? '🤖 NUMBER BOT' : '👥 ALL TECH OTP') + '</div><div class="s">' + (b ? 'online' : 'live') + '</div></div></div><div class="msgs" id="messages"></div>' + (b ? '<div class="ba" id="btnArea"></div>' : '<div class="footer">إرسال الرسائل غير مسموح به</div>') + '</div>';
-        }
-        
-        function bindEvents() {
-            if(cur === 'bot') {
-                if(cCty && cFlag) { showNumbers(cCty, cFlag); }
-                else if(cSvc) { loadCountries(cSvc); }
-                else { showStart(); }
-            } else if(cur === 'group') {
-                el('messages').innerHTML = '<div class="msg">📡 numberpanel.tech - Live OTP</div>';
-                db.ref('messages').off();
-                db.ref('messages').limitToLast(50).on('child_added', s => { if(cur === 'group') showOTP(s.val()); });
-                if(otpTimer) clearInterval(otpTimer);
-                otpTimer = setInterval(() => { fetchOTP(); }, 3000);
+        function bindEvents(){
+            if(cur==='bot'){
+                if(curNum){showNumber();}
+                else if(cCty&&cFlag){showNumbers(cCty,cFlag);}
+                else if(cSvc){loadCountries(cSvc);}
+                else{showStart();}
+            }else if(cur==='group'){
+                el('messages').innerHTML='<div class="msg">📡 numberpanel.tech - Live OTP</div>';
+                db.ref('messages').off();db.ref('messages').limitToLast(50).on('child_added',s=>{if(cur==='group')showOTP(s.val());});
+                if(otpTimer)clearInterval(otpTimer);
+                otpTimer=setInterval(()=>{fetchOTP();},3000);
                 fetchOTP();
             }
         }
         
-        function openScreen(s) { cur = s; save(); if(otpTimer) clearInterval(otpTimer); render(); }
-        function openChat(t) { cur = t; cSvc = ''; cCty = ''; cFlag = ''; save(); render(); }
-        function goBack() {
-            if(cCty) { cCty = ''; cFlag = ''; save(); loadCountries(cSvc); }
-            else if(cSvc) { cSvc = ''; save(); showStart(); }
-            else { cur = 'main'; save(); if(otpTimer) clearInterval(otpTimer); render(); }
+        function openScreen(s){cur=s;save();if(otpTimer)clearInterval(otpTimer);render();}
+        function openChat(t){cur=t;cSvc='';cCty='';cFlag='';curNum='';save();render();}
+        function goBack(){
+            if(curNum){curNum='';save();showNumbers(cCty,cFlag);}
+            else if(cCty){cCty='';cFlag='';save();loadCountries(cSvc);}
+            else if(cSvc){cSvc='';save();showStart();}
+            else{cur='main';save();if(otpTimer)clearInterval(otpTimer);render();}
         }
         
-        function showOTP(m) {
-            if(cur !== 'group') return;
-            const t = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute: '2-digit'});
-            const code = m.code || '---';
-            el('messages').innerHTML += '<div class="msg"><span class="user">Alexender</span><br>🌐 ' + m.service + '<br>📱 <span class="num" onclick="copyText(\'' + m.number + '\')">' + m.number + '</span><br>🔑 <span class="code" onclick="copyText(\'' + code + '\')">' + code + '</span><div class="time">' + t + '</div></div>';
-            el('messages').scrollTop = el('messages').scrollHeight;
+        function showNumber(){
+            el('messages').innerHTML='<div class="center-num"><div><div class="emoji">📱</div><div class="big">'+curNum+'</div><div style="color:#10b981;margin-top:8px;">'+cFlag+' '+cCty+'</div></div></div>';
+            el('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="copyText(\''+curNum+'\')">📋 نسخ</button><button class="btn bgold" onclick="checkCode(\''+curNum+'\')">📩 جلب الكود</button></div><div class="brow"><button class="btn" onclick="showNumbers(\''+cCty+'\',\''+cFlag+'\')">🔄 تغيير الرقم</button><button class="btn" onclick="loadServices()">🌍 خدمات</button></div>';
         }
         
-        async function fetchOTP() {
-            try {
-                const d = await api('/api/otp?count=20');
-                if(Array.isArray(d)) {
-                    d.forEach(i => {
-                        const k = i[1] + '-' + i[2];
-                        if(!known.has(k)) {
-                            known.add(k);
-                            db.ref('messages').push({type: 'otp', service: i[0], number: i[1], code: i[2].match(/\d{4,8}/)?.[0] || i[2]});
-                        }
+        function showOTP(m){
+            if(cur!=='group')return;
+            const t=new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
+            const code=m.code||'---';
+            el('messages').innerHTML+='<div class="msg">🌐 '+m.service+'<br>📱 <span class="num" onclick="copyText(\''+m.number+'\')">'+m.number+'</span><br>🔑 <span class="code" onclick="copyText(\''+code+'\')">'+code+'</span><div class="time">'+t+'</div></div>';
+            el('messages').scrollTop=el('messages').scrollHeight;
+        }
+        
+        async function fetchOTP(){
+            try{const d=await api('/api/otp?count=20');if(Array.isArray(d))d.forEach(i=>{const k=i[1]+'-'+i[2];if(!known.has(k)){known.add(k);db.ref('messages').push({type:'otp',service:i[0],number:i[1],code:i[2].match(/\d{4,8}/)?.[0]||i[2]});}});}catch(e){}
+        }
+        
+        function showStart(){
+            el('messages').innerHTML='<div class="msg">👋 أهلاً بك! اضغط START لاختيار الخدمة والدولة.</div>';
+            el('btnArea').innerHTML='<button class="btn bgreen" onclick="loadServices()">▶️ START</button>';
+        }
+        
+        async function loadServices(){
+            el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
+            try{const d=await api('/api/services');if(d.success&&d.services){let btns='';d.services.forEach(s=>{btns+='<button class="btn" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';});el('btnArea').innerHTML=btns;}}catch(e){}
+        }
+        
+        async function loadCountries(key,name){
+            cSvc=key;cCty='';cFlag='';curNum='';save();
+            el('messages').innerHTML='<div class="msg">🌐 '+name+'<br>اختر الدولة:</div>';
+            el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
+            try{const d=await api('/api/countries?service='+key);if(d.success&&d.countries){let btns='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';d.countries.forEach(c=>{const cn=cNames[c.name]||c.name;btns+='<button class="btn" onclick="selectCountry(\''+c.name+'\',\''+(c.flag||'')+'\')">'+(c.flag||'')+' '+cn+' ('+c.count+')</button>';});el('btnArea').innerHTML=btns;}}catch(e){}
+        }
+        
+        function selectCountry(country,flag){cCty=country;cFlag=flag;save();showNumbers(country,flag);}
+        
+        async function showNumbers(country,flag){
+            const cn=cNames[country]||country;
+            el('messages').innerHTML='<div class="msg">🌐 '+cSvc+'<br>🌍 '+flag+' '+cn+'<br>📱 اضغط على رقم:</div>';
+            el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب الأرقام...</div>';
+            try{
+                const d=await api('/api/otp?count=200');
+                if(Array.isArray(d)){
+                    let flt=d.filter(i=>i.length>4&&i[4]&&String(i[4]).trim().toUpperCase()===String(country).trim().toUpperCase());
+                    if(flt.length===0)flt=d.filter(i=>i[0]&&String(i[0]).toLowerCase().includes(String(cSvc).toLowerCase()));
+                    if(flt.length===0)flt=d.slice(0,30);
+                    let nums=[...new Set(flt.map(i=>i[1]))].slice(0,30);
+                    let btns='';
+                    nums.forEach(num=>{
+                        btns+='<div class="brow"><button class="btn bgreen" onclick="selectNum(\''+num+'\')">📱 '+num+'</button><button class="btn bgold" onclick="checkCode(\''+num+'\')">📩 كود</button></div>';
                     });
+                    btns+='<div class="brow"><button class="btn" onclick="loadCountries(\''+cSvc+'\')">🔙 دول</button><button class="btn" onclick="loadServices()">🌍 خدمات</button></div>';
+                    el('btnArea').innerHTML=btns;
                 }
-            } catch(e) {}
+            }catch(e){el('btnArea').innerHTML='<button class="btn" onclick="showNumbers(\''+country+'\',\''+flag+'\')">❌ إعادة</button>';}
         }
         
-        function showStart() {
-            el('messages').innerHTML = '<div class="msg">👋 أهلاً بك عبر البروكسي! اضغط START لاختيار الخدمة والدولة.</div>';
-            el('btnArea').innerHTML = '<button class="btn bgreen" onclick="loadServices()">▶️ START</button>';
-        }
+        function selectNum(num){curNum=num;save();showNumber();}
         
-        async function loadServices() {
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل عبر البروكسي...</div>';
-            try {
-                const d = await api('/api/services');
-                if(d.success && d.services) {
-                    let btns = '';
-                    d.services.forEach(s => {
-                        btns += '<button class="btn" onclick="loadCountries(\'' + s.key + '\', \'' + s.name + '\')">' + s.name + ' (' + s.count + ')</button>';
-                    });
-                    el('btnArea').innerHTML = btns;
-                } else {
-                    el('btnArea').innerHTML = '<button class="btn" onclick="showStart()">❌ لا توجد خدمات، إعادة المحاولة</button>';
+        async function checkCode(num){
+            el('messages').innerHTML+='<div class="msg">⏳ جاري جلب الكود لـ '+num+'...</div>';
+            try{
+                const d=await api('/api/otp?count=50');
+                if(Array.isArray(d)){
+                    const f=d.find(i=>i[1]===num);
+                    if(f){const cd=f[2].match(/\d{4,8}/)?.[0]||f[2];
+                        el('messages').innerHTML+='<div class="msg">✅ الكود: <span class="code" onclick="copyText(\''+cd+'\')">'+cd+'</span><br>📱 '+num+'</div>';
+                    }else{el('messages').innerHTML+='<div class="msg">⏳ لم يصل الكود بعد لـ '+num+'</div>';}
+                    el('messages').scrollTop=el('messages').scrollHeight;
                 }
-            } catch(e) {
-                el('btnArea').innerHTML = '<button class="btn" onclick="showStart()">❌ خطأ في الاتصال بالبروكسي</button>';
-            }
+            }catch(e){}
         }
         
-        async function loadCountries(key, name) {
-            cSvc = key; cCty = ''; cFlag = ''; save();
-            el('messages').innerHTML = '<div class="msg">🌐 ' + (name || key) + '<br>اختر الدولة:</div>';
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
-            try {
-                const d = await api('/api/countries?service=' + key);
-                if(d.success && d.countries) {
-                    let btns = '<button class="btn" onclick="loadServices()">🔙 خدمات</button>';
-                    d.countries.forEach(c => {
-                        const cn = cNames[c.name] || c.name;
-                        btns += '<button class="btn" onclick="selectCountry(\'' + c.name + '\', \'' + (c.flag || '') + '\')">' + (c.flag || '') + ' ' + cn + ' (' + c.count + ')</button>';
-                    });
-                    el('btnArea').innerHTML = btns;
-                } else {
-                    el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">🔙 خدمات</button>';
-                }
-            } catch(e) {}
-        }
-        
-        function selectCountry(country, flag) { cCty = country; cFlag = flag; save(); showNumbers(country, flag); }
-        
-        async function showNumbers(country, flag) {
-            const cn = cNames[country] || country;
-            el('messages').innerHTML = '<div class="msg">🌐 ' + cSvc + '<br>🌍 ' + flag + ' ' + cn + '<br>📱 اضغط على رقم لنسخه:</div>';
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب الأرقام...</div>';
-            try {
-                const d = await api('/api/otp?count=200');
-                if(Array.isArray(d)) {
-                    let flt = d.filter(i => i.length > 4 && i[4] && String(i[4]).trim().toUpperCase() === String(country).trim().toUpperCase());
-                    if(flt.length === 0) flt = d.filter(i => i[0] && String(i[0]).toLowerCase().includes(String(cSvc).toLowerCase()));
-                    if(flt.length === 0) flt = d.slice(0, 30);
-                    let nums = [...new Set(flt.map(i => i[1]))].slice(0, 30);
-                    let btns = '<div class="brow"><button class="btn bgreen" onclick="showNumbers(\'' + country + '\', \'' + flag + '\')">🔄 تحديث</button><button class="btn bgold" onclick="checkCodes(\'' + country + '\')">📩 أكواد</button></div><div class="brow"><button class="btn" onclick="loadCountries(\'' + cSvc + '\')">🔙 دول</button><button class="btn" onclick="loadServices()">🌍 خدمات</button></div>';
-                    nums.forEach(num => {
-                        btns += '<button class="btn bgreen" onclick="copyText(\'' + num + '\')">📱 ' + num + '</button>';
-                    });
-                    el('btnArea').innerHTML = btns;
-                }
-            } catch(e) {
-                el('btnArea').innerHTML = '<button class="btn" onclick="showNumbers(\'' + country + '\', \'' + flag + '\')">❌ إعادة</button>';
-            }
-        }
-        
-        async function checkCodes(country) {
-            el('messages').innerHTML += '<div class="msg">🔍 جاري جلب الأكواد...</div>';
-            try {
-                const d = await api('/api/otp?count=50');
-                if(Array.isArray(d)) {
-                    let flt = d.filter(i => i.length > 4 && i[4] && String(i[4]).trim().toUpperCase() === String(country).trim().toUpperCase());
-                    if(flt.length === 0) flt = d.slice(0, 20);
-                    let html = '<div class="msg"><b>📦 أكواد:</b><br>';
-                    flt.slice(0, 20).forEach(i => {
-                        const cd = i[2].match(/\d{4,8}/)?.[0] || i[2];
-                        html += '📱 <span class="num" onclick="copyText(\'' + i[1] + '\')">' + i[1] + '</span> ⬅️ <span class="code" onclick="copyText(\'' + cd + '\')">' + cd + '</span><br>';
-                    });
-                    html += '</div>';
-                    el('messages').innerHTML += html;
-                    el('messages').scrollTop = el('messages').scrollHeight;
-                }
-            } catch(e) {}
-        }
-        
-        window.onload = () => {
-            if(S.cur === 'group' || S.cur === 'bot') { cur = S.cur; render(); }
-            else { cur = 'main'; render(); }
+        window.onload=()=>{
+            if(S.cur==='group'||S.cur==='bot'){cur=S.cur;render();}
+            else{cur='main';render();}
         };
     </script>
 </body>
