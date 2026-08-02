@@ -32,7 +32,6 @@
         .card .code{background:#f59e0b;color:#000;padding:3px 10px;border-radius:5px;font-weight:700;font-size:15px;display:inline-block;margin-top:4px}
         .card .svc{color:#f87171;font-size:12px}
         .card .arrow{color:#7d8b99;font-size:20px}
-        .card .loading{color:#7d8b99;font-size:13px}
         .ba{padding:10px;border-top:1px solid #111822;background:#17212b;display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto}
         .btn{border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;color:#fff;cursor:pointer;text-align:center;background:#2b5278;width:100%;margin-bottom:8px}
         .btn:active{opacity:0.8}
@@ -45,8 +44,6 @@
         .ni{display:flex;flex-direction:column;align-items:center;color:#7d8b99;font-size:11px;cursor:pointer;gap:4px;background:none;border:none;flex:1}
         .ni.ac{color:#5288c1}
         .nic{font-size:20px}
-        .big-num{font-size:28px;font-weight:700;color:#60a5fa;text-align:center;word-break:break-all}
-        .big-code{font-size:32px;font-weight:700;color:#f59e0b;text-align:center}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
     </style>
 </head>
@@ -57,13 +54,13 @@
         const db=firebase.database();
         const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
         
-        let S=JSON.parse(localStorage.getItem('otp_big')||'{}');
+        let S=JSON.parse(localStorage.getItem('otp_ok')||'{}');
         let cur=S.cur||'main',cSvc=S.cSvc||'',cCty=S.cCty||'',cFlag=S.cFlag||'';
         let known=new Set(),otpTimer=null;
         const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
         
-        function save(){S={cur,cSvc,cCty,cFlag};localStorage.setItem('otp_big',JSON.stringify(S));}
-        function api(p){return fetch(PROXY+p).then(r=>r.json());}
+        function save(){S={cur,cSvc,cCty,cFlag};localStorage.setItem('otp_ok',JSON.stringify(S));}
+        async function api(p){const r=await fetch(PROXY+p);return await r.json();}
         function el(id){return document.getElementById(id);}
         function copyText(t){navigator.clipboard.writeText(t);}
         
@@ -119,21 +116,36 @@
         async function loadServices(){
             el('messages').innerHTML='<div class="card"><div class="info">⏳ جاري تحميل الخدمات...</div></div>';
             el('btnArea').innerHTML='';
-            try{const d=await api('/api/services');if(d.success&&d.services){el('messages').innerHTML='<div class="card"><div class="info">📋 اختر الخدمة:</div></div>';let btns='';d.services.forEach(s=>{btns+='<button class="btn" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';});el('btnArea').innerHTML=btns;}}catch(e){}
+            try{
+                const d=await api('/api/services');
+                if(d.success&&d.services){
+                    el('messages').innerHTML='<div class="card"><div class="info">📋 اختر الخدمة:</div></div>';
+                    let btns='';
+                    d.services.forEach(s=>{btns+='<button class="btn" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';});
+                    el('btnArea').innerHTML=btns;
+                }else{el('messages').innerHTML='<div class="card"><div class="info">❌ فشل تحميل الخدمات</div></div>';}
+            }catch(e){el('messages').innerHTML='<div class="card"><div class="info">❌ خطأ في الاتصال</div></div>';}
         }
         
         async function loadCountries(key,name){
             cSvc=key;cCty='';cFlag='';save();
             el('messages').innerHTML='<div class="card"><div class="info">🌐 '+name+'<br>اختر الدولة:</div></div>';
             el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
-            try{const d=await api('/api/countries?service='+key);if(d.success&&d.countries){let btns='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';d.countries.forEach(c=>{const cn=cNames[c.name]||c.name;btns+='<button class="btn" onclick="selectCountry(\''+c.name+'\',\''+(c.flag||'')+'\')">'+(c.flag||'')+' '+cn+' ('+c.count+')</button>';});el('btnArea').innerHTML=btns;}}catch(e){}
+            try{
+                const d=await api('/api/countries?service='+key);
+                if(d.success&&d.countries){
+                    let btns='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';
+                    d.countries.forEach(c=>{const cn=cNames[c.name]||c.name;btns+='<button class="btn" onclick="selectCountry(\''+c.name+'\',\''+(c.flag||'')+'\')">'+(c.flag||'')+' '+cn+' ('+c.count+')</button>';});
+                    el('btnArea').innerHTML=btns;
+                }else{el('btnArea').innerHTML='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';}
+            }catch(e){}
         }
         
         function selectCountry(country,flag){cCty=country;cFlag=flag;save();showNumbers(country,flag);}
         
         async function showNumbers(country,flag){
             const cn=cNames[country]||country;
-            el('messages').innerHTML='<div class="card"><div class="info">🌍 '+flag+' '+cn+'<br>⏳ جاري جلب الأرقام والأكواد...</div></div>';
+            el('messages').innerHTML='<div class="card"><div class="info">🌍 '+flag+' '+cn+'<br>⏳ جاري جلب الأرقام...</div></div>';
             el('btnArea').innerHTML='';
             try{
                 const d=await api('/api/otp?count=200');
@@ -141,7 +153,6 @@
                     let flt=d.filter(i=>i.length>4&&i[4]&&String(i[4]).trim().toUpperCase()===String(country).trim().toUpperCase());
                     if(flt.length===0)flt=d.filter(i=>i[0]&&String(i[0]).toLowerCase().includes(String(cSvc).toLowerCase()));
                     if(flt.length===0)flt=d.slice(0,20);
-                    
                     let nums=[...new Set(flt.map(i=>i[1]))].slice(0,20);
                     let html='';
                     nums.forEach(num=>{
