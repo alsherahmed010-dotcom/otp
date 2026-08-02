@@ -87,7 +87,7 @@
             }else if(cur==='group'){
                 el('messages').innerHTML='<div class="msg">📡 numberpanel.tech - Live OTP</div>';
                 db.ref('messages').off();db.ref('messages').limitToLast(50).on('child_added',s=>{if(cur==='group')showOTP(s.val());});
-                if(otpTimer)clearInterval(otpTimer);otpTimer=setInterval(fetchOTP,3000);fetchOTP();
+                if(otpTimer)clearInterval(otpTimer);otpTimer=setInterval(fetchOTP,3000);fetchOTP();loadActiveCountries();
             }
         }
         
@@ -107,7 +107,25 @@
             el('messages').scrollTop=el('messages').scrollHeight;
         }
         
-        async function fetchOTP(){
+        async function loadActiveCountries(){
+try{
+var d=await api('/api/otp?count=100');
+if(Array.isArray(d)){
+var countries={};
+d.forEach(function(i){if(i[4]){var c=i[4].trim();countries[c]=(countries[c]||0)+1;}});
+var sorted=[];
+for(var k in countries)sorted.push([k,countries[k]]);
+sorted.sort(function(a,b){return b[1]-a[1];});
+sorted=sorted.slice(0,10);
+var html='<div class="msg"><b>🔥 أكثر الدول نشاطاً:</b><br>';
+sorted.forEach(function(c,i){html+=(i+1)+'. '+c[0]+': '+c[1]+' رسالة<br>';});
+html+='</div>';
+el("messages").innerHTML+=html;
+el("messages").scrollTop=el("messages").scrollHeight;
+}
+}catch(e){}
+}
+async function fetchOTP(){
             try{const d=await api('/api/otp?count=10');if(Array.isArray(d))d.forEach(i=>{const k=i[1]+'-'+i[2];if(!known.has(k)){known.add(k);db.ref('messages').push({type:'otp',service:i[0],number:i[1],code:i[2].match(/\d{4,8}/)?.[0]||i[2]});}});}catch(e){}
         }
         
