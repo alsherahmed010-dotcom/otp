@@ -154,7 +154,7 @@
             border: none;
             border-radius: 8px;
             padding: 11px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #fff;
             cursor: pointer;
@@ -277,13 +277,13 @@
         const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
         const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        let S = JSON.parse(localStorage.getItem('otp_session_v12') || '{}');
+        let S = JSON.parse(localStorage.getItem('otp_session_v13') || '{}');
         let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'services';
         let numBatchIndex = S.numBatchIndex || 0, currentNumbersPool = S.currentNumbersPool || [];
         let known = new Set(), otpTimer = null;
 
         function save() { 
-            localStorage.setItem('otp_session_v12', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
+            localStorage.setItem('otp_session_v13', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode, numBatchIndex, currentNumbersPool})); 
         }
 
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
@@ -301,7 +301,6 @@
             setTimeout(() => { t.className = ""; }, 1200);
         }
 
-        // محرك 144Hz لتنفيذ التحديثات بسلاسة فائقة تزامناً مع شاشة الجهاز
         function render() {
             requestAnimationFrame(() => {
                 const app = el('app');
@@ -398,18 +397,6 @@
             render(); 
         }
         
-        function goBack() { 
-            if (viewMode === 'hot_countries') {
-                viewMode = 'services'; save(); loadServices();
-            } else if (cCty) { 
-                cCty = ''; cFlag = ''; save(); loadCountries(cSvc); 
-            } else if (cSvc) {
-                cSvc = ''; viewMode = 'services'; save(); loadServices();
-            } else { 
-                goHomeDirect();
-            }
-        }
-        
         function showGroupMessage(m) {
             if (cur !== 'group') return;
             const t = new Date().toLocaleTimeString('ar-EG', {hour: '2-digit', minute: '2-digit'});
@@ -465,20 +452,37 @@
 
         async function showHotCountries() {
             viewMode = 'hot_countries'; cur = 'bot'; save(); render();
-            el('messages').innerHTML = '<div class="msg-block">🔥 الدول الأكثر نشاطاً في المنصة الآن:</div>';
+            el('messages').innerHTML = '<div class="msg-block">🔥 الخدمات والدول الأكثر نشاطاً في المنصة الآن:</div>';
             el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
             
             try {
-                const d = await api('/api/otp?count=30');
-                let counts = {};
+                const d = await api('/api/otp?count=35');
+                let items = [];
                 if (Array.isArray(d)) {
-                    d.forEach(i => { let c = i.length > 4 && i[4] ? i[4] : 'زيمبابوي 🇿🇼'; counts[c] = (counts[c] || 0) + 1; });
+                    d.forEach(i => {
+                        let srv = i[0] || 'WhatsApp';
+                        let cty = i.length > 4 && i[4] ? i[4] : 'زيمبابوي 🇿🇼';
+                        items.push({ service: srv, country: cty });
+                    });
                 }
-                let sorted = Object.keys(counts).sort((a,b) => counts[b] - counts[a]);
-                if (sorted.length === 0) sorted = ['زيمبابوي 🇿🇼', 'إندونيسيا 🇮🇩'];
+                
+                // تصفية العناصر الفريدة (الخدمة مع الدولة)
+                let uniqueMap = new Map();
+                items.forEach(x => { uniqueMap.set(x.service + ' | ' + x.country, x); });
+                let list = Array.from(uniqueMap.values()).slice(0, 15);
+
+                if (list.length === 0) {
+                    list = [
+                        { service: 'WhatsApp', country: 'مصر 🇪🇬' },
+                        { service: 'Telegram', country: 'إندونيسيا 🇮🇩' },
+                        { service: 'Google', country: 'أمريكا 🇺🇸' }
+                    ];
+                }
 
                 let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
-                sorted.forEach(c => { btns += `<button class="btn" onclick="selectCountry('${c}','')">🌍 ${c}</button>`; });
+                list.forEach(item => {
+                    btns += `<button class="btn" onclick="cSvc='${item.service}'; selectCountry('${item.country}','')">📌 ${item.service} ➔ ${item.country}</button>`;
+                });
                 el('btnArea').innerHTML = btns;
             } catch(e) { el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">🔙 رجوع</button>'; }
         }
@@ -507,13 +511,39 @@
             el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك! اختر الخدمة المطلوبة:</div>';
             el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل الخدمات...</div>';
             try {
-                const d = await api('/api/services');
-                if (d.success && d.services) {
+                const res = await api('/api/services');
+                let servicesList = [];
+                if (Array.isArray(res)) {
+                    servicesList = res;
+                } else if (res && res.services && Array.isArray(res.services)) {
+                    servicesList = res.services;
+                }
+
+                if (servicesList.length > 0) {
                     let btns = '';
-                    d.services.forEach(s => { btns += `<button class="btn" onclick="loadCountries('${s.name}')">${s.name} (${s.count})</button>`; });
+                    servicesList.forEach(s => {
+                        let name = typeof s === 'string' ? s : (s.name || 'الخدمة');
+                        let count = (typeof s === 'object' && s.count !== undefined) ? ` (${s.count})` : '';
+                        btns += `<button class="btn" onclick="loadCountries('${name}')">${name}${count}</button>`;
+                    });
                     el('btnArea').innerHTML = btns;
-                } else { el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">❌ إعادة المحاولة</button>'; }
-            } catch (e) { el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">❌ خطأ بالاتصال</button>'; }
+                } else {
+                    // قائمة افتراضية احتياطية في حال تعذر جلب الخدمات مباشرة
+                    let defaults = ['WhatsApp', 'Telegram', 'Google / Gmail', 'Instagram', 'TikTok', 'Facebook', 'Twitter', 'Netflix', 'Line', 'PayPal'];
+                    let btns = '';
+                    defaults.forEach(name => {
+                        btns += `<button class="btn" onclick="loadCountries('${name}')">${name}</button>`;
+                    });
+                    el('btnArea').innerHTML = btns;
+                }
+            } catch (e) {
+                let defaults = ['WhatsApp', 'Telegram', 'Google / Gmail', 'Instagram', 'TikTok', 'Facebook', 'Twitter', 'Netflix'];
+                let btns = '';
+                defaults.forEach(name => {
+                    btns += `<button class="btn" onclick="loadCountries('${name}')">${name}</button>`;
+                });
+                el('btnArea').innerHTML = btns;
+            }
         }
 
         async function loadCountries(serviceName) {
@@ -521,13 +551,37 @@
             el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>اختر الدولة المتاحة لعرض أرقامها:</div>`;
             el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري تحميل الدول...</div>';
             try {
-                const d = await api('/api/countries?service=' + encodeURIComponent(serviceName));
-                if (d.success && d.countries) {
-                    let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
-                    d.countries.forEach(c => { btns += `<button class="btn" onclick="selectCountry('${c.name}','${c.flag || ''}')">${c.flag || ''} ${c.name} (${c.count})</button>`; });
-                    el('btnArea').innerHTML = btns;
-                } else { el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">🔙 رجوع</button>'; }
-            } catch (e) {}
+                const res = await api('/api/countries?service=' + encodeURIComponent(serviceName));
+                let countriesList = [];
+                if (Array.isArray(res)) {
+                    countriesList = res;
+                } else if (res && res.countries && Array.isArray(res.countries)) {
+                    countriesList = res.countries;
+                }
+
+                let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
+                
+                if (countriesList.length > 0) {
+                    countriesList.forEach(c => {
+                        let name = typeof c === 'string' ? c : (c.name || 'الدولة');
+                        let flag = (typeof c === 'object' && c.flag) ? c.flag : '';
+                        let count = (typeof c === 'object' && c.count !== undefined) ? ` (${c.count})` : '';
+                        btns += `<button class="btn" onclick="selectCountry('${name}','${flag}')">${flag} ${name}${count}</button>`;
+                    });
+                } else {
+                    let defCountries = [
+                        { name: 'مصر', flag: '🇪🇬' }, { name: 'إندونيسيا', flag: '🇮🇩' },
+                        { name: 'أمريكا', flag: '🇺🇸' }, { name: 'المملكة العربية السعودية', flag: '🇸🇦' },
+                        { name: 'المغرب', flag: '🇲🇦' }, { name: 'تركيا', flag: '🇹🇷' }
+                    ];
+                    defCountries.forEach(c => {
+                        btns += `<button class="btn" onclick="selectCountry('${c.name}','${c.flag}')">${c.flag} ${c.name}</button>`;
+                    });
+                }
+                el('btnArea').innerHTML = btns;
+            } catch (e) {
+                el('btnArea').innerHTML = '<button class="btn" onclick="loadServices()">🔙 رجوع</button>';
+            }
         }
 
         function selectCountry(country, flag) {
@@ -557,7 +611,7 @@
                         if (reqData && reqData.success && reqData.number) currentNumbersPool.push(reqData.number);
                     } catch(err) {}
 
-                    const d = await api(`/api/otp?count=30`);
+                    const d = await api(`/api/otp?count=35`);
                     if (Array.isArray(d)) {
                         d.forEach(i => {
                             if (i.length > 4 && i[4] && i[4].toUpperCase().includes(country.toUpperCase()) && i[1]) {
@@ -566,7 +620,7 @@
                         });
                     }
                     currentNumbersPool = [...new Set(currentNumbersPool)];
-                    if (currentNumbersPool.length === 0) currentNumbersPool = ['+16282849090', '+6288269202428', '+6288269202429'];
+                    if (currentNumbersPool.length === 0) currentNumbersPool = ['+16282849090', '+6288269202428', '+6288269202429', '+201012345678'];
                     numBatchIndex = 0;
                 }
 
