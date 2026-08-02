@@ -53,48 +53,48 @@
         /* Header */
         .tg-header {
             background-color: #242f3d;
-            padding: 10px 15px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid #111822;
-            min-height: 56px;
+            min-height: 60px;
         }
 
         .tg-header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
         .tg-back-arrow {
             color: #ffffff;
-            font-size: 24px;
+            font-size: 26px;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 4px 10px;
         }
 
         .tg-avatar {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background-color: #2b5278;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 20px;
             color: #fff;
             flex-shrink: 0;
         }
 
         .tg-title-info h2 {
-            font-size: 16px;
+            font-size: 17px;
             color: #ffffff;
             font-weight: 600;
         }
 
         .tg-title-info p {
-            font-size: 12px;
+            font-size: 13px;
             color: #7d8b99;
         }
 
@@ -110,26 +110,26 @@
         .chat-row {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
-            gap: 14px;
+            padding: 14px 18px;
+            gap: 16px;
             cursor: pointer;
             border-bottom: 1px solid rgba(255,255,255,0.02);
         }
 
         .chat-row:active { background-color: rgba(255,255,255,0.05); }
-        .chat-row .tg-avatar { width: 48px; height: 48px; font-size: 20px; }
+        .chat-row .tg-avatar { width: 52px; height: 52px; font-size: 22px; }
         .chat-row .info { flex: 1; min-width: 0; }
-        .chat-row .name { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 4px; }
-        .chat-row .preview { font-size: 13px; color: #7d8b99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-row .name { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 5px; }
+        .chat-row .preview { font-size: 14px; color: #7d8b99; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         /* Chat Body */
         .chat-body {
             flex: 1;
-            padding: 12px;
+            padding: 14px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             background-color: #0e1621;
             -webkit-overflow-scrolling: touch;
             transform: translateZ(0);
@@ -137,64 +137,64 @@
 
         .msg-block {
             background-color: #182533;
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 14px;
-            line-height: 1.5;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 15px;
+            line-height: 1.6;
             color: #ffffff;
         }
 
         .msg-user { color: #64b5f6; font-weight: 600; }
-        .num { color: #60a5fa; font-weight: 600; font-size: 16px; cursor: pointer; }
-        .code { background-color: #f59e0b; color: #000; padding: 3px 10px; border-radius: 5px; font-weight: 700; display: inline-block; margin: 4px 0; font-size: 16px; cursor: pointer; }
-        .time-tag { font-size: 11px; color: #7d8b99; text-align: left; margin-top: 4px; }
+        .num { color: #60a5fa; font-weight: 600; font-size: 17px; cursor: pointer; }
+        .code { background-color: #f59e0b; color: #000; padding: 4px 12px; border-radius: 6px; font-weight: 700; display: inline-block; margin: 6px 0; font-size: 17px; cursor: pointer; }
+        .time-tag { font-size: 12px; color: #7d8b99; text-align: left; margin-top: 6px; }
 
         /* Buttons */
         .btn {
             border: none;
-            border-radius: 8px;
-            padding: 11px;
-            font-size: 14px;
+            border-radius: 10px;
+            padding: 13px;
+            font-size: 15px;
             font-weight: 600;
             color: #fff;
             cursor: pointer;
             text-align: center;
             background-color: #2b5278;
             width: 100%;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .btn:active { opacity: 0.7; transform: scale(0.98); }
         .btn-green { background-color: #2e8b57; }
         .btn-gold { background-color: #f59e0b; color: #000; }
-        .btn-row { display: flex; gap: 8px; }
+        .btn-row { display: flex; gap: 10px; }
         .btn-row .btn { flex: 1; margin-bottom: 0; }
 
         .number-item-row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 10px;
+            margin-bottom: 8px;
             align-items: center;
         }
         .number-item-row .btn {
             margin-bottom: 0;
             flex: 2;
-            font-size: 14px;
+            font-size: 15px;
         }
         .number-item-row .btn-fetch {
             flex: 1;
             background-color: #2675d3;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         .btn-area {
-            padding: 10px;
+            padding: 12px;
             border-top: 1px solid #111822;
             background-color: #17212b;
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            max-height: 52vh; 
+            gap: 8px;
+            max-height: 55vh; 
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -202,10 +202,10 @@
         /* Chat Input Bar */
         .chat-input-bar {
             display: flex;
-            padding: 8px 10px;
+            padding: 10px 12px;
             background-color: #17212b;
             border-top: 1px solid #111822;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
         }
 
@@ -213,10 +213,10 @@
             flex: 1;
             background-color: #0e1621;
             border: 1px solid #2b5278;
-            border-radius: 20px;
-            padding: 8px 14px;
+            border-radius: 22px;
+            padding: 10px 16px;
             color: #fff;
-            font-size: 14px;
+            font-size: 15px;
             outline: none;
         }
 
@@ -225,45 +225,45 @@
             color: #fff;
             border: none;
             border-radius: 50%;
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 18px;
         }
 
         /* Toast */
         #toast {
             visibility: hidden;
-            min-width: 150px;
+            min-width: 160px;
             background-color: #f59e0b;
             color: #000;
             text-align: center;
-            border-radius: 6px;
-            padding: 8px;
+            border-radius: 8px;
+            padding: 10px;
             position: absolute;
             z-index: 99;
             left: 50%;
-            bottom: 70px;
+            bottom: 75px;
             transform: translateX(-50%);
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
             transition: opacity 0.15s;
             opacity: 0;
         }
         #toast.show { visibility: visible; opacity: 1; }
 
         /* Bottom Nav */
-        .bottom-nav { background-color: #17212b; display: flex; justify-content: space-around; padding: 6px 0; border-top: 1px solid #111822; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: #7d8b99; font-size: 12px; font-weight: 500; cursor: pointer; gap: 3px; background: none; border: none; flex: 1; }
+        .bottom-nav { background-color: #17212b; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #111822; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: #7d8b99; font-size: 13px; font-weight: 500; cursor: pointer; gap: 4px; background: none; border: none; flex: 1; }
         .nav-item.active { color: #5288c1; }
-        .nav-icon { font-size: 20px; }
+        .nav-icon { font-size: 22px; }
 
-        ::-webkit-scrollbar { width: 3px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -277,12 +277,12 @@
         const BASE_URL = 'https://numberpanel.tech';
         const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        let S = JSON.parse(localStorage.getItem('otp_session_v17') || '{}');
+        let S = JSON.parse(localStorage.getItem('otp_session_v18') || '{}');
         let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', viewMode = S.viewMode || 'services';
         let known = new Set(), otpTimer = null;
 
         function save() { 
-            localStorage.setItem('otp_session_v17', JSON.stringify({cur, cSvc, cCty, viewMode})); 
+            localStorage.setItem('otp_session_v18', JSON.stringify({cur, cSvc, cCty, viewMode})); 
         }
 
         function el(id) { return document.getElementById(id); }
@@ -296,7 +296,7 @@
             }
             t.innerText = msg || "تم النسخ!";
             t.className = "show";
-            setTimeout(() => { t.className = ""; }, 1200);
+            setTimeout(() => { t.className = ""; }, 1400);
         }
 
         function render() {
@@ -451,7 +451,7 @@
             try {
                 const res = await fetch(BASE_URL + '/api/latest_otp?number=' + encodeURIComponent(num), { headers: { 'Authorization': 'Bearer ' + API_KEY } });
                 const data = await res.json();
-                if (data && (data.success || data.النجاح) && (data.has_otp || data.رمز_التحقق_من_كلمة_المرور)) {
+                if (data && (data.success || data.النجاح || data.has_otp)) {
                     let code = data.otp_code || data.verification_code || data.رمز_التحقق_من_كلمة_المرور || '---';
                     el('messages').innerHTML += `
                         <div class="msg-block">
@@ -469,17 +469,19 @@
         function loadServices() {
             viewMode = 'services'; cur = 'bot'; cSvc = ''; cCty = ''; save(); render();
             el('messages').innerHTML = '<div class="msg-block">👋 أهلاً بك! جاري جلب الخدمات المتاحة من السيرفر...</div>';
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:12px;">جاري التحميل...</div>';
 
             fetch(BASE_URL + '/api/services', { headers: { 'Authorization': 'Bearer ' + API_KEY } })
                 .then(r => r.json())
                 .then(res => {
                     let list = [];
-                    if (res && (res.services || res.الخدمات)) {
-                        let raw = res.services || res.الخدمات;
-                        list = raw.map(s => typeof s === 'string' ? s : (s.name || s.الاسم)).filter(Boolean);
-                    } else if (Array.isArray(res)) {
-                        list = res.map(s => typeof s === 'string' ? s : (s.name || s.الاسم)).filter(Boolean);
+                    // دعم جميع أشكال الاستجابة المحتملة من الـ API
+                    let raw = res.services || res.الخدمات || res.data || res;
+                    if (Array.isArray(raw)) {
+                        list = raw.map(s => {
+                            if (typeof s === 'string') return s;
+                            return s.name || s.الاسم || s.service || s.الخدمة || '';
+                        }).filter(Boolean);
                     }
 
                     if (list.length > 0) {
@@ -490,35 +492,36 @@
                         });
                         el('btnArea').innerHTML = btns;
                     } else {
-                        el('messages').innerHTML = '<div class="msg-block">⚠️ لم يتم العثور على خدمات متاحة حالياً من الـ API.</div>';
-                        el('btnArea').innerHTML = '';
+                        el('messages').innerHTML = `<div class="msg-block">⚠️ لم يتم العثور على خدمات متاحة حالياً.<br><small style="color:#7d8b99;">استجابة السيرفر: ${JSON.stringify(res)}</small></div>`;
+                        el('btnArea').innerHTML = `<button class="btn" onclick="loadServices()">🔄 إعادة المحاولة</button>`;
                     }
                 })
                 .catch(e => {
-                    el('messages').innerHTML = '<div class="msg-block">❌ حدث خطأ أثناء الاتصال بالـ API لجلب الخدمات.</div>';
-                    el('btnArea').innerHTML = '';
+                    el('messages').innerHTML = '<div class="msg-block">❌ حدث خطأ أثناء الاتصال بالـ API لجلب الخدمات. تأكد من الإنترنت أو السيرفر.</div>';
+                    el('btnArea').innerHTML = `<button class="btn" onclick="loadServices()">🔄 إعادة المحاولة</button>`;
                 });
         }
 
         function loadCountries(serviceName) {
             cSvc = serviceName; cCty = ''; viewMode = 'countries'; save();
             el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>جاري جلب الدول المتاحة لهذه الخدمة...</div>`;
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:12px;">جاري التحميل...</div>';
 
             fetch(BASE_URL + '/api/countries?service=' + encodeURIComponent(serviceName), { headers: { 'Authorization': 'Bearer ' + API_KEY } })
                 .then(r => r.json())
                 .then(res => {
                     let list = [];
-                    if (res && (res.countries || res.بلدان)) {
-                        let raw = res.countries || res.بلدان;
-                        list = raw.map(c => typeof c === 'string' ? c : (c.name || c.الاسم)).filter(Boolean);
-                    } else if (Array.isArray(res)) {
-                        list = res.map(c => typeof c === 'string' ? c : (c.name || c.الاسم)).filter(Boolean);
+                    let raw = res.countries || res.بلدان || res.data || res;
+                    if (Array.isArray(raw)) {
+                        list = raw.map(c => {
+                            if (typeof c === 'string') return c;
+                            return c.name || c.الاسم || c.country || c.الدولة || '';
+                        }).filter(Boolean);
                     }
 
                     if (list.length > 0) {
                         el('messages').innerHTML = `<div class="msg-block">🌐 الخدمة: <b>${serviceName}</b>.<br>اختر الدولة المطلوبة:</div>`;
-                        let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
+                        let btns = `<div class="btn-row"><button class="btn" onclick="loadServices()">🔙 الخدمات</button></div><hr style="border-color:#242f3d; margin:6px 0;">`;
                         list.forEach(c => {
                             btns += `<button class="btn" onclick="selectCountry('${c}')">🌍 ${c}</button>`;
                         });
@@ -542,7 +545,7 @@
                     🌍 الدولة: <b>${country}</b><br>
                     📱 جاري طلب رقم جديد من السيرفر...
                 </div>`;
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري توليد الرقم...</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:12px;">جاري توليد الرقم...</div>';
 
             try {
                 const res = await fetch(BASE_URL + '/api/request_number', {
@@ -552,16 +555,13 @@
                 });
                 const data = await res.json();
                 
-                let num = '';
-                if (data && (data.number || data.الرقم)) {
-                    num = data.number || data.الرقم;
-                }
+                let num = data.number || data.الرقم || data.phone || '';
 
                 if (num) {
                     let btns = `<div class="btn-row">
                                     <button class="btn" onclick="loadCountries('${cSvc}')">🔙 الدول</button>
                                     <button class="btn btn-gold" onclick="selectCountry('${country}')">🔄 طلب رقم جديد</button>
-                                </div><hr style="border-color:#242f3d; margin:5px 0;">`;
+                                </div><hr style="border-color:#242f3d; margin:6px 0;">`;
 
                     btns += `
                         <div class="number-item-row">
