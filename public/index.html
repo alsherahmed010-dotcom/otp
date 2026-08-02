@@ -217,13 +217,14 @@
         firebase.initializeApp({apiKey:"AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",projectId:"otp-5acda",databaseURL:"https://otp-5acda-default-rtdb.firebaseio.com"});
         const db = firebase.database();
         const PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
+        const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
         
-        let S = JSON.parse(localStorage.getItem('otp_session_v5') || '{}');
+        let S = JSON.parse(localStorage.getItem('otp_session_v6') || '{}');
         let cur = S.cur || 'main', cSvc = S.cSvc || '', cCty = S.cCty || '', cFlag = S.cFlag || '', viewMode = S.viewMode || 'start';
         let known = new Set(), otpTimer = null;
 
         function save() { 
-            localStorage.setItem('otp_session_v5', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode})); 
+            localStorage.setItem('otp_session_v6', JSON.stringify({cur, cSvc, cCty, cFlag, viewMode})); 
         }
         function api(p) { return fetch(PROXY + p).then(r => r.json()); }
         function el(id) { return document.getElementById(id); }
@@ -270,7 +271,8 @@
                             </div>
                         </div>
                         <div class="bottom-nav">
-                            <button class="nav-item active" onclick="openScreen('main')"><span class="nav-icon">💬</span>محادثات</button>
+                            <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openScreen('main'); showStart();"><span class="nav-icon">💬</span>محادثات</button>
+                            <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); showHotCountries();"><span class="nav-icon">🔥</span>الدول الأكثر نشاطاً</button>
                         </div>
                     </div>`;
             } else if (cur === 'bot' || cur === 'group') {
@@ -288,6 +290,10 @@
                         </div>
                         <div class="chat-body" id="messages"></div>
                         ${cur === 'bot' ? '<div class="btn-area" id="btnArea"></div>' : '<div class="footer-locked">إرسال الرسائل غير مسموح به في هذه المجموعة.</div>'}
+                        <div class="bottom-nav">
+                            <button class="nav-item ${viewMode !== 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); showStart();"><span class="nav-icon">💬</span>محادثات</button>
+                            <button class="nav-item ${viewMode === 'hot_countries' ? 'active' : ''}" onclick="openChat('bot'); showHotCountries();"><span class="nav-icon">🔥</span>الدول الأكثر نشاطاً</button>
+                        </div>
                     </div>`;
             }
             bindEvents();
@@ -382,6 +388,7 @@
 
         async function showHotCountries() {
             viewMode = 'hot_countries';
+            cur = 'bot';
             save();
             el('messages').innerHTML = '<div class="msg-block">🔥 الدول الأكثر نشاطاً وحركة مرور الآن في المنصة:</div>';
             el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب الدول النشطة...</div>';
@@ -400,7 +407,7 @@
                 if (sortedCountries.length === 0) sortedCountries = ['زيمبابوي 🇿🇼', 'إندونيسيا 🇮🇩', 'الولايات المتحدة 🇺🇸'];
 
                 let btns = `<div class="btn-row"><button class="btn" onclick="showStart()">🔙 القائمة الرئيسية</button></div><hr style="border-color:#242f3d; margin:5px 0;">`;
-                sortedCountries.slice(0, 15).forEach(c => {
+                sortedCountries.forEach(c => {
                     btns += `<button class="btn" onclick="selectCountry('${c}','')">🌍 ${c} (${countryCounts[c] || 'نشط'})</button>`;
                 });
                 el('btnArea').innerHTML = btns;
@@ -457,37 +464,57 @@
         async function showNumbersList(country, flag) {
             el('messages').innerHTML = `
                 <div class="msg-block">
-                    🌐 الخدمة: <b>${cSvc || 'عام'}</b><br>
+                    🌐 الخدمة: <b>${cSvc || 'WhatsApp'}</b><br>
                     🌍 الدولة المحددة: ${flag || ''} <b>${country}</b><br>
-                    📱 اضغط على أي رقم أدناه لنسخه فوراً:
+                    📱 جاري جلب الأرقام الخاصة بهذه الدولة حصرياً...
                 </div>`;
             
-            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري جلب أرقام الخدمة والدولة...</div>';
+            el('btnArea').innerHTML = '<div style="text-align:center;color:#7d8b99;padding:10px;">جاري طلب الأرقام من الخادم...</div>';
             
             try {
-                const d = await api(`/api/otp?count=200`);
+                // جلب الأرقام المخصصة لهذه الدولة حصرياً عبر نقطة النهاية المتاحة
+                let numbersList = [];
+                try {
+                    const reqRes = await fetch(PROXY + '/api/request_number', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ service: cSvc || 'WhatsApp', country: country })
+                    });
+                    const reqData = await reqRes.json();
+                    if (reqData && reqData.success && reqData.number) {
+                        numbersList.push(reqData.number);
+                    }
+                } catch(err) {}
+
+                // جلب أرقام إضافية من البث المباشر المفلترة لنفس الدولة لضمان ظهور قائمة غنية بالدولة المطلوبة
+                const d = await api(`/api/otp?count=150`);
                 if (Array.isArray(d)) {
-                    let flt = d.filter(i => {
-                        const matchSvc = cSvc ? i[0].toLowerCase().includes(cSvc.toLowerCase()) : true;
+                    d.forEach(i => {
                         const matchCty = i.length > 4 && i[4] && i[4].toUpperCase().includes(country.toUpperCase());
-                        return matchSvc || matchCty;
+                        if (matchCty && i[1]) {
+                            numbersList.push(i[1]);
+                        }
                     });
-
-                    if (flt.length === 0) flt = d.slice(0, 20);
-
-                    let btns = `<div class="btn-row">
-                                    <button class="btn" onclick="${cSvc ? "loadCountries('" + cSvc + "')" : "showHotCountries()"}">🔙 تغيير الدولة</button>
-                                    <button class="btn btn-gold" onclick="checkAllCodes()">📩 فحص كل الأكواد</button>
-                                </div><hr style="border-color:#242f3d; margin:5px 0;">`;
-
-                    let uniqueNums = [...new Set(flt.map(i => i[1]))].slice(0, 40);
-                    
-                    uniqueNums.forEach(num => {
-                        btns += `<button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>`;
-                    });
-
-                    el('btnArea').innerHTML = btns;
                 }
+
+                let uniqueNums = [...new Set(numbersList)];
+                if (uniqueNums.length === 0) {
+                    uniqueNums = ['+16282849090', '+6288269202428'];
+                }
+
+                let btns = `<div class="btn-row">
+                                <button class="btn" onclick="${cSvc ? "loadCountries('" + cSvc + "')" : "showHotCountries()"}">🔙 تغيير الدولة</button>
+                                <button class="btn btn-gold" onclick="checkAllCodes()">📩 فحص كل الأكواد</button>
+                            </div><hr style="border-color:#242f3d; margin:5px 0;">`;
+
+                uniqueNums.slice(0, 30).forEach(num => {
+                    btns += `<button class="btn btn-green" onclick="copyText('${num}')">📱 ${num}</button>`;
+                });
+
+                el('btnArea').innerHTML = btns;
             } catch (e) {
                 el('btnArea').innerHTML = '<button class="btn" onclick="showNumbersList(\''+country+'\',\''+flag+'\')">❌ إعادة المحاولة</button>';
             }
