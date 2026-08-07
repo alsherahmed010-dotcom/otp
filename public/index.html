@@ -3,188 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Live</title>
+    <title>OTP LIVE</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root{--bg:#0e1621;--surface:#17212b;--card:#182533;--blue:#2563eb;--gold:#f59e0b;--green:#16a34a;--red:#ef4444;--text:#fff;--text2:#94a3b8}
-        *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif}
-        body{background:var(--bg);color:var(--text);min-height:100vh}
-        .app{max-width:600px;margin:0 auto;background:var(--surface);min-height:100vh;display:flex;flex-direction:column}
-        .h{background:#242f3d;padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.05)}
-        .h .back{color:#fff;font-size:22px;cursor:pointer}
-        .h .av{width:44px;height:44px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
-        .h .info{flex:1}
-        .h .info .n{font-size:17px;font-weight:600;color:#fff}
-        .h .info .s{font-size:13px;color:var(--text2)}
-        .content{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
-        .controls{display:flex;gap:8px;flex-wrap:wrap}
-        .controls .btn{flex:1;min-width:100px}
-        .btn{border:none;border-radius:10px;padding:14px 18px;font-size:16px;font-weight:600;cursor:pointer;text-align:center;background:var(--blue);color:#fff;transition:0.2s}
-        .btn:active{opacity:0.8;transform:scale(0.98)}
-        .bgreen{background:var(--green)}
-        .bgold{background:var(--gold);color:#000}
-        .bred{background:var(--red)}
-        .boutline{background:transparent;border:2px solid var(--blue);color:var(--blue)}
-        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        .card{background:var(--card);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;transition:0.15s;display:flex;flex-direction:column;align-items:center;gap:6px;border:2px solid transparent}
-        .card:active{background:#1e3040;border-color:var(--blue);transform:scale(0.96)}
-        .card .flag{font-size:30px}
-        .card .num{color:#60a5fa;font-weight:700;font-size:14px;word-break:break-all;direction:ltr}
-        .card .code{background:var(--gold);color:#000;padding:3px 8px;border-radius:5px;font-weight:700;font-size:13px;direction:ltr}
-        .card .svc{color:#f87171;font-size:10px}
-        .codes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-        .code-card{background:var(--card);border-radius:12px;padding:14px;text-align:center;cursor:pointer}
-        .code-card:active{background:#1e3040}
-        .code-card .big-code{font-size:28px;font-weight:800;color:var(--gold);letter-spacing:3px;direction:ltr}
-        .code-card .num{color:#60a5fa;font-size:13px;direction:ltr}
-        .code-card .flag{font-size:22px}
-        .msg{background:var(--card);border-radius:12px;padding:14px;font-size:15px;line-height:1.6;text-align:center}
-        .footer{background:var(--surface);padding:14px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);color:var(--text2);font-size:14px}
-        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
+        :root{--bg:#0a0a0a;--card:#0f0f0f;--green:#0f0;--gold:#ff0;--red:#f00;--cyan:#0ff;--text:#0f0;--text2:#0a0}
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
+        body{background:#000;color:var(--text);min-height:100vh}
+        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,0.03) 2px,rgba(0,255,0,0.03) 4px);pointer-events:none;animation:scan 6s linear infinite}
+        @keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+        .app{max-width:550px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
+        .header{text-align:center;padding:20px 0;border-bottom:2px solid var(--green);margin-bottom:20px;animation:glow 2s infinite}
+        @keyframes glow{0%,100%{text-shadow:0 0 10px var(--green)}50%{text-shadow:0 0 30px var(--green),0 0 50px var(--green)}}
+        .header h1{font-size:28px;letter-spacing:3px;color:var(--green)}
+        .header p{color:var(--text2);margin-top:5px;font-size:12px}
+        .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+        @media(max-width:400px){.grid{grid-template-columns:1fr}}
+        .card{background:var(--card);border:1px solid #1a3a1a;border-radius:12px;padding:16px;transition:0.2s;animation:fadeIn 0.3s}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .card:hover{border-color:var(--green);box-shadow:0 0 20px rgba(0,255,0,0.15)}
+        .card .head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+        .card .flag{font-size:28px}
+        .card .svc{color:var(--red);font-weight:bold;font-size:13px}
+        .card .country{color:var(--cyan);font-size:11px}
+        .card .num{font-size:22px;font-weight:bold;color:#fff;margin:10px 0;word-break:break-all;direction:ltr;text-shadow:0 0 5px rgba(255,255,255,0.3)}
+        .card .code{background:#000;border:1px solid var(--gold);color:var(--gold);padding:6px 14px;display:inline-block;font-size:20px;font-weight:bold;letter-spacing:2px;direction:ltr;text-shadow:0 0 10px var(--gold);animation:glitch 2s infinite}
+        @keyframes glitch{0%,100%{text-shadow:0 0 10px var(--gold)}50%{text-shadow:0 0 20px var(--gold),2px 0 var(--red)}}
+        .card .btns{display:flex;gap:8px;margin-top:10px}
+        .btn{border:1px solid var(--green);background:transparent;color:var(--green);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:bold;font-family:'Courier New',monospace;flex:1;text-align:center;transition:0.2s}
+        .btn:hover{background:var(--green);color:#000;box-shadow:0 0 15px rgba(0,255,0,0.3)}
+        .btn.gold{border-color:var(--gold);color:var(--gold)}
+        .btn.gold:hover{background:var(--gold);color:#000}
+        .live-dot{display:inline-block;width:10px;height:10px;background:var(--green);border-radius:50%;animation:blink 1s infinite;margin-left:5px}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+        .stats{text-align:center;color:var(--text2);font-size:11px;padding:10px}
+        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#000}::-webkit-scrollbar-thumb{background:var(--green);border-radius:2px}
     </style>
 </head>
 <body>
-    <div class="app" id="app"></div>
+    <div class="app">
+        <div class="header">
+            <h1>⬢ OTP LIVE</h1>
+            <p>Packet Interception Active <span class="live-dot"></span></p>
+        </div>
+        <div class="grid" id="grid"></div>
+        <div class="stats" id="stats"></div>
+    </div>
     <script>
         firebase.initializeApp({apiKey:"AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",projectId:"otp-5acda",databaseURL:"https://otp-5acda-default-rtdb.firebaseio.com"});
         const db=firebase.database();
         const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
+        let known=new Set(),count=0;
         
-        let S=JSON.parse(localStorage.getItem('otp_big2')||'{}');
-        let cur=S.cur||'main',cSvc=S.cSvc||'',cCty=S.cCty||'',cFlag=S.cFlag||'';
-        let known=new Set(),otpTimer=null;
+        const flags={MZ:'🇲🇿',TG:'🇹🇬',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',UA:'🇺🇦',QA:'🇶🇦',TJ:'🇹🇯',HT:'🇭🇹',ID:'🇮🇩'};
         const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
         
-        function save(){S={cur,cSvc,cCty,cFlag};localStorage.setItem('otp_big2',JSON.stringify(S));}
-        async function api(p){const r=await fetch(PROXY+p);return await r.json();}
-        function el(id){return document.getElementById(id);}
+        function getFlag(c){return flags[c]||'🌍';}
+        function getCName(c){return cNames[c]||c;}
         function copyText(t){navigator.clipboard.writeText(t);}
         
-        function render(){
-            const app=el('app');app.innerHTML='';
-            if(cur==='main'){app.innerHTML=mainHTML();}
-            else if(cur==='bot'){app.innerHTML=chatHTML();bindBot();}
-            else if(cur==='group'){app.innerHTML=groupHTML();bindGroup();}
-        }
-        
-        function mainHTML(){
-            return '<div class="h"><div class="av">✈️</div><div class="info"><div class="n">OTP Live</div><div class="s">Number Panel</div></div></div><div class="content"><div class="msg" style="cursor:pointer;" onclick="openChat(\'bot\')">🤖 <b>NUMBER BOT</b><br><small>أرقام وأكواد من كل الدول</small></div><div class="msg" style="cursor:pointer;" onclick="openChat(\'group\')">👥 <b>OTP LIVE</b><br><small>بث مباشر لأكواد التفعيل</small></div></div>';
-        }
-        
-        function chatHTML(){
-            return '<div class="h"><div class="back" onclick="goMain()">←</div><div class="av">🤖</div><div class="info"><div class="n">🤖 NUMBER BOT</div><div class="s">اختر الخدمة والدولة</div></div></div><div class="content" id="messages"></div><div class="footer" id="btnArea"></div>';
-        }
-        
-        function groupHTML(){
-            return '<div class="h"><div class="back" onclick="goMain()">←</div><div class="av">👥</div><div class="info"><div class="n">👥 OTP LIVE</div><div class="s">بث مباشر مستمر</div></div></div><div class="content" id="messages"></div><div class="footer">بث مباشر مستمر لأكواد التفعيل</div>';
-        }
-        
-        function goMain(){cur='main';save();if(otpTimer)clearInterval(otpTimer);render();}
-        function openChat(t){cur=t;cSvc='';cCty='';cFlag='';save();render();}
-        
-        function bindBot(){
-            if(cCty&&cFlag){showNumbers(cCty,cFlag);}
-            else if(cSvc){loadCountries(cSvc);}
-            else{loadServices();}
-        }
-        
-        function bindGroup(){
-            el('messages').innerHTML='<div class="msg">📡 جاري تحميل OTP Live...</div>';
-            db.ref('messages').off();db.ref('messages').limitToLast(50).on('child_added',s=>{if(cur==='group')showOTP(s.val());});
-            if(otpTimer)clearInterval(otpTimer);
-            otpTimer=setInterval(fetchOTP,2000);
-            fetchOTP();
-        }
-        
-        function showOTP(m){
-            if(cur!=='group')return;
-            const code=m.code||'---';
-            el('messages').innerHTML+='<div class="msg" onclick="copyText(\''+code+'\')" style="cursor:pointer;">📩 '+m.service+'<br>📱 <span style="color:#60a5fa;">'+m.number+'</span><br>🔑 <span style="background:#f59e0b;color:#000;padding:2px 8px;border-radius:4px;">'+code+'</span></div>';
-            el('messages').scrollTop=el('messages').scrollHeight;
-        }
-        
         async function fetchOTP(){
-            try{const d=await api('/api/otp?count=15');if(Array.isArray(d))d.forEach(i=>{const k=i[1]+'-'+i[2];if(!known.has(k)){known.add(k);db.ref('messages').push({type:'otp',service:i[0],number:i[1],code:i[2].match(/\d{4,8}/)?.[0]||i[2]});}});}catch(e){}
-        }
-        
-        async function loadServices(){
-            el('messages').innerHTML='<div class="msg">⏳ جاري التحميل...</div>';
-            el('btnArea').innerHTML='';
             try{
-                const d=await api('/api/services');
-                if(d.success&&d.services){
-                    el('messages').innerHTML='<div class="msg">📋 <b>اختر الخدمة:</b></div>';
-                    let btns='';
-                    d.services.forEach(s=>{btns+='<button class="btn" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';});
-                    el('btnArea').innerHTML=btns;
-                }
-            }catch(e){el('messages').innerHTML='<div class="msg">❌ خطأ</div>';}
-        }
-        
-        async function loadCountries(key,name){
-            cSvc=key;cCty='';cFlag='';save();
-            el('messages').innerHTML='<div class="msg">🌐 '+name+'<br><b>اختر الدولة:</b></div>';
-            el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
-            try{
-                const d=await api('/api/countries?service='+key);
-                if(d.success&&d.countries){
-                    let btns='<button class="btn boutline" onclick="loadServices()">🔙 خدمات</button>';
-                    d.countries.forEach(c=>{const cn=cNames[c.name]||c.name;btns+='<button class="btn" onclick="selectCountry(\''+c.name+'\',\''+(c.flag||'')+'\')">'+(c.flag||'')+' '+cn+' ('+c.count+')</button>';});
-                    el('btnArea').innerHTML=btns;
+                const d=await fetch(PROXY+'/api/otp?count=15').then(r=>r.json());
+                if(Array.isArray(d)){
+                    d.forEach(i=>{
+                        const k=i[1]+'-'+i[2];
+                        if(!known.has(k)){
+                            known.add(k);
+                            count++;
+                            const code=i[2].match(/\d{4,8}/)?.[0]||i[2];
+                            const country=i[4]||'';
+                            const grid=document.getElementById('grid');
+                            grid.innerHTML=`
+                                <div class="card">
+                                    <div class="head">
+                                        <span class="flag">${getFlag(country)}</span>
+                                        <span class="svc">${i[0]}</span>
+                                        <span class="country">${getCName(country)}</span>
+                                    </div>
+                                    <div class="num">+${i[1]}</div>
+                                    <div class="code">${code}</div>
+                                    <div class="btns">
+                                        <button class="btn" onclick="copyText('${i[1]}')">📋 رقم</button>
+                                        <button class="btn gold" onclick="copyText('${code}')">🔑 كود</button>
+                                    </div>
+                                </div>
+                            `+grid.innerHTML.substring(0,grid.innerHTML.length-1000);
+                            document.getElementById('stats').textContent='⬢ Packets Intercepted: '+count;
+                        }
+                    });
                 }
             }catch(e){}
         }
         
-        function selectCountry(country,flag){cCty=country;cFlag=flag;save();showNumbers(country,flag);}
-        
-        async function showNumbers(country,flag){
-            const cn=cNames[country]||country;
-            el('messages').innerHTML='<div class="msg">🌍 '+flag+' '+cn+'<br>⏳ جاري جلب الأرقام...</div>';
-            el('btnArea').innerHTML='';
-            try{
-                const d=await api('/api/otp?count=200');
-                if(Array.isArray(d)){
-                    let flt=d.filter(i=>i.length>4&&i[4]&&String(i[4]).trim().toUpperCase()===String(country).trim().toUpperCase());
-                    if(flt.length===0)flt=d.filter(i=>i[0]&&String(i[0]).toLowerCase().includes(String(cSvc).toLowerCase()));
-                    if(flt.length===0)flt=d.slice(0,30);
-                    
-                    let nums=[...new Set(flt.map(i=>i[1]))].slice(0,30);
-                    let html='<div class="grid">';
-                    nums.forEach(num=>{
-                        const found=flt.find(i=>i[1]===num);
-                        const cd=found&&found[2]?found[2].match(/\d{4,8}/)?.[0]||'---':'---';
-                        const svc=found?found[0]:'';
-                        html+='<div class="card" onclick="copyText(\''+num+'\')"><span class="flag">'+flag+'</span><span class="svc">'+svc+'</span><span class="num">'+num+'</span><span class="code">'+cd+'</span></div>';
-                    });
-                    html+='</div>';
-                    el('messages').innerHTML=html||'<div class="msg">❌ لا توجد أرقام</div>';
-                    el('btnArea').innerHTML='<div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn bgreen" onclick="showNumbers(\''+country+'\',\''+flag+'\')">🔄 تحديث</button><button class="btn bgold" onclick="showAllCodes(\''+country+'\')">📋 كل الأكواد</button><button class="btn" onclick="loadCountries(\''+cSvc+'\')">🌍 دول</button><button class="btn" onclick="loadServices()">📱 خدمات</button></div>';
-                }
-            }catch(e){el('btnArea').innerHTML='<button class="btn" onclick="showNumbers(\''+country+'\',\''+flag+'\')">❌ إعادة</button>';}
-        }
-        
-        async function showAllCodes(country){
-            el('messages').innerHTML='<div class="msg">⏳ جاري جلب جميع الأكواد...</div>';
-            el('btnArea').innerHTML='';
-            try{
-                const d=await api('/api/otp?count=100');
-                if(Array.isArray(d)){
-                    let flt=d.filter(i=>i.length>4&&i[4]&&String(i[4]).trim().toUpperCase()===String(country).trim().toUpperCase());
-                    if(flt.length===0)flt=d.slice(0,30);
-                    let html='<div class="codes-grid">';
-                    flt.slice(0,20).forEach(i=>{
-                        const cd=i[2].match(/\d{4,8}/)?.[0]||i[2];
-                        html+='<div class="code-card" onclick="copyText(\''+cd+'\')"><span class="flag">'+(i[4]?'🌍':'📩')+'</span><div class="big-code">'+cd+'</div><div class="num">'+i[1]+'</div></div>';
-                    });
-                    html+='</div>';
-                    el('messages').innerHTML=html;
-                    el('btnArea').innerHTML='<div style="display:flex;gap:8px;"><button class="btn bgreen" onclick="showNumbers(\''+country+'\',\''+cFlag+'\')">🔙 أرقام</button><button class="btn" onclick="loadCountries(\''+cSvc+'\')">🌍 دول</button></div>';
-                }
-            }catch(e){}
-        }
-        
-        window.onload=()=>{render();};
+        setInterval(fetchOTP,2000);
+        fetchOTP();
     </script>
 </body>
 </html>
