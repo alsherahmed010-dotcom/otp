@@ -11,12 +11,10 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .header h1{font-size:26px;letter-spacing:3px;text-shadow:0 0 10px #0f0}
 .top-bar{display:flex;gap:8px;margin-bottom:15px}
 .search-box{flex:1;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:14px;font-family:'Courier New',monospace;border-radius:8px;outline:none}
-.search-box:focus{border-color:#0f0}
 .btn-sm{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:12px 14px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;cursor:pointer;white-space:nowrap;font-weight:bold}
 .btn-sm:hover{background:#0f0;color:#000}
-.card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in 0.2s}
+.card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px}
 .card:hover{border-color:#0f0}
-@keyframes in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 .card .flag{font-size:32px;min-width:45px;text-align:center}
 .card .info{flex:1}
 .card .phone{color:#fff;font-weight:bold;font-size:16px;direction:ltr}
@@ -25,7 +23,7 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
 .back-btn{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:8px 16px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;cursor:pointer;margin-bottom:15px;display:inline-block}
 .back-btn:hover{background:#0f0;color:#000}
-.grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .num-box{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;text-align:center;cursor:pointer}
 .num-box:hover{border-color:#0f0}
 .num-box .flag{font-size:28px}
@@ -36,6 +34,7 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .tag:hover{border-color:#0f0}
 .tag .name{color:#fff;font-weight:bold}
 .tag .count{color:#ff0;font-size:12px}
+.tag .flag{font-size:24px}
 .btn-row{display:flex;gap:8px;margin-top:10px}
 .btn-row .btn-sm{flex:1}
 </style></head>
@@ -44,13 +43,9 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <script>
 var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
 var known={},c=0,allCards=[],page='main';
-var myNums=JSON.parse(localStorage.getItem('myNumbers')||'[]');
-var savedSvc=localStorage.getItem('savedSvc')||'';
-var savedCty=localStorage.getItem('savedCty')||'';
 var flags={TG:'🇹🇬',LB:'🇱🇧',UA:'🇺🇦',AM:'🇦🇲',MZ:'🇲🇿',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',ID:'🇮🇩'};
 var cNames={TG:'توجو',LB:'لبنان',UA:'أوكرانيا',AM:'أرمينيا',MZ:'موزمبيق',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',ID:'إندونيسيا'};
 
-function saveNums(){localStorage.setItem('myNumbers',JSON.stringify(myNums));}
 function extractCode(txt){var m=txt.match(/\d{3,8}[-.\s]?\d{3,8}/);if(m)return m[0];m=txt.match(/\d{4,8}/);return m?m[0]:txt.substring(0,15);}
 
 function add(i){
@@ -81,13 +76,12 @@ function showAnalysis(){
         var svcs={};d.forEach(function(i){var svc=i[0];if(!svcs[svc])svcs[svc]={};var ct=(i[4]||'').trim();if(ct)svcs[svc][ct]=(svcs[svc][ct]||0)+1;});
         var html='';for(var svc in svcs){var top=[];for(var k in svcs[svc])top.push([k,svcs[svc][k]]);top.sort(function(a,b){return b[1]-a[1];});top=top.slice(0,5);
             html+='<div style="margin-bottom:15px"><h3 style="color:#ff0">📱 '+svc+'</h3><div style="display:flex;flex-wrap:wrap;gap:8px">';
-            for(var i=0;i<top.length;i++){html+='<div class="tag"><div style="font-size:24px">'+(flags[top[i][0]]||'🌍')+'</div><div class="name">'+(cNames[top[i][0]]||top[i][0])+'</div><div class="count">'+top[i][1]+'</div></div>';}
+            for(var i=0;i<top.length;i++){html+='<div class="tag"><div class="flag">'+(flags[top[i][0]]||'🌍')+'</div><div class="name">'+(cNames[top[i][0]]||top[i][0])+'</div><div class="count">'+top[i][1]+'</div></div>';}
             html+='</div></div>';}
         document.getElementById('content').innerHTML=html;
     });
 }
 
-// صفحة الأرقام - خدمات ← دول ← 4 أرقام
 function showNumbers(){
     page='services';
     document.getElementById('app').innerHTML='<div class="header"><h1>📱 الأرقام</h1></div><button class="back-btn" onclick="showMain()">← رجوع</button><div id="content">⏳ جاري التحميل...</div>';
@@ -99,41 +93,39 @@ function showNumbers(){
 }
 
 function showCountries(key,name){
-    localStorage.setItem('savedSvc',key);
     document.getElementById('app').innerHTML='<div class="header"><h1>🌍 '+name+'</h1></div><button class="back-btn" onclick="showNumbers()">← خدمات</button><div id="content">⏳ جاري التحميل...</div>';
     fetch(PROXY+'/api/countries?service='+key).then(function(r){return r.json();}).then(function(d){
         if(!d.success)return;
-        var html='';d.countries.forEach(function(c){html+='<div class="tag" onclick="showCountryNums(\''+c.name+'\',\''+(c.flag||'')+'\',\''+name+'\')"><div style="font-size:24px">'+(c.flag||'🌍')+'</div><div class="name">'+(cNames[c.name]||c.name)+'</div><div class="count">'+c.count+'</div></div>';});
+        var html='';d.countries.forEach(function(c){html+='<div class="tag" onclick="showNums(\''+c.name+'\',\''+(c.flag||'')+'\',\''+name+'\',\''+key+'\')"><div class="flag">'+(c.flag||'🌍')+'</div><div class="name">'+(cNames[c.name]||c.name)+'</div><div class="count">'+c.count+'</div></div>';});
         document.getElementById('content').innerHTML=html;
     });
 }
 
-function showCountryNums(country,flag,svc){
-    localStorage.setItem('savedCty',country);
-    document.getElementById('app').innerHTML='<div class="header"><h1>'+flag+' '+(cNames[country]||country)+'</h1></div><button class="back-btn" onclick="showCountries(\''+svc+'\',\''+svc+'\')">← دول</button><div id="content">⏳ جاري جلب الأرقام...</div><div id="codes"></div>';
-    fetchNums(country,svc);
-}
-
-function fetchNums(country,svc){
+function showNums(country,flag,svcName,svcKey){
+    document.getElementById('app').innerHTML='<div class="header"><h1>'+flag+' '+(cNames[country]||country)+'</h1></div><button class="back-btn" onclick="showCountries(\''+svcKey+'\',\''+svcName+'\')">← دول</button><div id="numsArea">⏳ جاري جلب الأرقام...</div>';
+    
     var promises=[];
     for(var i=0;i<4;i++){
-        promises.push(fetch(PROXY+'/api/request_number',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:svc,country:country})}).then(function(r){return r.json();}));
+        promises.push(
+            fetch(PROXY+'/api/request_number',{
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body:JSON.stringify({service:svcKey,country:country})
+            }).then(function(r){return r.json();})
+        );
     }
+    
     Promise.all(promises).then(function(results){
-        var newNums=[];
-        var html='<div class="grid4">';
+        var html='<div class="grid2">';
         results.forEach(function(d){
-            if(d.success&&d.number){
-                newNums.push({num:d.number,country:country,flag:d.flag||flag,svc:svc,code:''});
-                html+='<div class="num-box" onclick="navigator.clipboard.writeText(\''+d.number+'\')"><div class="flag">'+(d.flag||flag||'🌍')+'</div><div class="svc">'+svc+'</div><div class="num">+'+d.number+'</div><div class="code" id="code_'+d.number+'">---</div></div>';
+            if(d&&d.number){
+                html+='<div class="num-box" onclick="navigator.clipboard.writeText(\''+d.number+'\')"><div class="flag">'+(d.flag||flag||'🌍')+'</div><div class="svc">'+svcName+'</div><div class="num">+'+d.number+'</div><div class="code" id="cd_'+d.number+'">---</div></div>';
             }
         });
-        html+='</div>';
-        html+='<div class="btn-row"><button class="btn-sm" onclick="showCountryNums(\''+country+'\',\''+flag+'\',\''+svc+'\')">🔄 تغيير</button><button class="btn-sm" onclick="fetchCodes(\''+country+'\')">📩 جلب الأكواد</button></div>';
-        document.getElementById('content').innerHTML=html;
-        // حفظ الأرقام
-        newNums.forEach(function(n){myNums.push(n);});
-        saveNums();
+        html+='</div><div class="btn-row"><button class="btn-sm" onclick="showNums(\''+country+'\',\''+flag+'\',\''+svcName+'\',\''+svcKey+'\')">🔄 تغيير</button><button class="btn-sm" onclick="fetchCodes(\''+country+'\')">📩 جلب الأكواد</button></div>';
+        document.getElementById('numsArea').innerHTML=html;
+    }).catch(function(e){
+        document.getElementById('numsArea').innerHTML='❌ خطأ: '+e.message;
     });
 }
 
@@ -143,14 +135,11 @@ function fetchCodes(country){
         var flt=d.filter(function(i){return i[4]&&i[4].trim()===country;});
         flt.forEach(function(i){
             var code=extractCode(i[2]||'');
-            var el=document.getElementById('code_'+i[1]);
+            var el=document.getElementById('cd_'+i[1]);
             if(el)el.textContent=code;
         });
     });
 }
-
-// تحميل الأرقام المحفوظة
-if(savedSvc&&savedCty){page='numbers';}
 
 function go(){
     fetch(PROXY+'/api/otp?count=10').then(function(r){return r.json();}).then(function(d){if(Array.isArray(d)){d.forEach(function(i){var k=i[1]+'-'+i[2];if(!known[k]){known[k]=true;add(i);}});}});
