@@ -45,7 +45,7 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <script>
 var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
 var known={},c=0,allCards=[],page='main';
-var savedNums=JSON.parse(localStorage.getItem('savedNumbers')||'[]');
+var savedNums=JSON.parse(localStorage.getItem("savedNumbers")||"[]");var myNums=savedNums;function saveAll(){localStorage.setItem("savedNumbers",JSON.stringify(myNums));}(localStorage.getItem('savedNumbers')||'[]');
 var flags={TG:'🇹🇬',LB:'🇱🇧',UA:'🇺🇦',AM:'🇦🇲',MZ:'🇲🇿',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',ID:'🇮🇩'};
 var cNames={TG:'توجو',LB:'لبنان',UA:'أوكرانيا',AM:'أرمينيا',MZ:'موزمبيق',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',ID:'إندونيسيا'};
 
