@@ -25,19 +25,18 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
 .back-btn{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:8px 16px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;cursor:pointer;margin-bottom:15px;display:inline-block}
 .back-btn:hover{background:#0f0;color:#000}
-.section{margin-bottom:20px}
-.section h3{color:#ff0;margin-bottom:10px;text-shadow:0 0 10px #ff0;font-size:16px}
-.grid{display:flex;flex-wrap:wrap;gap:8px}
-.tag{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:10px 14px;font-size:13px;text-align:center;min-width:90px;cursor:pointer}
-.tag:hover{border-color:#0f0}
-.tag .flag{font-size:24px}
-.tag .name{color:#0ff;font-size:11px;margin-top:4px}
-.tag .count{color:#ff0;font-size:14px;font-weight:bold}
-.num-card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:6px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.num-card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer}
 .num-card:hover{border-color:#0f0}
-.num-card .code{font-size:24px;font-weight:bold;color:#ff0;direction:ltr;text-shadow:0 0 10px #ff0}
-.num-card .num{color:#fff;font-size:14px;direction:ltr}
-.dl-btn{background:#0a0a0a;border:1px solid #ff0;color:#ff0;padding:6px 12px;font-size:11px;font-family:'Courier New',monospace;border-radius:6px;cursor:pointer;margin-top:10px}
+.num-card:active{transform:scale(0.96)}
+.num-card .flag{font-size:24px}
+.num-card .num{color:#fff;font-weight:bold;font-size:12px;direction:ltr;word-break:break-all}
+.num-card .code{background:#000;border:1px solid #ff0;color:#ff0;padding:2px 6px;border-radius:4px;font-weight:bold;font-size:13px;direction:ltr;display:inline-block;margin-top:4px}
+.tag{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:12px;text-align:center;cursor:pointer;font-size:14px}
+.tag:hover{border-color:#0f0}
+.tag .name{color:#fff;font-weight:bold}
+.tag .count{color:#ff0;font-size:12px}
+.dl-btn{background:#0a0a0a;border:1px solid #ff0;color:#ff0;padding:8px 14px;font-size:12px;font-family:'Courier New',monospace;border-radius:6px;cursor:pointer;margin-left:8px}
 .dl-btn:hover{background:#ff0;color:#000}
 </style></head>
 <body>
@@ -45,8 +44,8 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <script>
 var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
 var known={},c=0,allCards=[],page='main',allData=[];
-var flags={AF:'🇦🇫',AL:'🇦🇱',DZ:'🇩🇿',AR:'🇦🇷',AM:'🇦🇲',AU:'🇦🇺',AT:'🇦🇹',AZ:'🇦🇿',BH:'🇧🇭',BD:'🇧🇩',BY:'🇧🇾',BE:'🇧🇪',BJ:'🇧🇯',BO:'🇧🇴',BA:'🇧🇦',BR:'🇧🇷',BG:'🇧🇬',BF:'🇧🇫',KH:'🇰🇭',CM:'🇨🇲',CA:'🇨🇦',TD:'🇹🇩',CL:'🇨🇱',CN:'🇨🇳',CO:'🇨🇴',CG:'🇨🇬',CD:'🇨🇩',CR:'🇨🇷',CI:'🇨🇮',HR:'🇭🇷',CU:'🇨🇺',CY:'🇨🇾',CZ:'🇨🇿',DK:'🇩🇰',DO:'🇩🇴',EC:'🇪🇨',EG:'🇪🇬',SV:'🇸🇻',EE:'🇪🇪',ET:'🇪🇹',FI:'🇫🇮',FR:'🇫🇷',GA:'🇬🇦',GE:'🇬🇪',DE:'🇩🇪',GH:'🇬🇭',GR:'🇬🇷',GT:'🇬🇹',GN:'🇬🇳',HT:'🇭🇹',HN:'🇭🇳',HK:'🇭🇰',HU:'🇭🇺',IS:'🇮🇸',IN:'🇮🇳',ID:'🇮🇩',IR:'🇮🇷',IQ:'🇮🇶',IE:'🇮🇪',IL:'🇮🇱',IT:'🇮🇹',JM:'🇯🇲',JP:'🇯🇵',JO:'🇯🇴',KZ:'🇰🇿',KE:'🇰🇪',KW:'🇰🇼',KG:'🇰🇬',LA:'🇱🇦',LV:'🇱🇻',LB:'🇱🇧',LY:'🇱🇾',LT:'🇱🇹',LU:'🇱🇺',MG:'🇲🇬',MY:'🇲🇾',ML:'🇲🇱',MX:'🇲🇽',MD:'🇲🇩',MA:'🇲🇦',MZ:'🇲🇿',MM:'🇲🇲',NP:'🇳🇵',NL:'🇳🇱',NZ:'🇳🇿',NI:'🇳🇮',NE:'🇳🇪',NG:'🇳🇬',KP:'🇰🇵',NO:'🇳🇴',OM:'🇴🇲',PK:'🇵🇰',PA:'🇵🇦',PY:'🇵🇾',PE:'🇵🇪',PH:'🇵🇭',PL:'🇵🇱',PT:'🇵🇹',QA:'🇶🇦',RO:'🇷🇴',RU:'🇷🇺',RW:'🇷🇼',SA:'🇸🇦',SN:'🇸🇳',RS:'🇷🇸',SG:'🇸🇬',SK:'🇸🇰',SI:'🇸🇮',SO:'🇸🇴',ZA:'🇿🇦',KR:'🇰🇷',ES:'🇪🇸',LK:'🇱🇰',SD:'🇸🇩',SE:'🇸🇪',CH:'🇨🇭',SY:'🇸�',TW:'🇹🇼',TJ:'🇹🇯',TZ:'🇹🇿',TH:'🇹🇭',TG:'🇹🇬',TN:'🇹🇳',TR:'🇹🇷',TM:'🇹🇲',UG:'🇺🇬',UA:'🇺🇦',AE:'🇦🇪',GB:'🇬🇧',US:'🇺🇸',UY:'🇺🇾',UZ:'🇺🇿',VE:'🇻🇪',VN:'🇻🇳',YE:'🇾🇪',ZM:'🇿🇲',ZW:'🇿🇼'};
-var cNames={TG:'توجو',LB:'لبنان',UA:'أوكرانيا',AM:'أرمينيا',MZ:'موزمبيق',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',QA:'قطر',TJ:'طاجيكستان',ID:'إندونيسيا'};
+var flags={TG:'🇹🇬',LB:'🇱🇧',UA:'🇺🇦',AM:'🇦🇲',MZ:'🇲🇿',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',ID:'🇮🇩'};
+var cNames={TG:'توجو',LB:'لبنان',UA:'أوكرانيا',AM:'أرمينيا',MZ:'موزمبيق',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',ID:'إندونيسيا'};
 
 function extractCode(txt){var m=txt.match(/\d{3,8}[-.\s]?\d{3,8}/);if(m)return m[0];m=txt.match(/\d{4,8}/);return m?m[0]:txt.substring(0,15);}
 
@@ -67,99 +66,62 @@ function filter(){renderCards();}
 
 function showMain(){
     page='main';
-    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE</h1></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showServices()">📱 الأرقام</button><button class="btn-sm" onclick="showAnalysis()">🏆 تحليل</button></div><div id="cards"></div><div class="stats" id="stats">⬢ '+c+' codes</div>';
+    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE</h1></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showServices()">📱 أرقام</button><button class="btn-sm" onclick="showAnalysis()">🏆 تحليل</button></div><div id="cards"></div><div class="stats" id="stats">⬢ '+c+' codes</div>';
     renderCards();
 }
 
 function showAnalysis(){
     page='analysis';
-    document.getElementById('app').innerHTML='<div class="header"><h1>🏆 تحليل OTP</h1></div><button class="back-btn" onclick="showMain()">← رجوع</button><div id="analysisContent">⏳ جاري التحميل...</div>';
-    loadAnalysis();
-}
-
-function loadAnalysis(){
-    fetch(PROXY+'/api/otp?count=200')
-    .then(function(r){return r.json();})
-    .then(function(d){
+    document.getElementById('app').innerHTML='<div class="header"><h1>🏆 تحليل</h1></div><button class="back-btn" onclick="showMain()">← رجوع</button><div id="content">⏳ جاري التحميل...</div>';
+    fetch(PROXY+'/api/otp?count=200').then(function(r){return r.json();}).then(function(d){
         if(!Array.isArray(d))return;
-        var svcs={};
-        d.forEach(function(i){
-            var svc=i[0];if(!svcs[svc])svcs[svc]={countries:{}};
-            var ct=(i[4]||'').trim();if(ct)svcs[svc].countries[ct]=(svcs[svc].countries[ct]||0)+1;
-        });
-        var html='';
-        for(var svc in svcs){
-            var topC=[];for(var k in svcs[svc].countries)topC.push([k,svcs[svc].countries[k]]);
-            topC.sort(function(a,b){return b[1]-a[1];});topC=topC.slice(0,5);
-            html+='<div class="section"><h3>📱 '+svc+'</h3><div class="grid">';
-            for(var i=0;i<topC.length;i++){
-                html+='<div class="tag" onclick="showCountryNumbers(\''+topC[i][0]+'\')"><div class="flag">'+(flags[topC[i][0]]||'🌍')+'</div><div class="name">'+(cNames[topC[i][0]]||topC[i][0])+'</div><div class="count">'+topC[i][1]+'</div></div>';
-            }
-            html+='</div></div>';
-        }
-        document.getElementById('analysisContent').innerHTML=html;
+        var svcs={};d.forEach(function(i){var svc=i[0];if(!svcs[svc])svcs[svc]={};var ct=(i[4]||'').trim();if(ct)svcs[svc][ct]=(svcs[svc][ct]||0)+1;});
+        var html='';for(var svc in svcs){var top=[];for(var k in svcs[svc])top.push([k,svcs[svc][k]]);top.sort(function(a,b){return b[1]-a[1];});top=top.slice(0,5);
+            html+='<div style="margin-bottom:15px"><h3 style="color:#ff0">📱 '+svc+'</h3><div style="display:flex;flex-wrap:wrap;gap:8px">';
+            for(var i=0;i<top.length;i++){html+='<div class="tag"><div style="font-size:24px">'+(flags[top[i][0]]||'🌍')+'</div><div class="name">'+(cNames[top[i][0]]||top[i][0])+'</div><div class="count">'+top[i][1]+'</div></div>';}
+            html+='</div></div>';}
+        document.getElementById('content').innerHTML=html;
     });
 }
 
-// صفحة الخدمات ← دول ← أرقام
 function showServices(){
     page='services';
-    document.getElementById('app').innerHTML='<div class="header"><h1>📱 الخدمات</h1></div><button class="back-btn" onclick="showMain()">← رجوع</button><div id="servicesContent">⏳ جاري التحميل...</div>';
-    loadServices();
-}
-
-function loadServices(){
-    fetch(PROXY+'/api/otp?count=200')
-    .then(function(r){return r.json();})
-    .then(function(d){
+    document.getElementById('app').innerHTML='<div class="header"><h1>📱 الخدمات</h1></div><button class="back-btn" onclick="showMain()">← رجوع</button><div id="content">⏳ جاري التحميل...</div>';
+    fetch(PROXY+'/api/otp?count=200').then(function(r){return r.json();}).then(function(d){
         if(!Array.isArray(d))return;
-        var svcs={};
-        d.forEach(function(i){svcs[i[0]]=(svcs[i[0]]||0)+1;});
-        var html='<div class="grid">';
-        for(var svc in svcs){
-            html+='<div class="tag" onclick="showServiceCountries(\''+svc+'\')"><div class="count">'+svcs[svc]+'</div><div class="name">'+svc+'</div></div>';
-        }
-        html+='</div>';
-        document.getElementById('servicesContent').innerHTML=html;
+        var svcs={};d.forEach(function(i){svcs[i[0]]=(svcs[i[0]]||0)+1;});
+        var html='<div style="display:flex;flex-wrap:wrap;gap:8px">';
+        for(var svc in svcs){html+='<div class="tag" onclick="showCountries(\''+svc+'\')"><div class="name">'+svc+'</div><div class="count">'+svcs[svc]+'</div></div>';}
+        html+='</div>';document.getElementById('content').innerHTML=html;
     });
 }
 
-function showServiceCountries(svc){
-    page='serviceCountries';
-    document.getElementById('app').innerHTML='<div class="header"><h1>🌍 '+svc+'</h1></div><button class="back-btn" onclick="showServices()">← خدمات</button><div id="svcCountries">⏳ جاري التحميل...</div>';
-    fetch(PROXY+'/api/otp?count=200')
-    .then(function(r){return r.json();})
-    .then(function(d){
+function showCountries(svc){
+    page='countries';
+    document.getElementById('app').innerHTML='<div class="header"><h1>🌍 '+svc+'</h1></div><button class="back-btn" onclick="showServices()">← خدمات</button><div id="content">⏳ جاري التحميل...</div>';
+    fetch(PROXY+'/api/otp?count=200').then(function(r){return r.json();}).then(function(d){
         if(!Array.isArray(d))return;
         var flt=d.filter(function(i){return i[0]===svc;});
-        var countries={};
-        flt.forEach(function(i){var ct=(i[4]||'').trim();if(ct)countries[ct]=(countries[ct]||0)+1;});
-        var topC=[];for(var k in countries)topC.push([k,countries[k]]);
-        topC.sort(function(a,b){return b[1]-a[1];});
-        var html='<div class="grid">';
-        for(var i=0;i<topC.length;i++){
-            html+='<div class="tag" onclick="showCountryNumbers(\''+topC[i][0]+'\')"><div class="flag">'+(flags[topC[i][0]]||'🌍')+'</div><div class="name">'+(cNames[topC[i][0]]||topC[i][0])+'</div><div class="count">'+topC[i][1]+'</div></div>';
-        }
-        html+='</div>';
-        document.getElementById('svcCountries').innerHTML=html;
+        var countries={};flt.forEach(function(i){var ct=(i[4]||'').trim();if(ct)countries[ct]=(countries[ct]||0)+1;});
+        var top=[];for(var k in countries)top.push([k,countries[k]]);top.sort(function(a,b){return b[1]-a[1];});
+        var html='<div style="display:flex;flex-wrap:wrap;gap:8px">';
+        for(var i=0;i<top.length;i++){html+='<div class="tag" onclick="showNumbers(\''+top[i][0]+'\')"><div style="font-size:24px">'+(flags[top[i][0]]||'🌍')+'</div><div class="name">'+(cNames[top[i][0]]||top[i][0])+'</div><div class="count">'+top[i][1]+'</div></div>';}
+        html+='</div>';document.getElementById('content').innerHTML=html;
     });
 }
 
-function showCountryNumbers(country){
-    page='country';
-    document.getElementById('app').innerHTML='<div class="header"><h1>'+ (flags[country]||'🌍') +' '+(cNames[country]||country)+'</h1></div><button class="back-btn" onclick="showServices()">← خدمات</button><button class="dl-btn" onclick="downloadCountry(\''+country+'\')">📥 تحميل</button><div id="countryNumbers">⏳ جاري التحميل...</div>';
-    fetch(PROXY+'/api/otp?count=200')
-    .then(function(r){return r.json();})
-    .then(function(d){
+function showNumbers(country){
+    page='numbers';
+    document.getElementById('app').innerHTML='<div class="header"><h1>'+ (flags[country]||'🌍') +' '+(cNames[country]||country)+'</h1></div><button class="back-btn" onclick="showServices()">← خدمات</button><button class="dl-btn" onclick="downloadCountry(\''+country+'\')">📥 تحميل</button><div id="content">⏳ جاري التحميل...</div>';
+    fetch(PROXY+'/api/otp?count=200').then(function(r){return r.json();}).then(function(d){
         if(!Array.isArray(d))return;
         var nums=d.filter(function(i){return (i[4]||'').trim()===country;});
-        var html='<div class="section"><h3>📱 '+nums.length+' أرقام</h3>';
+        var html='<h3 style="color:#ff0;margin-bottom:10px">📱 '+nums.length+' أرقام</h3><div class="grid3">';
         nums.forEach(function(i){
             var code=extractCode(i[2]||'');
-            html+='<div class="num-card" onclick="navigator.clipboard.writeText(\''+code+'\')"><span class="flag">'+(flags[country]||'🌍')+'</span><div class="info"><div class="num">+'+i[1]+'</div><div class="code">'+code+'</div></div></div>';
+            html+='<div class="num-card" onclick="navigator.clipboard.writeText(\''+code+'\')"><div class="flag">'+(flags[country]||'🌍')+'</div><div class="num">+'+i[1]+'</div><div class="code">'+code+'</div></div>';
         });
-        html+='</div>';
-        document.getElementById('countryNumbers').innerHTML=html;
+        html+='</div>';document.getElementById('content').innerHTML=html;
     });
 }
 
@@ -167,19 +129,14 @@ function downloadCountry(country){
     var nums=allData.filter(function(i){return (i[4]||'').trim()===country;});
     var txt='Country: '+country+'\n==========\n\n';
     nums.forEach(function(i){txt+=i[0]+' | +'+i[1]+' | '+extractCode(i[2]||'')+'\n';});
-    var blob=new Blob([txt],{type:'text/plain'});
-    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='country_'+country+'.txt';a.click();
+    var blob=new Blob([txt],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='country_'+country+'.txt';a.click();
 }
 
 function go(){
-    fetch(PROXY+'/api/otp?count=10')
-    .then(function(r){return r.json();})
-    .then(function(d){if(Array.isArray(d)){d.forEach(function(i){var k=i[1]+'-'+i[2];if(!known[k]){known[k]=true;add(i);}});}});
+    fetch(PROXY+'/api/otp?count=10').then(function(r){return r.json();}).then(function(d){if(Array.isArray(d)){d.forEach(function(i){var k=i[1]+'-'+i[2];if(!known[k]){known[k]=true;add(i);}});}});
 }
 
-showMain();
-go();
-setInterval(go,2000);
+showMain();go();setInterval(go,2000);
 </script>
 </body>
 </html>
