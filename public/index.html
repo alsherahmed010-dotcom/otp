@@ -23,21 +23,28 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <body>
 <div class="app"><div class="header"><h1>⬢ OTP LIVE</h1></div><div class="list" id="list"></div><div class="stats" id="stats">⬢ 0</div></div>
 <script>
-const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
+var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
 var known={},c=0;
 var flags={MZ:'🇲🇿',TG:'🇹🇬',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',UA:'🇺🇦',QA:'🇶🇦',TJ:'🇹🇯',HT:'🇭🇹',ID:'🇮🇩'};
 var cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
 
 function add(i){
-    var code=i[2].match(/\d{4,8}/);
-    code=code?code[0]:'---';
-    var ct=i[4]?i[4].trim():'';
+    console.log('Adding:',i);
+    var full=i[2]||'';
+    var match=full.match(/\d{4,8}/);
+    var code=match?match[0]:full.substring(0,20);
+    var ct=(i[4]||'').trim();
+    var flag=flags[ct]||'🌍';
+    var cName=cNames[ct]||ct;
+    
     var div=document.createElement('div');
     div.className='card';
     div.onclick=function(){navigator.clipboard.writeText(code);};
-    div.innerHTML='<span class="flag">'+(flags[ct]||'🌍')+'</span><div class="info"><div class="meta">'+i[0]+' · '+(cNames[ct]||ct)+'</div><div class="num">+'+i[1]+'</div><div class="code">'+code+'</div></div>';
+    div.innerHTML='<span class="flag">'+flag+'</span><div class="info"><div class="meta">'+i[0]+' · '+cName+'</div><div class="num">+'+i[1]+'</div><div class="code">'+code+'</div></div>';
+    
     var list=document.getElementById('list');
-    list.insertBefore(div,list.firstChild);
+    if(list.firstChild){list.insertBefore(div,list.firstChild);}
+    else{list.appendChild(div);}
     c++;
     document.getElementById('stats').textContent='⬢ '+c;
 }
@@ -46,6 +53,7 @@ function go(){
     fetch(PROXY+'/api/otp?count=10')
     .then(function(r){return r.json();})
     .then(function(d){
+        console.log('Got:',d.length,'items');
         if(Array.isArray(d)){
             d.forEach(function(i){
                 var k=i[1]+'-'+i[2];
@@ -56,7 +64,7 @@ function go(){
             });
         }
     })
-    .catch(function(e){console.log(e);});
+    .catch(function(e){console.log('Error:',e);});
 }
 
 go();
