@@ -9,8 +9,11 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .app{max-width:500px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
 .header{text-align:center;padding:20px 0;border-bottom:2px solid #0f0;margin-bottom:10px}
 .header h1{font-size:26px;letter-spacing:3px;text-shadow:0 0 10px #0f0}
-.search-box{width:100%;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:14px;font-family:'Courier New',monospace;border-radius:8px;margin-bottom:15px;outline:none}
+.top-bar{display:flex;gap:8px;margin-bottom:15px}
+.search-box{flex:1;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:14px;font-family:'Courier New',monospace;border-radius:8px;outline:none}
 .search-box:focus{border-color:#0f0}
+.btn-sm{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:12px 14px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;cursor:pointer;white-space:nowrap;font-weight:bold}
+.btn-sm:hover{background:#0f0;color:#000}
 .card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in 0.2s}
 .card:hover{border-color:#0f0}
 @keyframes in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
@@ -20,14 +23,23 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .card .prefix{color:#0ff;font-size:11px}
 .card .code{font-size:30px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0}
 .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
+.stats-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.stat-card{flex:1;min-width:100px;background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:12px;text-align:center}
+.stat-card .svc{color:#f00;font-weight:bold;font-size:12px}
+.stat-card .flag{font-size:28px}
+.stat-card .cty{color:#0ff;font-size:10px}
+.stat-card .cnt{color:#ff0;font-size:11px}
+.back-btn{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:8px 16px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;cursor:pointer;margin-bottom:15px;display:inline-block}
+.back-btn:hover{background:#0f0;color:#000}
 .hidden{display:none}
 </style></head>
 <body>
-<div class="app"><div class="header"><h1>⬢ OTP LIVE</h1></div><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><div id="cards"></div><div class="stats" id="stats">⬢ 0 codes</div></div>
+<div class="app" id="app"></div>
 <script>
 var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
-var known={},c=0,allCards=[];
+var known={},c=0,allCards=[],page='main';
 var flags={AF:'🇦🇫',AL:'🇦🇱',DZ:'🇩🇿',AR:'🇦🇷',AM:'🇦🇲',AU:'🇦🇺',AT:'🇦🇹',AZ:'🇦🇿',BH:'🇧🇭',BD:'🇧🇩',BY:'🇧🇾',BE:'🇧🇪',BJ:'🇧🇯',BO:'🇧🇴',BA:'🇧🇦',BR:'🇧🇷',BG:'🇧🇬',BF:'🇧🇫',KH:'🇰🇭',CM:'🇨🇲',CA:'🇨🇦',TD:'🇹🇩',CL:'🇨🇱',CN:'🇨🇳',CO:'🇨🇴',CG:'🇨🇬',CD:'🇨🇩',CR:'🇨🇷',CI:'🇨🇮',HR:'🇭🇷',CU:'🇨🇺',CY:'🇨🇾',CZ:'🇨🇿',DK:'🇩🇰',DO:'🇩🇴',EC:'🇪🇨',EG:'🇪🇬',SV:'🇸🇻',EE:'🇪🇪',ET:'🇪🇹',FI:'🇫🇮',FR:'🇫🇷',GA:'🇬🇦',GE:'🇬🇪',DE:'🇩🇪',GH:'🇬🇭',GR:'🇬🇷',GT:'🇬🇹',GN:'🇬🇳',HT:'🇭🇹',HN:'🇭🇳',HK:'🇭🇰',HU:'🇭🇺',IS:'🇮🇸',IN:'🇮🇳',ID:'🇮🇩',IR:'🇮🇷',IQ:'🇮🇶',IE:'🇮🇪',IL:'🇮🇱',IT:'🇮🇹',JM:'🇯🇲',JP:'🇯🇵',JO:'🇯🇴',KZ:'🇰🇿',KE:'🇰🇪',KW:'🇰🇼',KG:'🇰🇬',LA:'🇱🇦',LV:'🇱🇻',LB:'🇱🇧',LY:'🇱🇾',LT:'🇱🇹',LU:'🇱🇺',MG:'🇲🇬',MY:'🇲🇾',ML:'🇲🇱',MX:'🇲🇽',MD:'🇲🇩',MA:'🇲🇦',MZ:'🇲🇿',MM:'🇲🇲',NP:'🇳🇵',NL:'🇳🇱',NZ:'🇳🇿',NI:'🇳🇮',NE:'🇳🇪',NG:'🇳🇬',KP:'🇰🇵',NO:'🇳🇴',OM:'🇴🇲',PK:'🇵🇰',PA:'🇵🇦',PY:'🇵🇾',PE:'🇵🇪',PH:'🇵🇭',PL:'🇵🇱',PT:'🇵🇹',QA:'🇶🇦',RO:'🇷🇴',RU:'🇷🇺',RW:'🇷🇼',SA:'🇸🇦',SN:'🇸🇳',RS:'🇷🇸',SG:'🇸🇬',SK:'🇸🇰',SI:'🇸🇮',SO:'🇸🇴',ZA:'🇿🇦',KR:'🇰🇷',ES:'🇪🇸',LK:'🇱🇰',SD:'🇸🇩',SE:'🇸🇪',CH:'🇨🇭',SY:'🇸🇾',TW:'🇹🇼',TJ:'🇹🇯',TZ:'🇹🇿',TH:'🇹🇭',TG:'🇹🇬',TN:'🇹🇳',TR:'🇹🇷',TM:'🇹🇲',UG:'🇺🇬',UA:'🇺🇦',AE:'🇦🇪',GB:'🇬🇧',US:'🇺🇸',UY:'🇺🇾',UZ:'🇺🇿',VE:'🇻🇪',VN:'🇻🇳',YE:'🇾🇪',ZM:'🇿🇲',ZW:'🇿🇼'};
+var cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا',LB:'لبنان',AM:'أرمينيا'};
 
 function extractCode(txt){
     var m=txt.match(/\d{3,8}[-.\s]?\d{3,8}/);
@@ -36,30 +48,66 @@ function extractCode(txt){
     return m?m[0]:txt.substring(0,15);
 }
 
+function renderMain(){
+    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE</h1></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showBest()">🏆 أفضل الدول</button></div><div id="cards"></div><div class="stats" id="stats">⬢ 0 codes</div>';
+    page='main';
+    renderCards();
+}
+
+function renderBest(){
+    document.getElementById('app').innerHTML='<div class="header"><h1>🏆 أفضل الدول لكل خدمة</h1></div><button class="back-btn" onclick="renderMain()">← رجوع</button><div id="bestCards">⏳ جاري التحميل...</div>';
+    page='best';
+    loadBest();
+}
+
+function showBest(){renderBest();}
+
 function add(i){
     var code=extractCode(i[2]||'');
     var ct=(i[4]||'').trim();
     var flag=flags[ct]||'🌍';
     var prefix=i[1]?i[1].substring(0,7):'';
-    var html='<div class="card" data-search="'+i[1]+' '+code+'" onclick="navigator.clipboard.writeText(\''+code+'\')"><span class="flag">'+flag+'</span><div class="info"><div class="phone">📱 +'+i[1]+'</div><div class="prefix">🆔 Prefix: '+prefix+'</div><div class="code">'+code+'</div></div></div>';
-    allCards.unshift({html:html,search:i[1]+' '+code});
+    allCards.unshift({html:'<div class="card" onclick="navigator.clipboard.writeText(\''+code+'\')"><span class="flag">'+flag+'</span><div class="info"><div class="phone">📱 +'+i[1]+'</div><div class="prefix">🆔 Prefix: '+prefix+'</div><div class="code">'+code+'</div></div></div>',search:i[1]+' '+code});
     renderCards();
     c++;
     document.getElementById('stats').textContent='⬢ '+c+' codes';
 }
 
 function renderCards(){
-    var q=(document.getElementById('search').value||'').toLowerCase();
+    if(page!=='main')return;
+    var q=(document.getElementById('search')?document.getElementById('search').value:'').toLowerCase();
     var html='';
     for(var i=0;i<allCards.length;i++){
-        if(!q||allCards[i].search.toLowerCase().indexOf(q)>=0){
-            html+=allCards[i].html;
-        }
+        if(!q||allCards[i].search.toLowerCase().indexOf(q)>=0)html+=allCards[i].html;
     }
     document.getElementById('cards').innerHTML=html;
 }
 
 function filter(){renderCards();}
+
+function loadBest(){
+    fetch(PROXY+'/api/otp?count=100')
+    .then(function(r){return r.json();})
+    .then(function(d){
+        if(!Array.isArray(d))return;
+        var svcCountries={};
+        d.forEach(function(i){
+            var svc=i[0];var ct=(i[4]||'').trim();
+            if(!svcCountries[svc])svcCountries[svc]={};
+            if(!svcCountries[svc][ct])svcCountries[svc][ct]=0;
+            svcCountries[svc][ct]++;
+        });
+        var html='';
+        for(var svc in svcCountries){
+            var best='',max=0;
+            for(var ct in svcCountries[svc]){
+                if(svcCountries[svc][ct]>max){max=svcCountries[svc][ct];best=ct;}
+            }
+            html+='<div class="stat-card"><div class="svc">'+svc+'</div><div class="flag">'+(flags[best]||'🌍')+'</div><div class="cty">'+(cNames[best]||best)+'</div><div class="cnt">'+max+' أرقام</div></div>';
+        }
+        document.getElementById('bestCards').innerHTML='<div class="stats-row">'+html+'</div>';
+    });
+}
 
 function go(){
     fetch(PROXY+'/api/otp?count=10')
@@ -68,16 +116,13 @@ function go(){
         if(Array.isArray(d)){
             d.forEach(function(i){
                 var k=i[1]+'-'+i[2];
-                if(!known[k]){
-                    known[k]=true;
-                    add(i);
-                }
+                if(!known[k]){known[k]=true;add(i);}
             });
         }
-    })
-    .catch(function(e){console.log(e);});
+    });
 }
 
+renderMain();
 go();
 setInterval(go,2000);
 </script>
