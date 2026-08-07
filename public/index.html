@@ -2,49 +2,50 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>OTP Live</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
+        :root{--bg:#0e1621;--surface:#17212b;--card:#182533;--blue:#2b5278;--gold:#f59e0b;--green:#10b981;--text:#fff;--text2:#94a3b8}
         *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif}
-        body{background:#0e1621;color:#f5f5f5;display:flex;justify-content:center;align-items:center;min-height:100vh}
-        .app{width:100%;max-width:450px;background:#17212b;height:100vh;display:flex;flex-direction:column;box-shadow:0 0 15px rgba(0,0,0,0.5);overflow:hidden}
-        .h{background:#242f3d;padding:12px 15px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #111822;min-height:55px}
-        .h .back{color:#fff;font-size:20px;cursor:pointer}
-        .h .av{width:40px;height:40px;border-radius:50%;background:#2b5278;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0}
+        body{background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:center;min-height:100vh}
+        .app{width:100%;max-width:500px;height:100vh;background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+        .h{background:#242f3d;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.05);min-height:55px}
+        .h .back{color:#fff;font-size:20px;cursor:pointer;width:30px}
+        .h .av{width:40px;height:40px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0}
         .h .info{flex:1}
-        .h .info .n{font-size:15px;color:#fff;font-weight:600}
-        .h .info .s{font-size:12px;color:#7d8b99}
-        .list{flex:1;overflow-y:auto;background:#0e1621}
-        .row{display:flex;align-items:center;padding:14px 15px;gap:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02)}
+        .h .info .n{font-size:15px;font-weight:600;color:#fff}
+        .h .info .s{font-size:12px;color:var(--text2)}
+        .list{flex:1;overflow-y:auto;background:var(--bg)}
+        .row{display:flex;align-items:center;padding:14px 16px;gap:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02)}
         .row:active{background:rgba(255,255,255,0.03)}
         .row .av{width:50px;height:50px;font-size:20px}
         .row .info{flex:1}
         .row .n{font-size:15px;font-weight:500;color:#fff;margin-bottom:4px}
-        .row .p{font-size:13px;color:#7d8b99}
-        .msgs{flex:1;padding:15px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;background:#0e1621}
-        .card{background:#182533;border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
-        .card:active{background:#1e3040}
-        .card .flag{font-size:24px;width:45px;text-align:center}
-        .card .info{flex:1}
-        .card .num{color:#60a5fa;font-weight:700;font-size:17px}
-        .card .code{background:#f59e0b;color:#000;padding:3px 10px;border-radius:5px;font-weight:700;font-size:15px;display:inline-block;margin-top:4px}
-        .card .svc{color:#f87171;font-size:12px}
-        .card .arrow{color:#7d8b99;font-size:20px}
-        .ba{padding:10px;border-top:1px solid #111822;background:#17212b;display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto}
-        .btn{border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;color:#fff;cursor:pointer;text-align:center;background:#2b5278;width:100%;margin-bottom:8px}
+        .row .p{font-size:13px;color:var(--text2)}
+        .content{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+        .num-card{background:var(--card);border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;transition:0.15s;border:1px solid transparent;display:flex;flex-direction:column;align-items:center;gap:6px}
+        .num-card:active{background:#1e3040;border-color:var(--blue)}
+        .num-card .flag{font-size:28px}
+        .num-card .number{color:#60a5fa;font-weight:700;font-size:13px;word-break:break-all;direction:ltr}
+        .num-card .code{background:var(--gold);color:#000;padding:2px 8px;border-radius:4px;font-weight:700;font-size:12px;direction:ltr}
+        .num-card .svc{color:#f87171;font-size:10px}
+        .msg{background:var(--card);border-radius:12px;padding:12px;font-size:13px;line-height:1.6}
+        .btn{border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;color:#fff;cursor:pointer;text-align:center;background:var(--blue);width:100%;margin-bottom:8px}
         .btn:active{opacity:0.8}
-        .bgreen{background:#2e8b57}
-        .bgold{background:#f59e0b;color:#000;font-weight:600}
+        .bgreen{background:var(--green)}
+        .bgold{background:var(--gold);color:#000;font-weight:600}
         .brow{display:flex;gap:8px}
         .brow .btn{flex:1;margin-bottom:0}
-        .footer{background:#17212b;padding:12px;text-align:center;border-top:1px solid #111822;color:#7d8b99;font-size:13px}
-        .nav{display:flex;justify-content:space-around;padding:8px 0;background:#17212b;border-top:1px solid #111822}
-        .ni{display:flex;flex-direction:column;align-items:center;color:#7d8b99;font-size:11px;cursor:pointer;gap:4px;background:none;border:none;flex:1}
+        .ba{padding:10px;border-top:1px solid rgba(255,255,255,0.05);background:var(--surface);display:flex;flex-direction:column;gap:8px;max-height:40vh;overflow-y:auto}
+        .footer{background:var(--surface);padding:12px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);color:var(--text2);font-size:13px}
+        .nav{display:flex;background:var(--surface);border-top:1px solid rgba(255,255,255,0.05);padding:8px 0}
+        .ni{flex:1;display:flex;flex-direction:column;align-items:center;color:var(--text2);font-size:11px;cursor:pointer;gap:3px;background:none;border:none}
         .ni.ac{color:#5288c1}
         .nic{font-size:20px}
-        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#334155;border-radius:2px}
+        ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
     </style>
 </head>
 <body>
@@ -54,12 +55,12 @@
         const db=firebase.database();
         const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
         
-        let S=JSON.parse(localStorage.getItem('otp_ok')||'{}');
+        let S=JSON.parse(localStorage.getItem('otp_v200')||'{}');
         let cur=S.cur||'main',cSvc=S.cSvc||'',cCty=S.cCty||'',cFlag=S.cFlag||'';
         let known=new Set(),otpTimer=null;
         const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
         
-        function save(){S={cur,cSvc,cCty,cFlag};localStorage.setItem('otp_ok',JSON.stringify(S));}
+        function save(){S={cur,cSvc,cCty,cFlag};localStorage.setItem('otp_v200',JSON.stringify(S));}
         async function api(p){const r=await fetch(PROXY+p);return await r.json();}
         function el(id){return document.getElementById(id);}
         function copyText(t){navigator.clipboard.writeText(t);}
@@ -76,7 +77,7 @@
         
         function chatHTML(type){
             const b=type==='bot';
-            return '<div class="screen"><div class="h"><div class="back" onclick="goBack()">←</div><div class="av">'+(b?'🤖':'👥')+'</div><div class="info"><div class="n">'+(b?'🤖 NUMBER BOT':'👥 OTP LIVE')+'</div><div class="s">'+(b?'online':'live')+'</div></div></div><div class="msgs" id="messages"></div>'+(b?'<div class="ba" id="btnArea"></div>':'<div class="footer">بث مباشر مستمر</div>')+'</div>';
+            return '<div class="screen"><div class="h"><div class="back" onclick="goBack()">←</div><div class="av">'+(b?'🤖':'👥')+'</div><div class="info"><div class="n">'+(b?'🤖 NUMBER BOT':'👥 OTP LIVE')+'</div><div class="s">'+(b?'online':'live')+'</div></div></div><div class="content" id="messages"></div>'+(b?'<div class="ba" id="btnArea"></div>':'<div class="footer">بث مباشر مستمر</div>')+'</div>';
         }
         
         function bindEvents(){
@@ -85,7 +86,7 @@
                 else if(cSvc){loadCountries(cSvc);}
                 else{loadServices();}
             }else if(cur==='group'){
-                el('messages').innerHTML='<div class="card"><div class="info">📡 جاري تحميل OTP Live...</div></div>';
+                el('messages').innerHTML='<div class="msg">📡 جاري تحميل OTP Live...</div>';
                 db.ref('messages').off();db.ref('messages').limitToLast(50).on('child_added',s=>{if(cur==='group')showOTP(s.val());});
                 if(otpTimer)clearInterval(otpTimer);
                 otpTimer=setInterval(fetchOTP,2000);
@@ -103,9 +104,8 @@
         
         function showOTP(m){
             if(cur!=='group')return;
-            const t=new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
             const code=m.code||'---';
-            el('messages').innerHTML+='<div class="card" onclick="copyText(\''+code+'\')"><span class="flag">📩</span><div class="info"><span class="svc">'+m.service+'</span><br><span class="num">'+m.number+'</span><br><span class="code">'+code+'</span></div><span class="arrow">📋</span></div>';
+            el('messages').innerHTML+='<div class="num-card" onclick="copyText(\''+code+'\')" style="display:flex;flex-direction:row;text-align:right;gap:10px;padding:10px;"><span style="font-size:24px;">📩</span><div style="flex:1;"><span style="color:#f87171;font-size:11px;">'+m.service+'</span><br><span style="color:#60a5fa;font-weight:700;">'+m.number+'</span><br><span style="background:#f59e0b;color:#000;padding:2px 8px;border-radius:4px;font-weight:700;">'+code+'</span></div><span style="color:#7d8b99;">📋</span></div>';
             el('messages').scrollTop=el('messages').scrollHeight;
         }
         
@@ -114,54 +114,42 @@
         }
         
         async function loadServices(){
-            el('messages').innerHTML='<div class="card"><div class="info">⏳ جاري تحميل الخدمات...</div></div>';
+            el('messages').innerHTML='<div class="msg">⏳ جاري التحميل...</div>';
             el('btnArea').innerHTML='';
-            try{
-                const d=await api('/api/services');
-                if(d.success&&d.services){
-                    el('messages').innerHTML='<div class="card"><div class="info">📋 اختر الخدمة:</div></div>';
-                    let btns='';
-                    d.services.forEach(s=>{btns+='<button class="btn" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';});
-                    el('btnArea').innerHTML=btns;
-                }else{el('messages').innerHTML='<div class="card"><div class="info">❌ فشل تحميل الخدمات</div></div>';}
-            }catch(e){el('messages').innerHTML='<div class="card"><div class="info">❌ خطأ في الاتصال</div></div>';}
+            try{const d=await api('/api/services');if(d.success&&d.services){el('messages').innerHTML='<div class="msg">📋 اختر الخدمة:</div>';let btns='';d.services.forEach(s=>{btns+='<button class="btn" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';});el('btnArea').innerHTML=btns;}}catch(e){}
         }
         
         async function loadCountries(key,name){
             cSvc=key;cCty='';cFlag='';save();
-            el('messages').innerHTML='<div class="card"><div class="info">🌐 '+name+'<br>اختر الدولة:</div></div>';
+            el('messages').innerHTML='<div class="msg">🌐 '+name+'<br>اختر الدولة:</div>';
             el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
-            try{
-                const d=await api('/api/countries?service='+key);
-                if(d.success&&d.countries){
-                    let btns='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';
-                    d.countries.forEach(c=>{const cn=cNames[c.name]||c.name;btns+='<button class="btn" onclick="selectCountry(\''+c.name+'\',\''+(c.flag||'')+'\')">'+(c.flag||'')+' '+cn+' ('+c.count+')</button>';});
-                    el('btnArea').innerHTML=btns;
-                }else{el('btnArea').innerHTML='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';}
-            }catch(e){}
+            try{const d=await api('/api/countries?service='+key);if(d.success&&d.countries){let btns='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';d.countries.forEach(c=>{const cn=cNames[c.name]||c.name;btns+='<button class="btn" onclick="selectCountry(\''+c.name+'\',\''+(c.flag||'')+'\')">'+(c.flag||'')+' '+cn+' ('+c.count+')</button>';});el('btnArea').innerHTML=btns;}}catch(e){}
         }
         
         function selectCountry(country,flag){cCty=country;cFlag=flag;save();showNumbers(country,flag);}
         
         async function showNumbers(country,flag){
             const cn=cNames[country]||country;
-            el('messages').innerHTML='<div class="card"><div class="info">🌍 '+flag+' '+cn+'<br>⏳ جاري جلب الأرقام...</div></div>';
+            el('messages').innerHTML='<div class="msg">🌍 '+flag+' '+cn+'<br>⏳ جاري جلب الأرقام...</div>';
             el('btnArea').innerHTML='';
             try{
                 const d=await api('/api/otp?count=200');
                 if(Array.isArray(d)){
                     let flt=d.filter(i=>i.length>4&&i[4]&&String(i[4]).trim().toUpperCase()===String(country).trim().toUpperCase());
                     if(flt.length===0)flt=d.filter(i=>i[0]&&String(i[0]).toLowerCase().includes(String(cSvc).toLowerCase()));
-                    if(flt.length===0)flt=d.slice(0,20);
-                    let nums=[...new Set(flt.map(i=>i[1]))].slice(0,20);
-                    let html='';
+                    if(flt.length===0)flt=d.slice(0,30);
+                    
+                    let nums=[...new Set(flt.map(i=>i[1]))].slice(0,30);
+                    let html='<div class="grid">';
                     nums.forEach(num=>{
                         const found=flt.find(i=>i[1]===num);
                         const cd=found&&found[2]?found[2].match(/\d{4,8}/)?.[0]||'---':'---';
-                        html+='<div class="card" onclick="copyText(\''+num+'\')"><span class="flag">'+flag+'</span><div class="info"><span class="num">'+num+'</span><br><span class="code">'+cd+'</span></div><span class="arrow">📋</span></div>';
+                        const svc=found?found[0]:'';
+                        html+='<div class="num-card" onclick="copyText(\''+num+'\')"><span class="flag">'+flag+'</span><span class="svc">'+svc+'</span><span class="number">'+num+'</span><span class="code">'+cd+'</span></div>';
                     });
-                    el('messages').innerHTML=html||'<div class="card"><div class="info">❌ لا توجد أرقام</div></div>';
-                    el('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="showNumbers(\''+country+'\',\''+flag+'\')">🔄 تحديث</button><button class="btn" onclick="loadCountries(\''+cSvc+'\')">🔙 دول</button></div>';
+                    html+='</div>';
+                    el('messages').innerHTML=html||'<div class="msg">❌ لا توجد أرقام</div>';
+                    el('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="showNumbers(\''+country+'\',\''+flag+'\')">🔄 تحديث</button><button class="btn" onclick="loadCountries(\''+cSvc+'\')">🔙 دول</button><button class="btn" onclick="loadServices()">🌍 خدمات</button></div>';
                 }
             }catch(e){el('btnArea').innerHTML='<button class="btn" onclick="showNumbers(\''+country+'\',\''+flag+'\')">❌ إعادة</button>';}
         }
