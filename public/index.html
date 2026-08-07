@@ -7,8 +7,10 @@ body{background:#000;color:#0f0;min-height:100vh}
 body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,0.03) 2px,rgba(0,255,0,0.03) 4px);pointer-events:none;animation:scan 6s linear infinite}
 @keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
 .app{max-width:500px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
-.header{text-align:center;padding:20px 0;border-bottom:2px solid #0f0;margin-bottom:15px}
+.header{text-align:center;padding:20px 0;border-bottom:2px solid #0f0;margin-bottom:10px}
 .header h1{font-size:26px;letter-spacing:3px;text-shadow:0 0 10px #0f0}
+.search-box{width:100%;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:14px;font-family:'Courier New',monospace;border-radius:8px;margin-bottom:15px;outline:none}
+.search-box:focus{border-color:#0f0}
 .card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in 0.2s}
 .card:hover{border-color:#0f0}
 @keyframes in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
@@ -18,12 +20,13 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .card .prefix{color:#0ff;font-size:11px}
 .card .code{font-size:30px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0}
 .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
+.hidden{display:none}
 </style></head>
 <body>
-<div class="app"><div class="header"><h1>⬢ OTP LIVE</h1></div><div id="cards"></div><div class="stats" id="stats">⬢ 0 codes</div></div>
+<div class="app"><div class="header"><h1>⬢ OTP LIVE</h1></div><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><div id="cards"></div><div class="stats" id="stats">⬢ 0 codes</div></div>
 <script>
 var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
-var known={},c=0;
+var known={},c=0,allCards=[];
 var flags={AF:'🇦🇫',AL:'🇦🇱',DZ:'🇩🇿',AR:'🇦🇷',AM:'🇦🇲',AU:'🇦🇺',AT:'🇦🇹',AZ:'🇦🇿',BH:'🇧🇭',BD:'🇧🇩',BY:'🇧🇾',BE:'🇧🇪',BJ:'🇧🇯',BO:'🇧🇴',BA:'🇧🇦',BR:'🇧🇷',BG:'🇧🇬',BF:'🇧🇫',KH:'🇰🇭',CM:'🇨🇲',CA:'🇨🇦',TD:'🇹🇩',CL:'🇨🇱',CN:'🇨🇳',CO:'🇨🇴',CG:'🇨🇬',CD:'🇨🇩',CR:'🇨🇷',CI:'🇨🇮',HR:'🇭🇷',CU:'🇨🇺',CY:'🇨🇾',CZ:'🇨🇿',DK:'🇩🇰',DO:'🇩🇴',EC:'🇪🇨',EG:'🇪🇬',SV:'🇸🇻',EE:'🇪🇪',ET:'🇪🇹',FI:'🇫🇮',FR:'🇫🇷',GA:'🇬🇦',GE:'🇬🇪',DE:'🇩🇪',GH:'🇬🇭',GR:'🇬🇷',GT:'🇬🇹',GN:'🇬🇳',HT:'🇭🇹',HN:'🇭🇳',HK:'🇭🇰',HU:'🇭🇺',IS:'🇮🇸',IN:'🇮🇳',ID:'🇮🇩',IR:'🇮🇷',IQ:'🇮🇶',IE:'🇮🇪',IL:'🇮🇱',IT:'🇮🇹',JM:'🇯🇲',JP:'🇯🇵',JO:'🇯🇴',KZ:'🇰🇿',KE:'🇰🇪',KW:'🇰🇼',KG:'🇰🇬',LA:'🇱🇦',LV:'🇱🇻',LB:'🇱🇧',LY:'🇱🇾',LT:'🇱🇹',LU:'🇱🇺',MG:'🇲🇬',MY:'🇲🇾',ML:'🇲🇱',MX:'🇲🇽',MD:'🇲🇩',MA:'🇲🇦',MZ:'🇲🇿',MM:'🇲🇲',NP:'🇳🇵',NL:'🇳🇱',NZ:'🇳🇿',NI:'🇳🇮',NE:'🇳🇪',NG:'🇳🇬',KP:'🇰🇵',NO:'🇳🇴',OM:'🇴🇲',PK:'🇵🇰',PA:'🇵🇦',PY:'🇵🇾',PE:'🇵🇪',PH:'🇵🇭',PL:'🇵🇱',PT:'🇵🇹',QA:'🇶🇦',RO:'🇷🇴',RU:'🇷🇺',RW:'🇷🇼',SA:'🇸🇦',SN:'🇸🇳',RS:'🇷🇸',SG:'🇸🇬',SK:'🇸🇰',SI:'🇸🇮',SO:'🇸🇴',ZA:'🇿🇦',KR:'🇰🇷',ES:'🇪🇸',LK:'🇱🇰',SD:'🇸🇩',SE:'🇸🇪',CH:'🇨🇭',SY:'🇸🇾',TW:'🇹🇼',TJ:'🇹🇯',TZ:'🇹🇿',TH:'🇹🇭',TG:'🇹🇬',TN:'🇹🇳',TR:'🇹🇷',TM:'🇹🇲',UG:'🇺🇬',UA:'🇺🇦',AE:'🇦🇪',GB:'🇬🇧',US:'🇺🇸',UY:'🇺🇾',UZ:'🇺🇿',VE:'🇻🇪',VN:'🇻🇳',YE:'🇾🇪',ZM:'🇿🇲',ZW:'🇿🇼'};
 
 function extractCode(txt){
@@ -38,11 +41,25 @@ function add(i){
     var ct=(i[4]||'').trim();
     var flag=flags[ct]||'🌍';
     var prefix=i[1]?i[1].substring(0,7):'';
-    var html='<div class="card" onclick="navigator.clipboard.writeText(\''+code+'\')"><span class="flag">'+flag+'</span><div class="info"><div class="phone">📱 +'+i[1]+'</div><div class="prefix">🆔 Prefix: '+prefix+'</div><div class="code">'+code+'</div></div></div>';
-    document.getElementById('cards').innerHTML=html+document.getElementById('cards').innerHTML;
+    var html='<div class="card" data-search="'+i[1]+' '+code+'" onclick="navigator.clipboard.writeText(\''+code+'\')"><span class="flag">'+flag+'</span><div class="info"><div class="phone">📱 +'+i[1]+'</div><div class="prefix">🆔 Prefix: '+prefix+'</div><div class="code">'+code+'</div></div></div>';
+    allCards.unshift({html:html,search:i[1]+' '+code});
+    renderCards();
     c++;
     document.getElementById('stats').textContent='⬢ '+c+' codes';
 }
+
+function renderCards(){
+    var q=(document.getElementById('search').value||'').toLowerCase();
+    var html='';
+    for(var i=0;i<allCards.length;i++){
+        if(!q||allCards[i].search.toLowerCase().indexOf(q)>=0){
+            html+=allCards[i].html;
+        }
+    }
+    document.getElementById('cards').innerHTML=html;
+}
+
+function filter(){renderCards();}
 
 function go(){
     fetch(PROXY+'/api/otp?count=10')
