@@ -13,47 +13,51 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;animation:in 0.2s}
 .card:hover{border-color:#0f0}
 @keyframes in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.card .flag{font-size:32px;min-width:40px;text-align:center}
+.card .flag{font-size:32px;min-width:45px;text-align:center}
 .card .info{flex:1}
-.card .num{color:#fff;font-weight:bold;font-size:20px;direction:ltr}
-.card .meta{color:#0ff;font-size:10px}
-.card .code{font-size:28px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0}
+.card .phone{color:#fff;font-weight:bold;font-size:16px;direction:ltr}
+.card .prefix{color:#0ff;font-size:11px}
+.card .code{font-size:30px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0}
 .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
 </style></head>
 <body>
-<div class="app"><div class="header"><h1>⬢ OTP LIVE</h1></div><div class="list" id="list"></div><div class="stats" id="stats">⬢ 0</div></div>
+<div class="app"><div class="header"><h1>⬢ OTP LIVE</h1></div><div class="list" id="list"></div><div class="stats" id="stats">⬢ 0 codes</div></div>
 <script>
 var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
 var known={},c=0;
-var flags={MZ:'🇲🇿',TG:'🇹🇬',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',UA:'🇺🇦',QA:'🇶🇦',TJ:'🇹🇯',HT:'🇭🇹',ID:'🇮🇩'};
-var cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
+var flags={MZ:'🇲🇿',TG:'🇹🇬',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',UA:'🇺🇦',QA:'🇶🇦',TJ:'🇹🇯',HT:'🇭🇹',ID:'🇮🇩',LB:'🇱🇧'};
+var cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا',LB:'لبنان'};
+
+function extractCode(txt){
+    var m=txt.match(/\d{3,8}[-.\s]?\d{3,8}/);
+    if(m)return m[0];
+    m=txt.match(/\d{4,8}/);
+    return m?m[0]:txt.substring(0,15);
+}
 
 function add(i){
-    console.log('Adding:',i);
-    var full=i[2]||'';
-    var match=full.match(/\d{4,8}/);
-    var code=match?match[0]:full.substring(0,20);
+    var code=extractCode(i[2]||'');
     var ct=(i[4]||'').trim();
     var flag=flags[ct]||'🌍';
     var cName=cNames[ct]||ct;
+    var prefix=i[1]?i[1].substring(0,7):'';
     
     var div=document.createElement('div');
     div.className='card';
     div.onclick=function(){navigator.clipboard.writeText(code);};
-    div.innerHTML='<span class="flag">'+flag+'</span><div class="info"><div class="meta">'+i[0]+' · '+cName+'</div><div class="num">+'+i[1]+'</div><div class="code">'+code+'</div></div>';
+    div.innerHTML='<span class="flag">'+flag+'</span><div class="info"><div class="phone">📱 +'+i[1]+'</div><div class="prefix">🆔 Prefix: '+prefix+'</div><div class="code">'+code+'</div></div>';
     
     var list=document.getElementById('list');
     if(list.firstChild){list.insertBefore(div,list.firstChild);}
     else{list.appendChild(div);}
     c++;
-    document.getElementById('stats').textContent='⬢ '+c;
+    document.getElementById('stats').textContent='⬢ '+c+' codes';
 }
 
 function go(){
     fetch(PROXY+'/api/otp?count=10')
     .then(function(r){return r.json();})
     .then(function(d){
-        console.log('Got:',d.length,'items');
         if(Array.isArray(d)){
             d.forEach(function(i){
                 var k=i[1]+'-'+i[2];
@@ -64,7 +68,7 @@ function go(){
             });
         }
     })
-    .catch(function(e){console.log('Error:',e);});
+    .catch(function(e){console.log(e);});
 }
 
 go();
