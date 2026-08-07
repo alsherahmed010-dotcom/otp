@@ -23,23 +23,29 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .card .prefix{color:#0ff;font-size:11px}
 .card .code{font-size:30px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0}
 .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
-.stats-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
-.stat-card{flex:1;min-width:100px;background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:12px;text-align:center}
-.stat-card .svc{color:#f00;font-weight:bold;font-size:12px}
-.stat-card .flag{font-size:28px}
-.stat-card .cty{color:#0ff;font-size:10px}
-.stat-card .cnt{color:#ff0;font-size:11px}
+.best-section{margin-bottom:15px}
+.best-section h3{color:#ff0;margin-bottom:8px;text-shadow:0 0 10px #ff0}
+.best-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.best-tag{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:6px;padding:6px 10px;font-size:11px;display:flex;align-items:center;gap:4px}
+.best-tag .f{font-size:18px}
+.best-tag .c{color:#0ff}
+.best-tag .n{color:#ff0}
 .back-btn{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:8px 16px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;cursor:pointer;margin-bottom:15px;display:inline-block}
 .back-btn:hover{background:#0f0;color:#000}
-.hidden{display:none}
 </style></head>
 <body>
-<div class="app" id="app"></div>
+<div class="app">
+<div class="header"><h1>⬢ OTP LIVE</h1></div>
+<div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="toggleBest()">🏆 تحليل</button></div>
+<div class="best-section hidden" id="bestSection"></div>
+<div id="cards"></div>
+<div class="stats" id="stats">⬢ 0 codes</div>
+</div>
 <script>
 var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
-var known={},c=0,allCards=[],page='main';
+var known={},c=0,allCards=[],showBest=false;
 var flags={AF:'🇦🇫',AL:'🇦🇱',DZ:'🇩🇿',AR:'🇦🇷',AM:'🇦🇲',AU:'🇦🇺',AT:'🇦🇹',AZ:'🇦🇿',BH:'🇧🇭',BD:'🇧🇩',BY:'🇧🇾',BE:'🇧🇪',BJ:'🇧🇯',BO:'🇧🇴',BA:'🇧🇦',BR:'🇧🇷',BG:'🇧🇬',BF:'🇧🇫',KH:'🇰🇭',CM:'🇨🇲',CA:'🇨🇦',TD:'🇹🇩',CL:'🇨🇱',CN:'🇨🇳',CO:'🇨🇴',CG:'🇨🇬',CD:'🇨🇩',CR:'🇨🇷',CI:'🇨🇮',HR:'🇭🇷',CU:'🇨🇺',CY:'🇨🇾',CZ:'🇨🇿',DK:'🇩🇰',DO:'🇩🇴',EC:'🇪🇨',EG:'🇪🇬',SV:'🇸🇻',EE:'🇪🇪',ET:'🇪🇹',FI:'🇫🇮',FR:'🇫🇷',GA:'🇬🇦',GE:'🇬🇪',DE:'🇩🇪',GH:'🇬🇭',GR:'🇬🇷',GT:'🇬🇹',GN:'🇬🇳',HT:'🇭🇹',HN:'🇭🇳',HK:'🇭🇰',HU:'🇭🇺',IS:'🇮🇸',IN:'🇮🇳',ID:'🇮🇩',IR:'🇮🇷',IQ:'🇮🇶',IE:'🇮🇪',IL:'🇮🇱',IT:'🇮🇹',JM:'🇯🇲',JP:'🇯🇵',JO:'🇯🇴',KZ:'🇰🇿',KE:'🇰🇪',KW:'🇰🇼',KG:'🇰🇬',LA:'🇱🇦',LV:'🇱🇻',LB:'🇱🇧',LY:'🇱🇾',LT:'🇱🇹',LU:'🇱🇺',MG:'🇲🇬',MY:'🇲🇾',ML:'🇲🇱',MX:'🇲🇽',MD:'🇲🇩',MA:'🇲🇦',MZ:'🇲🇿',MM:'🇲🇲',NP:'🇳🇵',NL:'🇳🇱',NZ:'🇳🇿',NI:'🇳🇮',NE:'🇳🇪',NG:'🇳🇬',KP:'🇰🇵',NO:'🇳🇴',OM:'🇴🇲',PK:'🇵🇰',PA:'🇵🇦',PY:'🇵🇾',PE:'🇵🇪',PH:'🇵🇭',PL:'🇵🇱',PT:'🇵🇹',QA:'🇶🇦',RO:'🇷🇴',RU:'🇷🇺',RW:'🇷🇼',SA:'🇸🇦',SN:'🇸🇳',RS:'🇷🇸',SG:'🇸🇬',SK:'🇸🇰',SI:'🇸🇮',SO:'🇸🇴',ZA:'🇿🇦',KR:'🇰🇷',ES:'🇪🇸',LK:'🇱🇰',SD:'🇸🇩',SE:'🇸🇪',CH:'🇨🇭',SY:'🇸🇾',TW:'🇹🇼',TJ:'🇹🇯',TZ:'🇹🇿',TH:'🇹🇭',TG:'🇹🇬',TN:'🇹🇳',TR:'🇹🇷',TM:'🇹🇲',UG:'🇺🇬',UA:'🇺🇦',AE:'🇦🇪',GB:'🇬🇧',US:'🇺🇸',UY:'🇺🇾',UZ:'🇺🇿',VE:'🇻🇪',VN:'🇻🇳',YE:'🇾🇪',ZM:'🇿🇲',ZW:'🇿🇼'};
-var cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا',LB:'لبنان',AM:'أرمينيا'};
+var cNames={TG:'توجو',LB:'لبنان',UA:'أوكرانيا',AM:'أرمينيا',MZ:'موزمبيق',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
 
 function extractCode(txt){
     var m=txt.match(/\d{3,8}[-.\s]?\d{3,8}/);
@@ -47,20 +53,6 @@ function extractCode(txt){
     m=txt.match(/\d{4,8}/);
     return m?m[0]:txt.substring(0,15);
 }
-
-function renderMain(){
-    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE</h1></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showBest()">🏆 أفضل الدول</button></div><div id="cards"></div><div class="stats" id="stats">⬢ 0 codes</div>';
-    page='main';
-    renderCards();
-}
-
-function renderBest(){
-    document.getElementById('app').innerHTML='<div class="header"><h1>🏆 أفضل الدول لكل خدمة</h1></div><button class="back-btn" onclick="renderMain()">← رجوع</button><div id="bestCards">⏳ جاري التحميل...</div>';
-    page='best';
-    loadBest();
-}
-
-function showBest(){renderBest();}
 
 function add(i){
     var code=extractCode(i[2]||'');
@@ -74,7 +66,6 @@ function add(i){
 }
 
 function renderCards(){
-    if(page!=='main')return;
     var q=(document.getElementById('search')?document.getElementById('search').value:'').toLowerCase();
     var html='';
     for(var i=0;i<allCards.length;i++){
@@ -85,27 +76,49 @@ function renderCards(){
 
 function filter(){renderCards();}
 
-function loadBest(){
-    fetch(PROXY+'/api/otp?count=100')
+function toggleBest(){
+    showBest=!showBest;
+    var sec=document.getElementById('bestSection');
+    if(showBest){
+        sec.classList.remove('hidden');
+        loadAnalysis();
+    }else{
+        sec.classList.add('hidden');
+    }
+}
+
+function loadAnalysis(){
+    fetch(PROXY+'/api/otp?count=200')
     .then(function(r){return r.json();})
     .then(function(d){
         if(!Array.isArray(d))return;
-        var svcCountries={};
-        d.forEach(function(i){
-            var svc=i[0];var ct=(i[4]||'').trim();
-            if(!svcCountries[svc])svcCountries[svc]={};
-            if(!svcCountries[svc][ct])svcCountries[svc][ct]=0;
-            svcCountries[svc][ct]++;
+        
+        // واتساب فقط
+        var wa=d.filter(function(i){return i[0].toLowerCase().indexOf('whatsapp')>=0;});
+        
+        // أفضل الدول
+        var countries={},prefixes={};
+        wa.forEach(function(i){
+            var ct=(i[4]||'').trim();if(ct)countries[ct]=(countries[ct]||0)+1;
+            var p=i[1].substring(0,7);prefixes[p]=(prefixes[p]||0)+1;
         });
-        var html='';
-        for(var svc in svcCountries){
-            var best='',max=0;
-            for(var ct in svcCountries[svc]){
-                if(svcCountries[svc][ct]>max){max=svcCountries[svc][ct];best=ct;}
-            }
-            html+='<div class="stat-card"><div class="svc">'+svc+'</div><div class="flag">'+(flags[best]||'🌍')+'</div><div class="cty">'+(cNames[best]||best)+'</div><div class="cnt">'+max+' أرقام</div></div>';
+        var topC=[],topP=[];
+        for(var k in countries)topC.push([k,countries[k]]);
+        for(var k in prefixes)topP.push([k,prefixes[k]]);
+        topC.sort(function(a,b){return b[1]-a[1];});
+        topP.sort(function(a,b){return b[1]-a[1];});
+        topC=topC.slice(0,5);topP=topP.slice(0,10);
+        
+        var html='<h3>🌍 أفضل الدول لـ WhatsApp</h3><div class="best-row">';
+        for(var i=0;i<topC.length;i++){
+            html+='<span class="best-tag"><span class="f">'+(flags[topC[i][0]]||'🌍')+'</span><span class="c">'+(cNames[topC[i][0]]||topC[i][0])+'</span><span class="n">'+topC[i][1]+'</span></span>';
         }
-        document.getElementById('bestCards').innerHTML='<div class="stats-row">'+html+'</div>';
+        html+='</div><h3>📱 أفضل النطاقات لـ WhatsApp</h3><div class="best-row">';
+        for(var i=0;i<topP.length;i++){
+            html+='<span class="best-tag"><span class="n">'+topP[i][0]+'</span><span class="c">→ '+topP[i][1]+'</span></span>';
+        }
+        html+='</div>';
+        document.getElementById('bestSection').innerHTML=html;
     });
 }
 
@@ -122,7 +135,6 @@ function go(){
     });
 }
 
-renderMain();
 go();
 setInterval(go,2000);
 </script>
