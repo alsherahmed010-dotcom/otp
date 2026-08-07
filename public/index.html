@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>OTP LIVE</title>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>OTP HUB</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
 body{background:#000;color:#0f0;min-height:100vh}
@@ -25,34 +25,37 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
 .back-btn{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:8px 16px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;cursor:pointer;margin-bottom:15px;display:inline-block}
 .back-btn:hover{background:#0f0;color:#000}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.num-card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer}
-.num-card:hover{border-color:#0f0}
-.num-card:active{transform:scale(0.96)}
-.num-card .flag{font-size:24px}
-.num-card .num{color:#fff;font-weight:bold;font-size:12px;direction:ltr;word-break:break-all}
-.num-card .code{background:#000;border:1px solid #ff0;color:#ff0;padding:2px 6px;border-radius:4px;font-weight:bold;font-size:13px;direction:ltr;display:inline-block;margin-top:4px}
-.tag{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:12px;text-align:center;cursor:pointer;font-size:14px}
+.grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.num-box{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;text-align:center;cursor:pointer}
+.num-box:hover{border-color:#0f0}
+.num-box .flag{font-size:28px}
+.num-box .svc{color:#f00;font-size:10px}
+.num-box .num{color:#fff;font-weight:bold;font-size:18px;direction:ltr}
+.num-box .code{background:#000;border:1px solid #ff0;color:#ff0;padding:4px 10px;border-radius:4px;font-weight:bold;font-size:16px;direction:ltr;display:inline-block;margin-top:6px}
+.tag{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:12px;text-align:center;cursor:pointer;font-size:14px;display:inline-block;margin:4px}
 .tag:hover{border-color:#0f0}
 .tag .name{color:#fff;font-weight:bold}
 .tag .count{color:#ff0;font-size:12px}
-.dl-btn{background:#0a0a0a;border:1px solid #ff0;color:#ff0;padding:8px 14px;font-size:12px;font-family:'Courier New',monospace;border-radius:6px;cursor:pointer;margin-left:8px}
-.dl-btn:hover{background:#ff0;color:#000}
+.btn-row{display:flex;gap:8px;margin-top:10px}
+.btn-row .btn-sm{flex:1}
 </style></head>
 <body>
 <div class="app" id="app"></div>
 <script>
 var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
-var known={},c=0,allCards=[],page='main',allData=[];
+var known={},c=0,allCards=[],page='main';
+var myNums=JSON.parse(localStorage.getItem('myNumbers')||'[]');
+var savedSvc=localStorage.getItem('savedSvc')||'';
+var savedCty=localStorage.getItem('savedCty')||'';
 var flags={TG:'🇹🇬',LB:'🇱🇧',UA:'🇺🇦',AM:'🇦🇲',MZ:'🇲🇿',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',ID:'🇮🇩'};
 var cNames={TG:'توجو',LB:'لبنان',UA:'أوكرانيا',AM:'أرمينيا',MZ:'موزمبيق',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',ID:'إندونيسيا'};
 
+function saveNums(){localStorage.setItem('myNumbers',JSON.stringify(myNums));}
 function extractCode(txt){var m=txt.match(/\d{3,8}[-.\s]?\d{3,8}/);if(m)return m[0];m=txt.match(/\d{4,8}/);return m?m[0]:txt.substring(0,15);}
 
 function add(i){
     var code=extractCode(i[2]||'');var ct=(i[4]||'').trim();var flag=flags[ct]||'🌍';var prefix=i[1]?i[1].substring(0,7):'';
     allCards.unshift({html:'<div class="card" onclick="navigator.clipboard.writeText(\''+code+'\')"><span class="flag">'+flag+'</span><div class="info"><div class="phone">📱 +'+i[1]+'</div><div class="prefix">🆔 Prefix: '+prefix+'</div><div class="code">'+code+'</div></div></div>',search:i[1]+' '+code});
-    allData.push(i);
     if(page==='main'){renderCards();}
     c++;var s=document.getElementById('stats');if(s)s.textContent='⬢ '+c+' codes';
 }
@@ -66,7 +69,7 @@ function filter(){renderCards();}
 
 function showMain(){
     page='main';
-    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE</h1></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showServices()">📱 أرقام</button><button class="btn-sm" onclick="showAnalysis()">🏆 تحليل</button></div><div id="cards"></div><div class="stats" id="stats">⬢ '+c+' codes</div>';
+    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE</h1></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showNumbers()">📱 أرقام</button><button class="btn-sm" onclick="showAnalysis()">🏆 تحليل</button></div><div id="cards"></div><div class="stats" id="stats">⬢ '+c+' codes</div>';
     renderCards();
 }
 
@@ -84,53 +87,70 @@ function showAnalysis(){
     });
 }
 
-function showServices(){
+// صفحة الأرقام - خدمات ← دول ← 4 أرقام
+function showNumbers(){
     page='services';
-    document.getElementById('app').innerHTML='<div class="header"><h1>📱 الخدمات</h1></div><button class="back-btn" onclick="showMain()">← رجوع</button><div id="content">⏳ جاري التحميل...</div>';
-    fetch(PROXY+'/api/otp?count=200').then(function(r){return r.json();}).then(function(d){
-        if(!Array.isArray(d))return;
-        var svcs={};d.forEach(function(i){svcs[i[0]]=(svcs[i[0]]||0)+1;});
-        var html='<div style="display:flex;flex-wrap:wrap;gap:8px">';
-        for(var svc in svcs){html+='<div class="tag" onclick="showCountries(\''+svc+'\')"><div class="name">'+svc+'</div><div class="count">'+svcs[svc]+'</div></div>';}
-        html+='</div>';document.getElementById('content').innerHTML=html;
+    document.getElementById('app').innerHTML='<div class="header"><h1>📱 الأرقام</h1></div><button class="back-btn" onclick="showMain()">← رجوع</button><div id="content">⏳ جاري التحميل...</div>';
+    fetch(PROXY+'/api/services').then(function(r){return r.json();}).then(function(d){
+        if(!d.success)return;
+        var html='';d.services.forEach(function(s){html+='<div class="tag" onclick="showCountries(\''+s.key+'\',\''+s.name+'\')"><div class="name">'+s.name+'</div><div class="count">'+s.count+'</div></div>';});
+        document.getElementById('content').innerHTML=html;
     });
 }
 
-function showCountries(svc){
-    page='countries';
-    document.getElementById('app').innerHTML='<div class="header"><h1>🌍 '+svc+'</h1></div><button class="back-btn" onclick="showServices()">← خدمات</button><div id="content">⏳ جاري التحميل...</div>';
-    fetch(PROXY+'/api/otp?count=200').then(function(r){return r.json();}).then(function(d){
-        if(!Array.isArray(d))return;
-        var flt=d.filter(function(i){return i[0]===svc;});
-        var countries={};flt.forEach(function(i){var ct=(i[4]||'').trim();if(ct)countries[ct]=(countries[ct]||0)+1;});
-        var top=[];for(var k in countries)top.push([k,countries[k]]);top.sort(function(a,b){return b[1]-a[1];});
-        var html='<div style="display:flex;flex-wrap:wrap;gap:8px">';
-        for(var i=0;i<top.length;i++){html+='<div class="tag" onclick="showNumbers(\''+top[i][0]+'\')"><div style="font-size:24px">'+(flags[top[i][0]]||'🌍')+'</div><div class="name">'+(cNames[top[i][0]]||top[i][0])+'</div><div class="count">'+top[i][1]+'</div></div>';}
-        html+='</div>';document.getElementById('content').innerHTML=html;
+function showCountries(key,name){
+    localStorage.setItem('savedSvc',key);
+    document.getElementById('app').innerHTML='<div class="header"><h1>🌍 '+name+'</h1></div><button class="back-btn" onclick="showNumbers()">← خدمات</button><div id="content">⏳ جاري التحميل...</div>';
+    fetch(PROXY+'/api/countries?service='+key).then(function(r){return r.json();}).then(function(d){
+        if(!d.success)return;
+        var html='';d.countries.forEach(function(c){html+='<div class="tag" onclick="showCountryNums(\''+c.name+'\',\''+(c.flag||'')+'\',\''+name+'\')"><div style="font-size:24px">'+(c.flag||'🌍')+'</div><div class="name">'+(cNames[c.name]||c.name)+'</div><div class="count">'+c.count+'</div></div>';});
+        document.getElementById('content').innerHTML=html;
     });
 }
 
-function showNumbers(country){
-    page='numbers';
-    document.getElementById('app').innerHTML='<div class="header"><h1>'+ (flags[country]||'🌍') +' '+(cNames[country]||country)+'</h1></div><button class="back-btn" onclick="showServices()">← خدمات</button><button class="dl-btn" onclick="downloadCountry(\''+country+'\')">📥 تحميل</button><div id="content">⏳ جاري التحميل...</div>';
-    fetch(PROXY+'/api/otp?count=200').then(function(r){return r.json();}).then(function(d){
-        if(!Array.isArray(d))return;
-        var nums=d.filter(function(i){return (i[4]||'').trim()===country;});
-        var html='<h3 style="color:#ff0;margin-bottom:10px">📱 '+nums.length+' أرقام</h3><div class="grid3">';
-        nums.forEach(function(i){
-            var code=extractCode(i[2]||'');
-            html+='<div class="num-card" onclick="navigator.clipboard.writeText(\''+code+'\')"><div class="flag">'+(flags[country]||'🌍')+'</div><div class="num">+'+i[1]+'</div><div class="code">'+code+'</div></div>';
+function showCountryNums(country,flag,svc){
+    localStorage.setItem('savedCty',country);
+    document.getElementById('app').innerHTML='<div class="header"><h1>'+flag+' '+(cNames[country]||country)+'</h1></div><button class="back-btn" onclick="showCountries(\''+svc+'\',\''+svc+'\')">← دول</button><div id="content">⏳ جاري جلب الأرقام...</div><div id="codes"></div>';
+    fetchNums(country,svc);
+}
+
+function fetchNums(country,svc){
+    var promises=[];
+    for(var i=0;i<4;i++){
+        promises.push(fetch(PROXY+'/api/request_number',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:svc,country:country})}).then(function(r){return r.json();}));
+    }
+    Promise.all(promises).then(function(results){
+        var newNums=[];
+        var html='<div class="grid4">';
+        results.forEach(function(d){
+            if(d.success&&d.number){
+                newNums.push({num:d.number,country:country,flag:d.flag||flag,svc:svc,code:''});
+                html+='<div class="num-box" onclick="navigator.clipboard.writeText(\''+d.number+'\')"><div class="flag">'+(d.flag||flag||'🌍')+'</div><div class="svc">'+svc+'</div><div class="num">+'+d.number+'</div><div class="code" id="code_'+d.number+'">---</div></div>';
+            }
         });
-        html+='</div>';document.getElementById('content').innerHTML=html;
+        html+='</div>';
+        html+='<div class="btn-row"><button class="btn-sm" onclick="showCountryNums(\''+country+'\',\''+flag+'\',\''+svc+'\')">🔄 تغيير</button><button class="btn-sm" onclick="fetchCodes(\''+country+'\')">📩 جلب الأكواد</button></div>';
+        document.getElementById('content').innerHTML=html;
+        // حفظ الأرقام
+        newNums.forEach(function(n){myNums.push(n);});
+        saveNums();
     });
 }
 
-function downloadCountry(country){
-    var nums=allData.filter(function(i){return (i[4]||'').trim()===country;});
-    var txt='Country: '+country+'\n==========\n\n';
-    nums.forEach(function(i){txt+=i[0]+' | +'+i[1]+' | '+extractCode(i[2]||'')+'\n';});
-    var blob=new Blob([txt],{type:'text/plain'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='country_'+country+'.txt';a.click();
+function fetchCodes(country){
+    fetch(PROXY+'/api/otp?count=50').then(function(r){return r.json();}).then(function(d){
+        if(!Array.isArray(d))return;
+        var flt=d.filter(function(i){return i[4]&&i[4].trim()===country;});
+        flt.forEach(function(i){
+            var code=extractCode(i[2]||'');
+            var el=document.getElementById('code_'+i[1]);
+            if(el)el.textContent=code;
+        });
+    });
 }
+
+// تحميل الأرقام المحفوظة
+if(savedSvc&&savedCty){page='numbers';}
 
 function go(){
     fetch(PROXY+'/api/otp?count=10').then(function(r){return r.json();}).then(function(d){if(Array.isArray(d)){d.forEach(function(i){var k=i[1]+'-'+i[2];if(!known[k]){known[k]=true;add(i);}});}});
