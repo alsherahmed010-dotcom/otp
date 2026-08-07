@@ -7,44 +7,40 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <style>
-        :root{--bg:#0e1621;--surface:#17212b;--card:#182533;--blue:#2b5278;--gold:#f59e0b;--green:#10b981;--text:#fff;--text2:#94a3b8}
+        :root{--bg:#0e1621;--surface:#17212b;--card:#182533;--blue:#2563eb;--gold:#f59e0b;--green:#16a34a;--red:#ef4444;--text:#fff;--text2:#94a3b8}
         *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,sans-serif}
-        body{background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:center;min-height:100vh}
-        .app{width:100%;max-width:500px;height:100vh;background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
-        .h{background:#242f3d;padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.05);min-height:55px}
-        .h .back{color:#fff;font-size:20px;cursor:pointer;width:30px}
-        .h .av{width:40px;height:40px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0}
+        body{background:var(--bg);color:var(--text);min-height:100vh}
+        .app{max-width:600px;margin:0 auto;background:var(--surface);min-height:100vh;display:flex;flex-direction:column}
+        .h{background:#242f3d;padding:14px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.05)}
+        .h .back{color:#fff;font-size:22px;cursor:pointer}
+        .h .av{width:44px;height:44px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
         .h .info{flex:1}
-        .h .info .n{font-size:15px;font-weight:600;color:#fff}
-        .h .info .s{font-size:12px;color:var(--text2)}
-        .list{flex:1;overflow-y:auto;background:var(--bg)}
-        .row{display:flex;align-items:center;padding:14px 16px;gap:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02)}
-        .row:active{background:rgba(255,255,255,0.03)}
-        .row .av{width:50px;height:50px;font-size:20px}
-        .row .info{flex:1}
-        .row .n{font-size:15px;font-weight:500;color:#fff;margin-bottom:4px}
-        .row .p{font-size:13px;color:var(--text2)}
-        .content{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
-        .msg{background:var(--card);border-radius:12px;padding:12px;font-size:13px;line-height:1.6}
-        .btn{border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;color:#fff;cursor:pointer;text-align:center;background:var(--blue);width:100%;margin-bottom:8px}
-        .btn:active{opacity:0.8}
+        .h .info .n{font-size:17px;font-weight:600;color:#fff}
+        .h .info .s{font-size:13px;color:var(--text2)}
+        .content{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+        .controls{display:flex;gap:8px;flex-wrap:wrap}
+        .controls .btn{flex:1;min-width:100px}
+        .btn{border:none;border-radius:10px;padding:14px 18px;font-size:16px;font-weight:600;cursor:pointer;text-align:center;background:var(--blue);color:#fff;transition:0.2s}
+        .btn:active{opacity:0.8;transform:scale(0.98)}
         .bgreen{background:var(--green)}
-        .bgold{background:var(--gold);color:#000;font-weight:600}
-        .brow{display:flex;gap:8px}
-        .brow .btn{flex:1;margin-bottom:0}
-        .ba{padding:10px;border-top:1px solid rgba(255,255,255,0.05);background:var(--surface);display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto}
-        .footer{background:var(--surface);padding:12px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);color:var(--text2);font-size:13px}
-        .nav{display:flex;background:var(--surface);border-top:1px solid rgba(255,255,255,0.05);padding:8px 0}
-        .ni{flex:1;display:flex;flex-direction:column;align-items:center;color:var(--text2);font-size:11px;cursor:pointer;gap:3px;background:none;border:none}
-        .ni.ac{color:#5288c1}
-        .nic{font-size:20px}
-        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-        .card{background:var(--card);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
-        .card:active{background:#1e3040}
-        .card .flag{font-size:24px}
-        .card .num{color:#60a5fa;font-weight:700;font-size:12px;word-break:break-all;direction:ltr}
-        .card .code{background:var(--gold);color:#000;padding:2px 6px;border-radius:4px;font-weight:700;font-size:11px;direction:ltr}
-        .card .svc{color:#f87171;font-size:9px}
+        .bgold{background:var(--gold);color:#000}
+        .bred{background:var(--red)}
+        .boutline{background:transparent;border:2px solid var(--blue);color:var(--blue)}
+        .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+        .card{background:var(--card);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;transition:0.15s;display:flex;flex-direction:column;align-items:center;gap:6px;border:2px solid transparent}
+        .card:active{background:#1e3040;border-color:var(--blue);transform:scale(0.96)}
+        .card .flag{font-size:30px}
+        .card .num{color:#60a5fa;font-weight:700;font-size:14px;word-break:break-all;direction:ltr}
+        .card .code{background:var(--gold);color:#000;padding:3px 8px;border-radius:5px;font-weight:700;font-size:13px;direction:ltr}
+        .card .svc{color:#f87171;font-size:10px}
+        .codes-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+        .code-card{background:var(--card);border-radius:12px;padding:14px;text-align:center;cursor:pointer}
+        .code-card:active{background:#1e3040}
+        .code-card .big-code{font-size:28px;font-weight:800;color:var(--gold);letter-spacing:3px;direction:ltr}
+        .code-card .num{color:#60a5fa;font-size:13px;direction:ltr}
+        .code-card .flag{font-size:22px}
+        .msg{background:var(--card);border-radius:12px;padding:14px;font-size:15px;line-height:1.6;text-align:center}
+        .footer{background:var(--surface);padding:14px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);color:var(--text2);font-size:14px}
         ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px}
     </style>
 </head>
@@ -55,12 +51,12 @@
         const db=firebase.database();
         const PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
         
-        let S=JSON.parse(localStorage.getItem('otp_v300')||'{}');
+        let S=JSON.parse(localStorage.getItem('otp_big2')||'{}');
         let cur=S.cur||'main',cSvc=S.cSvc||'',cCty=S.cCty||'',cFlag=S.cFlag||'';
         let known=new Set(),otpTimer=null;
         const cNames={MZ:'موزمبيق',TG:'توجو',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',UA:'أوكرانيا',QA:'قطر',TJ:'طاجيكستان',HT:'هايتي',ID:'إندونيسيا'};
         
-        function save(){S={cur,cSvc,cCty,cFlag};localStorage.setItem('otp_v300',JSON.stringify(S));}
+        function save(){S={cur,cSvc,cCty,cFlag};localStorage.setItem('otp_big2',JSON.stringify(S));}
         async function api(p){const r=await fetch(PROXY+p);return await r.json();}
         function el(id){return document.getElementById(id);}
         function copyText(t){navigator.clipboard.writeText(t);}
@@ -68,38 +64,37 @@
         function render(){
             const app=el('app');app.innerHTML='';
             if(cur==='main'){app.innerHTML=mainHTML();}
-            else if(cur==='bot'||cur==='group'){app.innerHTML=chatHTML(cur);bindEvents();}
+            else if(cur==='bot'){app.innerHTML=chatHTML();bindBot();}
+            else if(cur==='group'){app.innerHTML=groupHTML();bindGroup();}
         }
         
         function mainHTML(){
-            return '<div class="screen"><div class="h"><div class="av">✈️</div><div class="info"><div class="n">OTP Live</div><div class="s">Number Panel</div></div></div><div class="list"><div class="row" onclick="openChat(\'bot\')"><div class="av" style="background:#2b5278;">🤖</div><div class="info"><div class="n">🤖 NUMBER BOT</div><div class="p">أرقام وأكواد من كل الدول</div></div></div><div class="row" onclick="openChat(\'group\')"><div class="av" style="background:#2e8b57;">👥</div><div class="info"><div class="n">👥 OTP LIVE</div><div class="p">بث مباشر لأكواد التفعيل</div></div></div></div><div class="nav"><button class="ni ac" onclick="openScreen(\'main\')"><span class="nic">💬</span>محادثات</button></div></div>';
+            return '<div class="h"><div class="av">✈️</div><div class="info"><div class="n">OTP Live</div><div class="s">Number Panel</div></div></div><div class="content"><div class="msg" style="cursor:pointer;" onclick="openChat(\'bot\')">🤖 <b>NUMBER BOT</b><br><small>أرقام وأكواد من كل الدول</small></div><div class="msg" style="cursor:pointer;" onclick="openChat(\'group\')">👥 <b>OTP LIVE</b><br><small>بث مباشر لأكواد التفعيل</small></div></div>';
         }
         
-        function chatHTML(type){
-            const b=type==='bot';
-            return '<div class="screen"><div class="h"><div class="back" onclick="goBack()">←</div><div class="av">'+(b?'🤖':'👥')+'</div><div class="info"><div class="n">'+(b?'🤖 NUMBER BOT':'👥 OTP LIVE')+'</div><div class="s">'+(b?'online':'live')+'</div></div></div><div class="content" id="messages"></div>'+(b?'<div class="ba" id="btnArea"></div>':'<div class="footer">بث مباشر مستمر</div>')+'</div>';
+        function chatHTML(){
+            return '<div class="h"><div class="back" onclick="goMain()">←</div><div class="av">🤖</div><div class="info"><div class="n">🤖 NUMBER BOT</div><div class="s">اختر الخدمة والدولة</div></div></div><div class="content" id="messages"></div><div class="footer" id="btnArea"></div>';
         }
         
-        function bindEvents(){
-            if(cur==='bot'){
-                if(cCty&&cFlag){showNumbers(cCty,cFlag);}
-                else if(cSvc){loadCountries(cSvc);}
-                else{loadServices();}
-            }else if(cur==='group'){
-                el('messages').innerHTML='<div class="msg">📡 جاري تحميل OTP Live...</div>';
-                db.ref('messages').off();db.ref('messages').limitToLast(50).on('child_added',s=>{if(cur==='group')showOTP(s.val());});
-                if(otpTimer)clearInterval(otpTimer);
-                otpTimer=setInterval(fetchOTP,2000);
-                fetchOTP();
-            }
+        function groupHTML(){
+            return '<div class="h"><div class="back" onclick="goMain()">←</div><div class="av">👥</div><div class="info"><div class="n">👥 OTP LIVE</div><div class="s">بث مباشر مستمر</div></div></div><div class="content" id="messages"></div><div class="footer">بث مباشر مستمر لأكواد التفعيل</div>';
         }
         
-        function openScreen(s){cur=s;save();if(otpTimer)clearInterval(otpTimer);render();}
+        function goMain(){cur='main';save();if(otpTimer)clearInterval(otpTimer);render();}
         function openChat(t){cur=t;cSvc='';cCty='';cFlag='';save();render();}
-        function goBack(){
-            if(cCty){cCty='';cFlag='';save();loadCountries(cSvc);}
-            else if(cSvc){cSvc='';save();loadServices();}
-            else{cur='main';save();if(otpTimer)clearInterval(otpTimer);render();}
+        
+        function bindBot(){
+            if(cCty&&cFlag){showNumbers(cCty,cFlag);}
+            else if(cSvc){loadCountries(cSvc);}
+            else{loadServices();}
+        }
+        
+        function bindGroup(){
+            el('messages').innerHTML='<div class="msg">📡 جاري تحميل OTP Live...</div>';
+            db.ref('messages').off();db.ref('messages').limitToLast(50).on('child_added',s=>{if(cur==='group')showOTP(s.val());});
+            if(otpTimer)clearInterval(otpTimer);
+            otpTimer=setInterval(fetchOTP,2000);
+            fetchOTP();
         }
         
         function showOTP(m){
@@ -114,27 +109,27 @@
         }
         
         async function loadServices(){
-            el('messages').innerHTML='<div class="msg">⏳ جاري تحميل الخدمات...</div>';
+            el('messages').innerHTML='<div class="msg">⏳ جاري التحميل...</div>';
             el('btnArea').innerHTML='';
             try{
                 const d=await api('/api/services');
                 if(d.success&&d.services){
-                    el('messages').innerHTML='<div class="msg">📋 اختر الخدمة:</div>';
+                    el('messages').innerHTML='<div class="msg">📋 <b>اختر الخدمة:</b></div>';
                     let btns='';
                     d.services.forEach(s=>{btns+='<button class="btn" onclick="loadCountries(\''+s.key+'\',\''+s.name+'\')">'+s.name+' ('+s.count+')</button>';});
                     el('btnArea').innerHTML=btns;
                 }
-            }catch(e){el('messages').innerHTML='<div class="msg">❌ خطأ في التحميل</div>';}
+            }catch(e){el('messages').innerHTML='<div class="msg">❌ خطأ</div>';}
         }
         
         async function loadCountries(key,name){
             cSvc=key;cCty='';cFlag='';save();
-            el('messages').innerHTML='<div class="msg">🌐 '+name+'<br>اختر الدولة:</div>';
+            el('messages').innerHTML='<div class="msg">🌐 '+name+'<br><b>اختر الدولة:</b></div>';
             el('btnArea').innerHTML='<div style="text-align:center;color:#7d8b99;padding:10px;">جاري التحميل...</div>';
             try{
                 const d=await api('/api/countries?service='+key);
                 if(d.success&&d.countries){
-                    let btns='<button class="btn" onclick="loadServices()">🔙 خدمات</button>';
+                    let btns='<button class="btn boutline" onclick="loadServices()">🔙 خدمات</button>';
                     d.countries.forEach(c=>{const cn=cNames[c.name]||c.name;btns+='<button class="btn" onclick="selectCountry(\''+c.name+'\',\''+(c.flag||'')+'\')">'+(c.flag||'')+' '+cn+' ('+c.count+')</button>';});
                     el('btnArea').innerHTML=btns;
                 }
@@ -164,15 +159,32 @@
                     });
                     html+='</div>';
                     el('messages').innerHTML=html||'<div class="msg">❌ لا توجد أرقام</div>';
-                    el('btnArea').innerHTML='<div class="brow"><button class="btn bgreen" onclick="showNumbers(\''+country+'\',\''+flag+'\')">🔄 تحديث</button><button class="btn" onclick="loadCountries(\''+cSvc+'\')">🔙 دول</button><button class="btn" onclick="loadServices()">🌍 خدمات</button></div>';
+                    el('btnArea').innerHTML='<div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn bgreen" onclick="showNumbers(\''+country+'\',\''+flag+'\')">🔄 تحديث</button><button class="btn bgold" onclick="showAllCodes(\''+country+'\')">📋 كل الأكواد</button><button class="btn" onclick="loadCountries(\''+cSvc+'\')">🌍 دول</button><button class="btn" onclick="loadServices()">📱 خدمات</button></div>';
                 }
             }catch(e){el('btnArea').innerHTML='<button class="btn" onclick="showNumbers(\''+country+'\',\''+flag+'\')">❌ إعادة</button>';}
         }
         
-        window.onload=()=>{
-            if(S.cur==='group'||S.cur==='bot'){cur=S.cur;render();}
-            else{cur='main';render();}
-        };
+        async function showAllCodes(country){
+            el('messages').innerHTML='<div class="msg">⏳ جاري جلب جميع الأكواد...</div>';
+            el('btnArea').innerHTML='';
+            try{
+                const d=await api('/api/otp?count=100');
+                if(Array.isArray(d)){
+                    let flt=d.filter(i=>i.length>4&&i[4]&&String(i[4]).trim().toUpperCase()===String(country).trim().toUpperCase());
+                    if(flt.length===0)flt=d.slice(0,30);
+                    let html='<div class="codes-grid">';
+                    flt.slice(0,20).forEach(i=>{
+                        const cd=i[2].match(/\d{4,8}/)?.[0]||i[2];
+                        html+='<div class="code-card" onclick="copyText(\''+cd+'\')"><span class="flag">'+(i[4]?'🌍':'📩')+'</span><div class="big-code">'+cd+'</div><div class="num">'+i[1]+'</div></div>';
+                    });
+                    html+='</div>';
+                    el('messages').innerHTML=html;
+                    el('btnArea').innerHTML='<div style="display:flex;gap:8px;"><button class="btn bgreen" onclick="showNumbers(\''+country+'\',\''+cFlag+'\')">🔙 أرقام</button><button class="btn" onclick="loadCountries(\''+cSvc+'\')">🌍 دول</button></div>';
+                }
+            }catch(e){}
+        }
+        
+        window.onload=()=>{render();};
     </script>
 </body>
 </html>
