@@ -3,27 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gemini</title>
+<title>Gemini AI Studio Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body { font-family: 'Cairo', sans-serif; background-color: #131314; color: #e3e3e3; }
-  .chat-container { max-width: 820px; }
+  .chat-container { max-width: 850px; }
   .sparkle-icon {
     background: linear-gradient(135deg, #4285f4, #9b72cb, #d96570);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   .input-box { background-color: #1e1f20; border-radius: 28px; }
-  .input-box:focus-within { background-color: #282a2c; }
+  .input-box:focus-within { background-color: #282a2c; border-color: #4285f4; }
   .sidebar { background-color: #1e1f20; transition: transform 0.3s ease-in-out; }
-  .code-block { background: #000; color: #34d399; padding: 12px; border-radius: 8px; font-family: monospace; direction: ltr; text-align: left; margin-top: 8px; }
+  .code-block { background: #000; color: #34d399; padding: 12px; border-radius: 8px; font-family: monospace; direction: ltr; text-align: left; margin-top: 8px; white-space: pre-wrap; word-break: break-word; }
+  .dots { display: inline-flex; gap: 4px; align-items: center; }
+  .dots span { width: 6px; height: 6px; background: #4285f4; border-radius: 50%; animation: b 1.4s infinite; }
+  .dots span:nth-child(2) { animation-delay: .2s; }
+  .dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes b { 0%,60%,100%{ transform: translateY(0); opacity: .4; } 30%{ transform: translateY(-6px); opacity: 1; } }
 </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
 
-  <!-- Overlay خلفية عتمة إغلاق القائمة الجانبية -->
+  <!-- Overlay إغلاق القائمة الجانبية -->
   <div id="sidebar-overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden transition-opacity"></div>
 
   <!-- القائمة الجانبية (Sidebar) -->
@@ -33,7 +38,7 @@
         <button onclick="closeSidebar()" class="p-2 hover:bg-[#333537] rounded-full text-gray-300">
           <span class="material-symbols-outlined">close</span>
         </button>
-        <span class="font-bold text-lg sparkle-icon">Gemini</span>
+        <span class="font-bold text-lg sparkle-icon">Gemini Studio</span>
       </div>
 
       <button onclick="createNewChat()" class="flex items-center gap-3 bg-[#282a2c] hover:bg-[#333537] text-white px-4 py-3 rounded-full font-medium w-full mb-6 transition-colors border border-[#37393b]">
@@ -41,14 +46,13 @@
       </button>
 
       <div class="text-xs font-semibold text-gray-400 px-2 mb-2">المحادثات الأخيرة</div>
-      <div id="recent-chats-list" class="space-y-1 max-h-[60vh] overflow-y-auto"></div>
+      <div id="recent-chats-list" class="space-y-1 max-h-[50vh] overflow-y-auto"></div>
     </div>
 
     <div class="border-t border-[#37393b] pt-4">
-      <label class="text-xs text-gray-400 block mb-1">النموذج النشط:</label>
+      <label class="text-xs text-gray-400 block mb-1">اختر النموذج المطلوب:</label>
       <select id="model-select" onchange="changeModel()" class="w-full bg-[#282a2c] text-white border border-[#37393b] rounded-xl p-2 text-sm outline-none">
-        <option value="gemini-2.5-flash">Gemini 2.5 Flash (الأسرع)</option>
-        <option value="gemini-flash-latest">Gemini Flash</option>
+        <!-- يتم تعبئتها ديناميكياً -->
       </select>
     </div>
   </aside>
@@ -59,25 +63,27 @@
       <button onclick="openSidebar()" class="p-2 hover:bg-[#1e1f20] rounded-full text-gray-300">
         <span class="material-symbols-outlined">menu</span>
       </button>
-      <span class="text-lg font-semibold text-gray-200">جيمناي</span>
+      <span class="text-lg font-semibold text-gray-200">جيمناي Pro</span>
+      <span class="text-xs bg-[#282a2c] text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/20">توليد نصوص/صور/فيديو</span>
     </div>
-    <div class="w-9 h-9 rounded-full bg-purple-600 flex items-center justify-center font-bold text-white shadow-md">
+    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-white shadow-md">
       أ
     </div>
   </header>
 
-  <!-- منطقة المحادثة المنتصف -->
+  <!-- منطقة الشات -->
   <main class="flex-1 overflow-y-auto px-4 py-6 flex flex-col items-center">
     <div class="chat-container w-full flex-1 flex flex-col">
       
       <!-- شاشة الترحيب الرسمية -->
       <div id="welcome-msg" class="my-auto text-center space-y-4 py-12">
-        <div class="inline-block text-5xl sparkle-icon mb-2">✦</div>
+        <div class="inline-block text-6xl sparkle-icon mb-2">✦</div>
         <h1 class="text-3xl md:text-5xl font-bold text-gray-100">هيا بنا نبدأ يا أحمد</h1>
+        <p class="text-gray-400 text-sm md:text-base">تحدث معي، أو اطلب رسم صورة (مثل: "ارسم أسد في الغابة") أو فيديو (مثل: "اصنع فيديو لسيارة")</p>
       </div>
 
       <!-- قائمة الرسائل -->
-      <div id="messages-list" class="space-y-6 w-full my-auto hidden"></div>
+      <div id="messages-list" class="space-y-6 w-full hidden"></div>
 
     </div>
   </main>
@@ -90,16 +96,16 @@
         <button onclick="removeImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>
       </div>
 
-      <div class="input-box p-3 flex flex-col gap-2 transition-all">
-        <textarea id="user-input" rows="1" placeholder="أدخل رسالتك هنا..." class="bg-transparent border-none outline-none resize-none px-2 text-gray-100 placeholder-gray-500 text-base"></textarea>
+      <div class="input-box p-3 flex flex-col gap-2 border border-[#37393b] transition-all">
+        <textarea id="user-input" rows="1" placeholder="اسأل أي شيء، أو اطلب صورة/فيديو..." class="bg-transparent border-none outline-none resize-none px-2 text-gray-100 placeholder-gray-500 text-base"></textarea>
         
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1 text-gray-400">
             <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFile(event)">
-            <button onclick="document.getElementById('file-input').click()" class="p-2 hover:bg-[#282a2c] rounded-full">
+            <button onclick="document.getElementById('file-input').click()" class="p-2 hover:bg-[#282a2c] rounded-full" title="إرفاق صورة">
               <span class="material-symbols-outlined text-xl">add_photo_alternate</span>
             </button>
-            <button id="mic-btn" onclick="toggleVoice()" class="p-2 hover:bg-[#282a2c] rounded-full">
+            <button id="mic-btn" onclick="toggleVoice()" class="p-2 hover:bg-[#282a2c] rounded-full" title="تسجيل صوتي">
               <span class="material-symbols-outlined text-xl">mic</span>
             </button>
           </div>
@@ -114,14 +120,34 @@
   </footer>
 
 <script>
+const NEXII_KEY = 'sk-e0683fb0c7af3fc6-dcdb07-72c65552';
+const NEXII_BASE = 'https://ai.nexii.cloud/v1';
+const AGNES = 'sk-eV8aSN0NWxNYGnTdvws5nIGAcMWvUk0G2i0u5MdGIdyl2H1Q';
+
+const MODELS = [
+  {id:'gemini-2.5-flash', label:'Gemini 2.5 Flash (الأسرع)', provider:'gemini'},
+  {id:'gemini-flash-latest', label:'Gemini Flash', provider:'gemini'},
+  {id:'gemini-1.5-pro', label:'Gemini 1.5 Pro', provider:'gemini'},
+  {id:'gemma-4-26b-a4b-it', label:'Gemma 4', provider:'gemini'},
+  {id:'cf/@cf/deepseek-ai/deepseek-r1-distill-qwen-32b', label:'DeepSeek R1', provider:'nexii'},
+  {id:'cf/@cf/zai-org/glm-5.2', label:'GLM 5.2', provider:'nexii'},
+  {id:'cf/@cf/meta/llama-3.3-70b-instruct-fp8-fast', label:'Llama 3.3 70B', provider:'nexii'},
+  {id:'cf/@cf/qwen/qwen2.5-coder-32b-instruct', label:'Qwen Coder 2.5', provider:'nexii'}
+];
+
 let chats = JSON.parse(localStorage.getItem('gemini_chats') || '[]');
 let currentChatId = localStorage.getItem('gemini_current_id') || null;
 let selectedImage = null;
 let currentModel = localStorage.getItem('gemini_model') || 'gemini-2.5-flash';
 
-document.getElementById('model-select').value = currentModel;
+populateModels();
 renderSidebarChats();
 renderHistory();
+
+function populateModels() {
+  const select = document.getElementById('model-select');
+  select.innerHTML = MODELS.map(m => `<option value="${m.id}" ${m.id === currentModel ? 'selected' : ''}>${m.label}</option>`).join('');
+}
 
 function openSidebar() {
   document.getElementById('sidebar').classList.remove('translate-x-full');
@@ -210,26 +236,43 @@ function renderHistory() {
 
   welcome.classList.add('hidden');
   msgList.classList.remove('hidden');
-  msgList.innerHTML = chat.history.map(m => createMsgHtml(m.role, m.text, m.image)).join('');
+  msgList.innerHTML = chat.history.map(m => createMsgHtml(m.role, m.text, m.image, m.type, m.mediaUrl)).join('');
 }
 
-function createMsgHtml(role, text, image) {
+function createMsgHtml(role, text, image, type, mediaUrl) {
   const isUser = role === 'user';
+  let bodyContent = formatText(text);
+
+  if(type === 'image' && mediaUrl) {
+    bodyContent = `<div><b>🎨 الصورة المنشأة:</b></div><img src="${mediaUrl}" class="max-w-full rounded-xl mt-2 border border-[#37393b] shadow-lg">`;
+  } else if(type === 'video' && mediaUrl) {
+    bodyContent = `<div><b>🎬 الفيديو المنشأ:</b></div><video src="${mediaUrl}" controls class="max-w-full rounded-xl mt-2 border border-[#37393b] shadow-lg"></video>`;
+  }
+
   return `
     <div class="flex gap-4 ${isUser ? 'justify-end' : 'justify-start'} w-full">
       ${!isUser ? '<div class="w-8 h-8 rounded-full sparkle-icon flex items-center justify-center font-bold text-xl shrink-0">✦</div>' : ''}
       <div class="max-w-[85%] ${isUser ? 'bg-[#282a2c] text-gray-100 rounded-2xl px-4 py-3' : 'text-gray-200 leading-relaxed'}">
         ${image ? `<img src="${image}" class="max-w-xs rounded-xl mb-2">` : ''}
-        <div>${formatText(text)}</div>
+        <div>${bodyContent}</div>
       </div>
     </div>
   `;
 }
 
 function formatText(t) {
+  if(!t) return '';
   t = t.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
   t = t.replace(/`([^`]+)`/g, '<code class="bg-[#282a2c] px-1.5 py-0.5 rounded text-green-400">$1</code>');
   return t.replace(/\n/g, '<br>');
+}
+
+function isImageRequest(txt) {
+  return /ارسم|صورة|صوره|انشئ صورة|أنشئ صورة|اصنع صورة|تخيل|تصميم صورة|draw|generate image|picture/i.test(txt);
+}
+
+function isVideoRequest(txt) {
+  return /فيديو|فديو|اصنع فيديو|انشئ فيديو|أنشئ فيديو|عمل فيديو|video|generate video/i.test(txt);
 }
 
 async function sendMessage() {
@@ -256,34 +299,102 @@ async function sendMessage() {
   const msgList = document.getElementById('messages-list');
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'flex gap-4 items-center text-gray-400 animate-pulse';
-  loadingDiv.innerHTML = '<div class="sparkle-icon font-bold text-xl">✦</div> جاري التفكير...';
+  loadingDiv.innerHTML = '<div class="sparkle-icon font-bold text-xl">✦</div> <span id="loading-text">جاري معالجة طلبك...</span>';
   msgList.appendChild(loadingDiv);
 
   try {
-    const contents = chat.history.slice(-8).map(h => {
-      const parts = [];
-      if(h.image) parts.push({ inline_data: { mime_type: 'image/jpeg', data: h.image.split(',')[1] } });
-      if(h.text) parts.push({ text: h.text });
-      return { role: h.role === 'user' ? 'user' : 'model', parts: parts };
-    });
+    // 1. فحص طلب إنشاء فيديو تلقائياً
+    if(isVideoRequest(text)) {
+      document.getElementById('loading-text').innerText = 'جاري طلب تصنيع الفيديو...';
+      const vr = await fetch('https://apihub.agnes-ai.com/v1/videos', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + AGNES, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'agnes-video-v2.0', prompt: text, num_frames: 81, frame_rate: 24 })
+      });
+      const vdata = await vr.json();
+      const vid = vdata.video_id || vdata.id;
 
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: currentModel, contents: contents })
-    });
-    const data = await res.json();
-    
-    msgList.removeChild(loadingDiv);
+      if(vid) {
+        let attempts = 0;
+        const poll = setInterval(async () => {
+          attempts++;
+          const pr = await fetch('https://apihub.agnes-ai.com/agnesapi?video_id=' + vid, { headers: { 'Authorization': 'Bearer ' + AGNES } });
+          const pd = await pr.json();
+          document.getElementById('loading-text').innerText = `جاري توليد الفيديو (${pd.progress || 0}%)...`;
 
-    if(data.error) {
-      chat.history.push({ role: 'assistant', text: '⚠️ خطأ: ' + data.error });
-    } else {
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'لم يتم استلام رد.';
-      chat.history.push({ role: 'assistant', text: reply });
+          if(pd.status === 'completed' || pd.url || pd.metadata?.url) {
+            clearInterval(poll);
+            msgList.removeChild(loadingDiv);
+            const vurl = pd.metadata?.url || pd.url;
+            chat.history.push({ role: 'assistant', text: text, type: 'video', mediaUrl: vurl });
+            saveChats(); renderHistory();
+          } else if(pd.status === 'failed' || attempts > 30) {
+            clearInterval(poll);
+            msgList.removeChild(loadingDiv);
+            chat.history.push({ role: 'assistant', text: '❌ تعذر إنشاء الفيديو حالياً، حاول مجدداً.' });
+            saveChats(); renderHistory();
+          }
+        }, 4000);
+        return;
+      }
     }
-  } catch(e) {
+
+    // 2. فحص طلب رسم صورة تلقائياً
+    if(isImageRequest(text)) {
+      document.getElementById('loading-text').innerText = 'جاري رسم الصورة المطلوب...';
+      const ir = await fetch('https://apihub.agnes-ai.com/v1/images/generations', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + AGNES, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'agnes-image-2.1-flash', prompt: text, size: '1K', ratio: '1:1', extra_body: { response_format: 'url' } })
+      });
+      const idata = await ir.json();
+      const iurl = idata.data?.[0]?.url;
+
+      msgList.removeChild(loadingDiv);
+      if(iurl) {
+        chat.history.push({ role: 'assistant', text: text, type: 'image', mediaUrl: iurl });
+      } else {
+        chat.history.push({ role: 'assistant', text: '❌ فشل في رسم الصورة.' });
+      }
+      saveChats(); renderHistory();
+      return;
+    }
+
+    // 3. المحادثات النصية العادية عبر AI
+    const modelObj = MODELS.find(m => m.id === currentModel);
+    let reply = '';
+
+    if(modelObj && modelObj.provider === 'nexii') {
+      const messages = chat.history.slice(-8).map(h => ({ role: h.role === 'user' ? 'user' : 'assistant', content: h.text }));
+      const nr = await fetch(NEXII_BASE + '/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + NEXII_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: currentModel, messages: messages, max_tokens: 1024 })
+      });
+      const ndata = await nr.json();
+      reply = ndata.choices?.[0]?.message?.content || 'لم يتم استلام رد.';
+    } else {
+      const contents = chat.history.slice(-8).map(h => {
+        const parts = [];
+        if(h.image) parts.push({ inline_data: { mime_type: 'image/jpeg', data: h.image.split(',')[1] } });
+        if(h.text) parts.push({ text: h.text });
+        return { role: h.role === 'user' ? 'user' : 'model', parts: parts };
+      });
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: currentModel, contents: contents })
+      });
+      const data = await res.json();
+      reply = data.candidates?.[0]?.content?.parts?.[0]?.text || ('⚠️ ' + (data.error || 'لم يتم استلام رد.'));
+    }
+
     msgList.removeChild(loadingDiv);
+    chat.history.push({ role: 'assistant', text: reply });
+
+  } catch(e) {
+    if(msgList.contains(loadingDiv)) msgList.removeChild(loadingDiv);
     chat.history.push({ role: 'assistant', text: '❌ تعذر الاتصال بالسيرفر.' });
   }
 
