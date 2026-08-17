@@ -1,16 +1,14 @@
 const express = require('express');
-const path = require('path');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 app.use(express.static('public'));
 
-// مفاتيح الـ API المحمية داخل السيرفر (مخفية عن العميل)
 const GEMINI_KEY = "AIzaSyCRLf-KQ7nG5CPfIAy6nPSd3uwGSaR4tcc";
 const AGNES_KEY = "Sk-eV8aSN0NWxNYGnTdvws5nIGAcMWvUk0G2i0u5MdGIdyl2H1Q";
 
-// 1. مسار المحادثة والتحليل عبر Gemini (مع دعم الذاكرة)
+// 1. إصلاح مسار Gemini مع دعم الذاكرة والملفات
 app.post('/api/chat', async (req, res) => {
     try {
         const { history } = req.body;
@@ -23,27 +21,30 @@ app.post('/api/chat', async (req, res) => {
         });
         
         const data = await response.json();
+        if (data.error) {
+            return res.status(400).json({ error: data.error.message });
+        }
         res.json(data);
     } catch (err) {
-        res.status(500).json({ error: 'خطأ في الاتصال بالذكاء الاصطناعي' });
+        res.status(500).json({ error: 'خطأ في الاتصال بالسيرفر' });
     }
 });
 
-// 2. مسار توليد وتعديل الصور عبر Agnes Image 2.1 Flash
+// 2. نموذج Agnes للصور
 app.post('/api/generate-image', async (req, res) => {
     try {
-        const { prompt, image } = req.body;
+        const { prompt, image, model } = req.body;
+        const selectedModel = model || "agnes-image-2.1-flash";
+        
         const bodyData = {
-            model: "agnes-image-2.1-flash",
+            model: selectedModel,
             prompt: prompt,
             size: "1K",
             ratio: "1:1",
             extra_body: { response_format: "url" }
         };
 
-        if (image) {
-            bodyData.extra_body.image = [image];
-        }
+        if (image) bodyData.extra_body.image = [image];
 
         const response = await fetch('https://apihub.agnes-ai.com/v1/images/generations', {
             method: 'POST',
@@ -61,12 +62,14 @@ app.post('/api/generate-image', async (req, res) => {
     }
 });
 
-// 3. مسار إنشاء الفيديو عبر Agnes Video V2.0
+// 3. نموذج Agnes للفيديو
 app.post('/api/generate-video', async (req, res) => {
     try {
-        const { prompt, image } = req.body;
+        const { prompt, image, model } = req.body;
+        const selectedModel = model || "agnes-video-v2.0";
+
         const bodyData = {
-            model: "agnes-video-v2.0",
+            model: selectedModel,
             prompt: prompt,
             height: 768,
             width: 1152,
@@ -88,11 +91,11 @@ app.post('/api/generate-video', async (req, res) => {
         const data = await response.json();
         res.json(data);
     } catch (err) {
-        res.status(500).json({ error: 'خطأ أثناء بدء مهمة الفيديو' });
+        res.status(500).json({ error: 'خطأ أثناء بدء الفيديو' });
     }
 });
 
-// 4. استعلام عن حالة الفيديو
+// 4. استعلام الفيديو
 app.get('/api/video-status/:id', async (req, res) => {
     try {
         const response = await fetch(`https://apihub.agnes-ai.com/agnesapi?video_id=${req.params.id}`, {
@@ -101,7 +104,7 @@ app.get('/api/video-status/:id', async (req, res) => {
         const data = await response.json();
         res.json(data);
     } catch (err) {
-        res.status(500).json({ error: 'خطأ في جلب حالة الفيديو' });
+        res.status(500).json({ error: 'خطأ جلب فيديو' });
     }
 });
 
