@@ -2,440 +2,90 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NEXUS & Gemini AI Studio</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>NEXUS AI Studio</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  body { font-family: 'Cairo', sans-serif; background-color: #131314; color: #e3e3e3; }
-  .chat-container { max-width: 850px; }
-  .sparkle-icon {
-    background: linear-gradient(135deg, #4285f4, #9b72cb, #d96570);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .input-box { background-color: #1e1f20; border-radius: 28px; }
-  .input-box:focus-within { background-color: #282a2c; border-color: #4285f4; }
-  .sidebar { background-color: #1e1f20; transition: transform 0.3s ease-in-out; }
-  .code-block { background: #000; color: #34d399; padding: 12px; border-radius: 8px; font-family: monospace; direction: ltr; text-align: left; margin-top: 8px; white-space: pre-wrap; word-break: break-word; }
+body{font-family:'Cairo',sans-serif;background:radial-gradient(circle at 50% 120%,#1a233a 0%,#000 60%);color:#e3e3e3}
+.chat-container{max-width:850px}
+.floating-input{background:rgba(30,31,32,.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:9999px}
+.sidebar{background:#131314;transition:transform .3s;border-left:1px solid #282a2c}
+.dots{display:inline-flex;gap:4px}
+.dots span{width:6px;height:6px;background:#a8c7fa;border-radius:50%;animation:b 1.4s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+.status-text{color:#a8c7fa;font-size:12px}
 </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden relative">
-
-  <!-- Overlay -->
-  <div id="sidebar-overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/60 z-30 hidden transition-opacity"></div>
-
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar fixed top-0 right-0 h-full w-80 z-40 transform translate-x-full flex flex-col justify-between p-4 shadow-2xl">
-    <div>
-      <div class="flex items-center justify-between mb-6">
-        <button onclick="closeSidebar()" class="p-2 hover:bg-[#333537] rounded-full text-gray-300">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-        <span class="font-bold text-lg sparkle-icon">NEXUS AI Studio</span>
-      </div>
-
-      <button onclick="createNewChat()" class="flex items-center gap-3 bg-[#282a2c] hover:bg-[#333537] text-white px-4 py-3 rounded-full font-medium w-full mb-6 transition-colors border border-[#37393b]">
-        <span class="material-symbols-outlined">add</span> محادثة جديدة
-      </button>
-
-      <div class="text-xs font-semibold text-gray-400 px-2 mb-2">المحادثات الأخيرة</div>
-      <div id="recent-chats-list" class="space-y-1 max-h-[45vh] overflow-y-auto"></div>
-    </div>
-
-    <div class="border-t border-[#37393b] pt-4">
-      <label class="text-xs text-gray-400 block mb-1">اختر النموذج المطلوب (جميع النماذج):</label>
-      <select id="model-select" onchange="changeModel()" class="w-full bg-[#282a2c] text-white border border-[#37393b] rounded-xl p-2.5 text-xs outline-none">
-        <!-- Dynamically populated -->
-      </select>
-    </div>
-  </aside>
-
-  <!-- Header -->
-  <header class="flex items-center justify-between px-4 py-3 border-b border-[#282a2c] shrink-0">
-    <div class="flex items-center gap-3">
-      <button onclick="openSidebar()" class="p-2 hover:bg-[#1e1f20] rounded-full text-gray-300">
-        <span class="material-symbols-outlined">menu</span>
-      </button>
-      <span class="text-lg font-semibold text-gray-200">NEXUS AI</span>
-      <span id="current-badge" class="text-xs bg-[#282a2c] text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/20">DeepSeek R1</span>
-    </div>
-    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-white shadow-md">
-      أ
-    </div>
-  </header>
-
-  <!-- Main Chat -->
-  <main class="flex-1 overflow-y-auto px-4 py-6 flex flex-col items-center">
-    <div class="chat-container w-full flex-1 flex flex-col">
-      
-      <div id="welcome-msg" class="my-auto text-center space-y-4 py-12">
-        <div class="inline-block text-6xl sparkle-icon mb-2">✦</div>
-        <h1 class="text-3xl md:text-5xl font-bold text-gray-100">مرحباً بك يا أحمد</h1>
-        <p class="text-gray-400 text-sm md:text-base max-w-md mx-auto">اختر من بين جميع نماذج الذكاء الاصطناعي (DeepSeek, Llama, Qwen, Gemini) أو اطلب رسم صورة وفيديو مباشرة.</p>
-      </div>
-
-      <div id="messages-list" class="space-y-6 w-full hidden"></div>
-
-    </div>
-  </main>
-
-  <!-- Footer Input -->
-  <footer class="p-4 shrink-0">
-    <div class="chat-container mx-auto">
-      <div id="img-preview-bar" class="hidden relative mb-2 inline-block">
-        <img id="img-preview" src="" class="h-16 rounded-xl border border-blue-500">
-        <button onclick="removeImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">×</button>
-      </div>
-
-      <div class="input-box p-3 flex flex-col gap-2 border border-[#37393b] transition-all">
-        <textarea id="user-input" rows="1" placeholder="اسأل أي سؤال، أو اطلب صورة/فيديو..." class="bg-transparent border-none outline-none resize-none px-2 text-gray-100 placeholder-gray-500 text-base"></textarea>
-        
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-1 text-gray-400">
-            <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFile(event)">
-            <button onclick="document.getElementById('file-input').click()" class="p-2 hover:bg-[#282a2c] rounded-full" title="إرفاق صورة">
-              <span class="material-symbols-outlined text-xl">add_photo_alternate</span>
-            </button>
-            <button id="mic-btn" onclick="toggleVoice()" class="p-2 hover:bg-[#282a2c] rounded-full" title="تسجيل صوتي">
-              <span class="material-symbols-outlined text-xl">mic</span>
-            </button>
-          </div>
-
-          <button onclick="sendMessage()" class="bg-white text-black hover:bg-gray-200 p-2.5 rounded-full transition-colors flex items-center justify-center">
-            <span class="material-symbols-outlined text-lg">send</span>
-          </button>
-        </div>
-      </div>
-      <div class="text-center mt-2 text-xs text-gray-500">تم تفعيل جميع النماذج الشغالة عبر API بنجاح.</div>
-    </div>
-  </footer>
-
+<div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/70 z-30 hidden"></div>
+<aside id="sidebar" class="sidebar fixed top-0 right-0 h-full w-80 z-40 transform translate-x-full flex flex-col justify-between p-4">
+<div>
+<div class="flex items-center justify-between mb-6"><button onclick="closeSidebar()" class="p-2 hover:bg-[#333537] rounded-full"><span class="material-symbols-outlined">close</span></button><span class="font-semibold">الإعدادات</span></div>
+<button onclick="newChat()" class="flex items-center gap-3 bg-[#282a2c] hover:bg-[#333537] text-white px-4 py-3 rounded-2xl font-medium w-full mb-4"><span class="material-symbols-outlined">add</span> محادثة جديدة</button>
+<div class="text-xs text-gray-400 mb-2">النماذج:</div>
+<select id="model-select-side" onchange="changeModelSide()" class="w-full bg-[#282a2c] text-white border border-[#37393b] rounded-xl p-2.5 text-xs outline-none mb-4"></select>
+<div class="text-xs text-gray-400 mb-2">المحادثات السابقة:</div>
+<div id="chat-list" class="space-y-1 max-h-[50vh] overflow-y-auto"></div>
+</div>
+</aside>
+<header class="flex items-center justify-between px-4 py-3 shrink-0 absolute top-0 w-full z-10">
+<div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold">I</div></div>
+<div class="flex items-center gap-1 bg-transparent hover:bg-white/10 px-3 py-1.5 rounded-full"><select id="model-select" onchange="changeModel()" class="bg-transparent text-white font-semibold text-sm outline-none appearance-none cursor-pointer text-center"></select></div>
+<button onclick="openSidebar()" class="p-2 hover:bg-white/10 rounded-full"><span class="material-symbols-outlined">menu</span></button>
+</header>
+<main class="flex-1 overflow-y-auto px-4 pt-20 pb-28 flex flex-col items-center">
+<div class="chat-container w-full flex-1 flex flex-col">
+<div id="welcome" class="my-auto text-center space-y-6"><h1 class="text-3xl font-medium">احمد، بماذا نبدأ؟</h1></div>
+<div id="msgs" class="space-y-6 w-full hidden pb-8"></div>
+</div>
+</main>
+<footer class="fixed bottom-0 w-full p-4 z-20 pointer-events-none">
+<div class="chat-container mx-auto pointer-events-auto relative">
+<input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFile(event)">
+<div id="img-preview-bar" class="hidden absolute -top-20 right-4 p-1 bg-[#1e1f20] rounded-xl border border-gray-700"><img id="img-preview" src="" class="h-16 rounded-lg object-cover"><button onclick="removeImage()" class="absolute -top-2 -left-2 bg-gray-800 text-white rounded-full w-6 h-6 text-xs">✕</button></div>
+<div class="floating-input px-2 py-2 flex items-center gap-2"><button onclick="document.getElementById('file-input').click()" class="p-2.5 text-gray-400 rounded-full"><span class="material-symbols-outlined">add</span></button><textarea id="user-input" rows="1" placeholder="اسأل Gemini" class="flex-1 bg-transparent border-none outline-none resize-none px-2 text-gray-100 max-h-32"></textarea><button onclick="sendMessage()" class="p-2.5 text-blue-300 rounded-full"><span class="material-symbols-outlined">send</span></button></div>
+</div>
+</footer>
 <script>
-const NEXII_KEY = 'sk-e0683fb0c7af3fc6-dcdb07-72c65552';
-const NEXII_BASE = 'https://ai.nexii.cloud/v1';
-const AGNES = 'sk-eV8aSN0NWxNYGnTdvws5nIGAcMWvUk0G2i0u5MdGIdyl2H1Q';
-
-// القائمة الكاملة لجميع النماذج
-const MODELS = [
-  // High Tier
-  {id:'cf/@cf/deepseek-ai/deepseek-r1-distill-qwen-32b', label:'💎 DeepSeek R1 32B (التفكير العميق)', provider:'nexii'},
-  {id:'cf/@cf/zai-org/glm-5.2', label:'💎 GLM 5.2 (ذكي جداً)', provider:'nexii'},
-  {id:'cf/@cf/deepseek-ai/deepseek-v4-flash-0731', label:'💎 DeepSeek V4 Flash (سريع وذكي)', provider:'nexii'},
-  {id:'cf/@cf/qwen/qwq-32b', label:'💎 QwQ 32B Reasoning', provider:'nexii'},
-  {id:'cf/@cf/meta/llama-4-scout-17b-16e-instruct', label:'💎 Llama 4 Scout', provider:'nexii'},
-  {id:'auto/best-reasoning', label:'💎 Auto: Best Reasoning', provider:'nexii'},
-  {id:'auto/best-coding', label:'💎 Auto: Best Coding', provider:'nexii'},
-
-  // Medium Tier
-  {id:'cf/@cf/meta/llama-3.3-70b-instruct-fp8-fast', label:'🔥 Llama 3.3 70B (متوازن)', provider:'nexii'},
-  {id:'cf/@cf/mistralai/mistral-small-3.1-24b-instruct', label:'🔥 Mistral Small 3.1', provider:'nexii'},
-  {id:'cf/@cf/qwen/qwen2.5-coder-32b-instruct', label:'🔥 Qwen 2.5 Coder (برمجة)', provider:'nexii'},
-  {id:'cf/@cf/google/gemma-4-26b-a4b-it', label:'🔥 Gemma 4 26B', provider:'nexii'},
-  {id:'auto/best-chat', label:'🔥 Auto: Best Chat', provider:'nexii'},
-  
-  // Low Tier & Gemini
-  {id:'cf/@cf/meta/llama-3.1-8b-instruct-fp8', label:'⚡ Llama 3.1 8B (سريع)', provider:'nexii'},
-  {id:'auto/best-fast', label:'⚡ Auto: Best Fast', provider:'nexii'},
-  {id:'gemini-2.5-flash', label:'✨ Gemini 2.5 Flash', provider:'gemini'},
-  {id:'gemini-1.5-pro', label:'✨ Gemini 1.5 Pro', provider:'gemini'}
-];
-
-let chats = JSON.parse(localStorage.getItem('gemini_chats') || '[]');
-let currentChatId = localStorage.getItem('gemini_current_id') || null;
-let selectedImage = null;
-let currentModel = localStorage.getItem('gemini_model') || 'cf/@cf/deepseek-ai/deepseek-r1-distill-qwen-32b';
-
-populateModels();
-renderSidebarChats();
-renderHistory();
-
-function populateModels() {
-  const select = document.getElementById('model-select');
-  select.innerHTML = MODELS.map(m => `<option value="${m.id}" ${m.id === currentModel ? 'selected' : ''}>${m.label}</option>`).join('');
-  updateBadge();
-}
-
-function updateBadge() {
-  const m = MODELS.find(x => x.id === currentModel);
-  if(m) document.getElementById('current-badge').innerText = m.label.split(' ')[1] || m.label;
-}
-
-function openSidebar() {
-  document.getElementById('sidebar').classList.remove('translate-x-full');
-  document.getElementById('sidebar-overlay').classList.remove('hidden');
-}
-
-function closeSidebar() {
-  document.getElementById('sidebar').classList.add('translate-x-full');
-  document.getElementById('sidebar-overlay').classList.add('hidden');
-}
-
-function changeModel() {
-  currentModel = document.getElementById('model-select').value;
-  localStorage.setItem('gemini_model', currentModel);
-  updateBadge();
-}
-
-function createNewChat() {
-  currentChatId = null;
-  localStorage.removeItem('gemini_current_id');
-  closeSidebar();
-  renderHistory();
-}
-
-function renderSidebarChats() {
-  const list = document.getElementById('recent-chats-list');
-  list.innerHTML = chats.map(c => `
-    <div onclick="loadChat('${c.id}')" class="flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer text-sm ${c.id === currentChatId ? 'bg-[#282a2c] text-white font-medium' : 'hover:bg-[#282a2c] text-gray-300'}">
-      <span class="truncate">${c.title}</span>
-      <button onclick="event.stopPropagation(); deleteChat('${c.id}')" class="text-gray-500 hover:text-red-400">
-        <span class="material-symbols-outlined text-sm">close</span>
-      </button>
-    </div>
-  `).join('');
-}
-
-function loadChat(id) {
-  currentChatId = id;
-  localStorage.setItem('gemini_current_id', id);
-  closeSidebar();
-  renderHistory();
-}
-
-function deleteChat(id) {
-  chats = chats.filter(c => c.id !== id);
-  if(currentChatId === id) createNewChat();
-  else { saveChats(); renderSidebarChats(); }
-}
-
-function saveChats() {
-  localStorage.setItem('gemini_chats', JSON.stringify(chats));
-}
-
-function getCurrentChat() {
-  return chats.find(c => c.id === currentChatId);
-}
-
-function handleFile(e) {
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    selectedImage = ev.target.result;
-    document.getElementById('img-preview').src = selectedImage;
-    document.getElementById('img-preview-bar').classList.remove('hidden');
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeImage() {
-  selectedImage = null;
-  document.getElementById('file-input').value = '';
-  document.getElementById('img-preview-bar').classList.add('hidden');
-}
-
-function renderHistory() {
-  const msgList = document.getElementById('messages-list');
-  const welcome = document.getElementById('welcome-msg');
-  const chat = getCurrentChat();
-
-  if(!chat || !chat.history || chat.history.length === 0) {
-    welcome.classList.remove('hidden');
-    msgList.classList.add('hidden');
-    msgList.innerHTML = '';
-    return;
-  }
-
-  welcome.classList.add('hidden');
-  msgList.classList.remove('hidden');
-  msgList.innerHTML = chat.history.map(m => createMsgHtml(m.role, m.text, m.image, m.type, m.mediaUrl)).join('');
-}
-
-function createMsgHtml(role, text, image, type, mediaUrl) {
-  const isUser = role === 'user';
-  let bodyContent = formatText(text);
-
-  if(type === 'image' && mediaUrl) {
-    bodyContent = `<div><b>🎨 الصورة المنشأة:</b></div><img src="${mediaUrl}" class="max-w-full rounded-xl mt-2 border border-[#37393b] shadow-lg">`;
-  } else if(type === 'video' && mediaUrl) {
-    bodyContent = `<div><b>🎬 الفيديو المنشأ:</b></div><video src="${mediaUrl}" controls class="max-w-full rounded-xl mt-2 border border-[#37393b] shadow-lg"></video>`;
-  }
-
-  return `
-    <div class="flex gap-4 ${isUser ? 'justify-end' : 'justify-start'} w-full">
-      ${!isUser ? '<div class="w-8 h-8 rounded-full sparkle-icon flex items-center justify-center font-bold text-xl shrink-0">✦</div>' : ''}
-      <div class="max-w-[85%] ${isUser ? 'bg-[#282a2c] text-gray-100 rounded-2xl px-4 py-3' : 'text-gray-200 leading-relaxed'}">
-        ${image ? `<img src="${image}" class="max-w-xs rounded-xl mb-2">` : ''}
-        <div>${bodyContent}</div>
-      </div>
-    </div>
-  `;
-}
-
-function formatText(t) {
-  if(!t) return '';
-  t = t.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-  t = t.replace(/`([^`]+)`/g, '<code class="bg-[#282a2c] px-1.5 py-0.5 rounded text-green-400">$1</code>');
-  return t.replace(/\n/g, '<br>');
-}
-
-function isImageRequest(txt) {
-  return /ارسم|صورة|صوره|انشئ صورة|أنشئ صورة|اصنع صورة|تخيل|تصميم صورة|draw|generate image|picture/i.test(txt);
-}
-
-function isVideoRequest(txt) {
-  return /فيديو|فديو|اصنع فيديو|انشئ فيديو|أنشئ فيديو|عمل فيديو|video|generate video/i.test(txt);
-}
-
-async function sendMessage() {
-  const input = document.getElementById('user-input');
-  const text = input.value.trim();
-  if(!text && !selectedImage) return;
-
-  let chat = getCurrentChat();
-  if(!chat) {
-    currentChatId = 'chat_' + Date.now();
-    chat = { id: currentChatId, title: text.substring(0, 25) || 'محادثة جديدة', history: [] };
-    chats.unshift(chat);
-  }
-
-  const imgToSend = selectedImage;
-  chat.history.push({ role: 'user', text: text, image: imgToSend });
-  saveChats();
-  renderSidebarChats();
-
-  input.value = '';
-  removeImage();
-  renderHistory();
-
-  const msgList = document.getElementById('messages-list');
-  const loadingDiv = document.createElement('div');
-  loadingDiv.className = 'flex gap-4 items-center text-gray-400 animate-pulse';
-  loadingDiv.innerHTML = '<div class="sparkle-icon font-bold text-xl">✦</div> <span id="loading-text">جاري معالجة الطلب...</span>';
-  msgList.appendChild(loadingDiv);
-
-  try {
-    // 1. توليد فيديو تلقائي
-    if(isVideoRequest(text)) {
-      document.getElementById('loading-text').innerText = 'جاري توليد الفيديو...';
-      const vr = await fetch('https://apihub.agnes-ai.com/v1/videos', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + AGNES, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'agnes-video-v2.0', prompt: text, num_frames: 81, frame_rate: 24 })
-      });
-      const vdata = await vr.json();
-      const vid = vdata.video_id || vdata.id;
-
-      if(vid) {
-        let attempts = 0;
-        const poll = setInterval(async () => {
-          attempts++;
-          const pr = await fetch('https://apihub.agnes-ai.com/agnesapi?video_id=' + vid, { headers: { 'Authorization': 'Bearer ' + AGNES } });
-          const pd = await pr.json();
-          document.getElementById('loading-text').innerText = `جاري التوليد (${pd.progress || 0}%)...`;
-
-          if(pd.status === 'completed' || pd.url || pd.metadata?.url) {
-            clearInterval(poll);
-            msgList.removeChild(loadingDiv);
-            const vurl = pd.metadata?.url || pd.url;
-            chat.history.push({ role: 'assistant', text: text, type: 'video', mediaUrl: vurl });
-            saveChats(); renderHistory();
-          } else if(pd.status === 'failed' || attempts > 30) {
-            clearInterval(poll);
-            msgList.removeChild(loadingDiv);
-            chat.history.push({ role: 'assistant', text: '❌ تعذر إنشاء الفيديو حالياً.' });
-            saveChats(); renderHistory();
-          }
-        }, 4000);
-        return;
-      }
-    }
-
-    // 2. توليد صور تلقائي
-    if(isImageRequest(text)) {
-      document.getElementById('loading-text').innerText = 'جاري رسم الصورة...';
-      const ir = await fetch('https://apihub.agnes-ai.com/v1/images/generations', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + AGNES, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'agnes-image-2.1-flash', prompt: text, size: '1K', ratio: '1:1', extra_body: { response_format: 'url' } })
-      });
-      const idata = await ir.json();
-      const iurl = idata.data?.[0]?.url;
-
-      msgList.removeChild(loadingDiv);
-      if(iurl) {
-        chat.history.push({ role: 'assistant', text: text, type: 'image', mediaUrl: iurl });
-      } else {
-        chat.history.push({ role: 'assistant', text: '❌ فشل في رسم الصورة.' });
-      }
-      saveChats(); renderHistory();
-      return;
-    }
-
-    // 3. معالجة المحادثات للنماذج الذكية (NEXUS + Gemini)
-    const modelObj = MODELS.find(m => m.id === currentModel) || MODELS[0];
-    let reply = '';
-
-    if(modelObj.provider === 'nexii') {
-      const messages = [
-        { role: "system", content: "You are NEXUS AI, a helpful and intelligent assistant. When spoken to in Arabic, respond in Arabic. Provide clean markdown formatted answers." },
-        ...chat.history.slice(-10).map(h => ({ role: h.role === 'user' ? 'user' : 'assistant', content: h.text }))
-      ];
-
-      const nr = await fetch(NEXII_BASE + '/chat/completions', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + NEXII_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: currentModel, messages: messages, max_tokens: 2048, temperature: 0.7 })
-      });
-      const ndata = await nr.json();
-      reply = ndata.choices?.[0]?.message?.content || ndata.choices?.[0]?.message?.reasoning_content || 'لم يتم استلام رد من هذا النموذج حالياً.';
-    } else {
-      const contents = chat.history.slice(-10).map(h => {
-        const parts = [];
-        if(h.image) parts.push({ inline_data: { mime_type: 'image/jpeg', data: h.image.split(',')[1] } });
-        if(h.text) parts.push({ text: h.text });
-        return { role: h.role === 'user' ? 'user' : 'model', parts: parts };
-      });
-
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: currentModel, contents: contents })
-      });
-      const data = await res.json();
-      reply = data.candidates?.[0]?.content?.parts?.[0]?.text || ('⚠️ ' + (data.error || 'لم يتم استلام رد.'));
-    }
-
-    msgList.removeChild(loadingDiv);
-    chat.history.push({ role: 'assistant', text: reply });
-
-  } catch(e) {
-    if(msgList.contains(loadingDiv)) msgList.removeChild(loadingDiv);
-    chat.history.push({ role: 'assistant', text: '❌ حدث خطأ أثناء الاتصال بالنموذج.' });
-  }
-
-  saveChats();
-  renderHistory();
-}
-
-function toggleVoice() {
-  const micBtn = document.getElementById('mic-btn');
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SpeechRecognition) return alert('التسجيل الصوتي غير مدعوم في متصفحك.');
-  
-  const rec = new SpeechRecognition();
-  rec.lang = 'ar-EG';
-  rec.onstart = () => micBtn.classList.add('text-red-500');
-  rec.onresult = (e) => { document.getElementById('user-input').value = e.results[0][0].transcript; };
-  rec.onend = () => micBtn.classList.remove('text-red-500');
-  rec.start();
-}
-
-document.getElementById('user-input').addEventListener('keypress', (e) => {
-  if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-});
+const NEXII_KEY='sk-e0683fb0c7af3fc6-dcdb07-72c65552';
+const NEXII_BASE='https://ai.nexii.cloud/v1';
+const MODELS=[{id:'cf/@cf/deepseek-ai/deepseek-r1-distill-qwen-32b',label:'DeepSeek R1',p:'nexii'},{id:'cf/@cf/zai-org/glm-5.2',label:'GLM 5.2',p:'nexii'},{id:'cf/@cf/deepseek-ai/deepseek-v4-flash-0731',label:'DeepSeek V4',p:'nexii'},{id:'cf/@cf/qwen/qwq-32b',label:'QwQ 32B',p:'nexii'},{id:'cf/@cf/meta/llama-4-scout-17b-16e-instruct',label:'Llama 4 Scout',p:'nexii'},{id:'auto/best-reasoning',label:'Auto Reasoning',p:'nexii'},{id:'auto/best-coding',label:'Auto Coding',p:'nexii'},{id:'cf/@cf/meta/llama-3.3-70b-instruct-fp8-fast',label:'Llama 70B',p:'nexii'},{id:'cf/@cf/mistralai/mistral-small-3.1-24b-instruct',label:'Mistral Small',p:'nexii'},{id:'cf/@cf/qwen/qwen2.5-coder-32b-instruct',label:'Qwen Coder',p:'nexii'},{id:'cf/@cf/google/gemma-4-26b-a4b-it',label:'Gemma 4',p:'nexii'},{id:'auto/best-chat',label:'Auto Chat',p:'nexii'},{id:'cf/@cf/meta/llama-3.1-8b-instruct-fp8',label:'Llama 8B',p:'nexii'},{id:'auto/best-fast',label:'Auto Fast',p:'nexii'},{id:'gemini-3.6-flash',label:'Gemini 3.6',p:'gemini'},{id:'gemini-flash-latest',label:'Gemini Latest',p:'gemini'}];
+let chats=JSON.parse(localStorage.getItem('aiChats')||'{}');
+let currentChatId=localStorage.getItem('currentChatId')||'';
+let history=chats[currentChatId]||[];
+let selectedImage=null;
+let currentModel=localStorage.getItem('aiModel')||MODELS[0].id;
+populateModels();populateModelsSide();renderHistory();renderChatList();
+function populateModels(){document.getElementById('model-select').innerHTML=MODELS.map(function(m){return '<option value="'+m.id+'"'+(m.id===currentModel?' selected':'')+' class="bg-[#1e1f20]">'+m.label+'</option>';}).join('');}
+function populateModelsSide(){document.getElementById('model-select-side').innerHTML=MODELS.map(function(m){return '<option value="'+m.id+'"'+(m.id===currentModel?' selected':'')+' class="bg-[#1e1f20]">'+m.label+'</option>';}).join('');}
+function changeModelSide(){currentModel=document.getElementById('model-select-side').value;localStorage.setItem('aiModel',currentModel);populateModels();}
+function openSidebar(){document.getElementById('sidebar').classList.remove('translate-x-full');document.getElementById('overlay').classList.remove('hidden');}
+function closeSidebar(){document.getElementById('sidebar').classList.add('translate-x-full');document.getElementById('overlay').classList.add('hidden');}
+function changeModel(){currentModel=document.getElementById('model-select').value;localStorage.setItem('aiModel',currentModel);populateModelsSide();}
+function renderChatList(){var list=document.getElementById('chat-list');var ids=Object.keys(chats);if(ids.length===0){list.innerHTML='<div class="text-gray-500 text-xs text-center">لا محادثات</div>';return;}list.innerHTML=ids.map(function(id){var msgs=chats[id];var title=msgs.length>0?msgs[0].text.substring(0,20):'محادثة';return '<div class="p-2 rounded-xl cursor-pointer hover:bg-[#282a2c]'+(id===currentChatId?' bg-[#1e3a5f]':'')+'" onclick="loadChat(\''+id+'\')">'+title+'<br><small class="text-gray-500">'+msgs.length+'</small></div>';}).join('');}
+function loadChat(id){currentChatId=id;history=chats[id]||[];localStorage.setItem('currentChatId',id);renderHistory();renderChatList();closeSidebar();}
+function newChat(){if(history.length>0&&currentChatId){chats[currentChatId]=history;}currentChatId='chat_'+Date.now();history=[];chats[currentChatId]=[];localStorage.setItem('aiChats',JSON.stringify(chats));localStorage.setItem('currentChatId',currentChatId);renderHistory();renderChatList();closeSidebar();}
+function saveChat(){if(currentChatId){chats[currentChatId]=history;localStorage.setItem('aiChats',JSON.stringify(chats));}}
+function handleFile(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){selectedImage=ev.target.result;document.getElementById('img-preview').src=selectedImage;document.getElementById('img-preview-bar').classList.remove('hidden');};r.readAsDataURL(f);}
+function removeImage(){selectedImage=null;document.getElementById('file-input').value='';document.getElementById('img-preview-bar').classList.add('hidden');}
+function renderHistory(){var msgs=document.getElementById('msgs');var welcome=document.getElementById('welcome');if(history.length===0){welcome.classList.remove('hidden');msgs.classList.add('hidden');msgs.innerHTML='';return;}welcome.classList.add('hidden');msgs.classList.remove('hidden');msgs.innerHTML=history.map(function(m){if(m.role==='user'){return '<div class="flex justify-end"><div class="bg-[#282a2c] rounded-2xl px-4 py-3 max-w-[85%]">'+(m.image?'<img src="'+m.image+'" class="max-w-xs rounded-xl mb-2">':'')+m.text+'</div></div>';}return '<div class="flex justify-start"><div class="max-w-[85%]">'+m.text+'</div></div>';}).join('');window.scrollTo(0,document.body.scrollHeight);}
+function appendMsg(role,text,image){history.push({role:role,text:text,image:image||null});saveChat();renderHistory();}
+function callNexii(model,text){var messages=[];history.forEach(function(h){messages.push({role:h.role,content:h.text.replace(/<[^>]+>/g,'')});});messages.push({role:'user',content:text});return fetch(NEXII_BASE+'/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+NEXII_KEY,'Content-Type':'application/json'},body:JSON.stringify({model:model,messages:messages,max_tokens:2048})}).then(function(r){return r.text();}).then(function(t){try{var d=JSON.parse(t);if(d.choices&&d.choices[0]&&d.choices[0].message)return d.choices[0].message.content||d.choices[0].message.reasoning_content||'';}catch(e){}var full='';var ls=t.split('\n');for(var i=0;i<ls.length;i++){if(ls[i].indexOf('data: ')>-1){var x=ls[i].substring(ls[i].indexOf('data: ')+6);if(x==='[DONE]')break;try{var j=JSON.parse(x);full+=j.choices[0].delta.content||'';}catch(e2){}}}return full;});}
+function callGemini(model,text){return fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:model,contents:[{role:'user',parts:[{text:text}]}]})}).then(function(r){return r.json();}).then(function(d){return d.candidates?.[0]?.content?.parts?.[0]?.text||('❌ '+(d.error?.message||'مفيش رد'));});}
+async function editImage(base64Img,editPrompt){var msgs=document.getElementById('msgs');var loading=document.createElement('div');loading.className='flex gap-4 items-center mt-4';loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div> <span class="status-text">جاري تعديل الصورة...</span>';msgs.appendChild(loading);try{var resp=await fetch('/api/replicate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:editPrompt,image:base64Img})});var data=await resp.json();var pid=data.id;if(!pid){msgs.removeChild(loading);appendMsg('assistant','❌ '+JSON.stringify(data).substring(0,100));return;}var poll=setInterval(async function(){var r=await fetch('/api/replicate-check?id='+pid);var d=await r.json();if(d.status==='succeeded'){clearInterval(poll);msgs.removeChild(loading);appendMsg('assistant','<img src="'+(Array.isArray(d.output)?d.output[0]:d.output)+'" class="max-w-full rounded-xl">');}else if(d.status==='failed'){clearInterval(poll);msgs.removeChild(loading);appendMsg('assistant','❌ فشل');}},3000);}catch(e){msgs.removeChild(loading);appendMsg('assistant','❌ '+e.message);}}
+async function genImage(prompt){var msgs=document.getElementById('msgs');var loading=document.createElement('div');loading.className='flex gap-4 items-center mt-4';loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div> <span class="status-text">جاري انشاء الصورة...</span>';msgs.appendChild(loading);try{var resp=await fetch('/api/replicate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})});var data=await resp.json();var pid=data.id;var poll=setInterval(async function(){var r=await fetch('/api/replicate-check?id='+pid);var d=await r.json();if(d.status==='succeeded'){clearInterval(poll);msgs.removeChild(loading);appendMsg('assistant','<img src="'+(Array.isArray(d.output)?d.output[0]:d.output)+'" class="max-w-full rounded-xl">');}},3000);}catch(e){msgs.removeChild(loading);appendMsg('assistant','❌ '+e.message);}}
+async function genVideo(prompt){var msgs=document.getElementById('msgs');var loading=document.createElement('div');loading.className='flex gap-4 items-center mt-4';loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div> <span class="status-text">جاري انشاء الفيديو...</span>';msgs.appendChild(loading);try{var resp=await fetch('https://apihub.agnes-ai.com/v1/videos',{method:'POST',headers:{'Authorization':'Bearer sk-eV8aSN0NWxNYGnTdvws5nIGAcMWvUk0G2i0u5MdGIdyl2H1Q','Content-Type':'application/json'},body:JSON.stringify({model:'agnes-video-v2.0',prompt:prompt,num_frames:81,frame_rate:24})});var data=await resp.json();var vid=data.video_id||data.id;var poll=setInterval(async function(){var r=await fetch('https://apihub.agnes-ai.com/agnesapi?video_id='+vid,{headers:{'Authorization':'Bearer sk-eV8aSN0NWxNYGnTdvws5nIGAcMWvUk0G2i0u5MdGIdyl2H1Q'}});var d=await r.json();if(d.status==='completed'){clearInterval(poll);msgs.removeChild(loading);appendMsg('assistant','<video src="'+(d.metadata?.url||d.url)+'" controls class="max-w-full rounded-xl"></video>');}},3000);}catch(e){msgs.removeChild(loading);appendMsg('assistant','❌ '+e.message);}}
+async function sendMessage(){var input=document.getElementById('user-input');var text=input.value.trim();if(!text&&!selectedImage)return;
+if(selectedImage&&text){appendMsg('user',text,selectedImage);await editImage(selectedImage,text);input.value='';removeImage();return;}
+if(/(صمم|ارسم|انشئ|اصنع|تخيل).*(صورة|صوره)/i.test(text)){appendMsg('user',text);await genImage(text);input.value='';return;}
+if(/(صمم|انشئ|اصنع|اعمل).*(فيديو|فديو)/i.test(text)){appendMsg('user',text);await genVideo(text);input.value='';return;}
+if(selectedImage){appendMsg('user',text||'حلل الصورة',selectedImage);}else{appendMsg('user',text);}input.value='';removeImage();
+var msgs=document.getElementById('msgs');var loading=document.createElement('div');loading.className='flex gap-4 items-center mt-4';loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div> <span class="status-text">جاري التفكير...</span>';msgs.appendChild(loading);
+try{var m=MODELS.find(function(x){return x.id===currentModel;});var reply='';if(m.p==='nexii'){reply=await callNexii(currentModel,text);if(!reply)reply='❌ مفيش رد';}else{reply=await callGemini(currentModel,text);}msgs.removeChild(loading);appendMsg('assistant',reply);}catch(e){msgs.removeChild(loading);appendMsg('assistant','❌ '+e.message);}}
+document.getElementById('user-input').addEventListener('keypress',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
 </script>
 </body>
 </html>
