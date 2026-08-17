@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>OTP HUB</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
 body{background:#000;color:#0f0;min-height:100vh}
@@ -9,6 +11,8 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .app{max-width:500px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
 .header{text-align:center;padding:20px 0;border-bottom:2px solid #0f0;margin-bottom:10px}
 .header h1{font-size:26px;letter-spacing:3px;text-shadow:0 0 10px #0f0}
+.online-dot{display:inline-block;width:10px;height:10px;background:#0f0;border-radius:50%;animation:blink 1s infinite;margin-left:5px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
 .top-bar{display:flex;gap:8px;margin-bottom:15px}
 .search-box{flex:1;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:14px;font-family:'Courier New',monospace;border-radius:8px;outline:none}
 .search-box:focus{border-color:#0f0}
@@ -23,6 +27,8 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .card .code{font-size:30px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0}
 .card .prefix{color:#0ff;font-size:11px}
 .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
+.back-btn{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:8px 16px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;cursor:pointer;margin-bottom:15px;display:inline-block}
+.back-btn:hover{background:#0f0;color:#000}
 .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .num-box{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;text-align:center;cursor:pointer}
 .num-box:hover{border-color:#0f0}
@@ -41,14 +47,24 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <body>
 <div class="app" id="app"></div>
 <script>
+firebase.initializeApp({apiKey:"AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",projectId:"otp-5acda",databaseURL:"https://otp-5acda-default-rtdb.firebaseio.com"});
+const db=firebase.database();
 var PROXY='https://ai-proxy-eosin.vercel.app/api/panel';
 var known={},c=0,allCards=[],page='main';
-var currentSvc=localStorage.getItem('curSvc')||'';
-var currentCty=localStorage.getItem('curCty')||'';
-var currentFlag=localStorage.getItem('curFlag')||'';
 var myNums=JSON.parse(localStorage.getItem('myNums')||'[]');
 var flags={TG:'🇹🇬',LB:'🇱🇧',UA:'🇺🇦',AM:'🇦🇲',MZ:'🇲🇿',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',ID:'🇮🇩'};
 var cNames={TG:'توجو',LB:'لبنان',UA:'أوكرانيا',AM:'أرمينيا',MZ:'موزمبيق',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',ID:'إندونيسيا'};
+
+// عداد المستخدمين
+var myRef=db.ref('online').push();
+myRef.set({time:Date.now()});
+myRef.onDisconnect().remove();
+
+db.ref('online').on('value',function(snap){
+    var count=snap.numChildren();
+    var el=document.getElementById('onlineCount');
+    if(el)el.textContent=count;
+});
 
 function saveNums(){localStorage.setItem('myNums',JSON.stringify(myNums));}
 function extractCode(txt){var m=txt.match(/\d{3,8}[-.\s]?\d{3,8}/);if(m)return m[0];m=txt.match(/\d{4,8}/);return m?m[0]:txt.substring(0,15);}
@@ -69,23 +85,21 @@ function filter(){renderCards();}
 
 function showMain(){
     page='main';
-    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE</h1></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showAnalysis()">🏆 تحليل</button><button class="btn-sm" onclick="showNumbers()">📱 أرقام</button></div><div id="cards"></div><div class="stats" id="stats">⬢ '+c+' codes</div>';
+    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE <span class="online-dot"></span> <span id="onlineCount">0</span></h1></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showAnalysis()">🏆 تحليل</button><button class="btn-sm" onclick="showNumbers()">📱 أرقام</button></div><div id="cards"></div><div class="stats" id="stats">⬢ '+c+' codes</div>';
     renderCards();
     if(myNums.length>0){showMyNums();}
 }
 
 function showMyNums(){
     var html='<div style="margin-top:15px"><h3 style="color:#ff0;margin-bottom:8px">💾 أرقامي ('+myNums.length+')</h3><div class="grid2">';
-    myNums.forEach(function(n,i){
-        html+='<div class="num-box" onclick="navigator.clipboard.writeText(\''+n.num+'\')"><div class="flag">'+(n.flag||'🌍')+'</div><div class="svc">'+n.svc+'</div><div class="num">+'+n.num+'</div><div class="code">'+(n.code||'---')+'</div></div>';
-    });
+    myNums.forEach(function(n){html+='<div class="num-box" onclick="navigator.clipboard.writeText(\''+n.num+'\')"><div class="flag">'+(n.flag||'🌍')+'</div><div class="svc">'+n.svc+'</div><div class="num">+'+n.num+'</div><div class="code">'+(n.code||'---')+'</div></div>';});
     html+='</div></div>';
     document.getElementById('cards').insertAdjacentHTML('beforeend',html);
 }
 
 function showAnalysis(){
     page='analysis';
-    document.getElementById('app').innerHTML='<div class="header"><h1>🏆 تحليل</h1></div><button class="btn-sm" onclick="showMain()">← رجوع لـ OTP LIVE</button><div id="content" style="margin-top:10px;">⏳ جاري التحميل...</div>';
+    document.getElementById('app').innerHTML='<div class="header"><h1>🏆 تحليل</h1></div><button class="btn-sm" onclick="showMain()">← رجوع</button><div id="content" style="margin-top:10px;">⏳ جاري التحميل...</div>';
     fetch(PROXY+'/api/otp?count=200').then(function(r){return r.json();}).then(function(d){
         if(!Array.isArray(d))return;
         var svcs={};d.forEach(function(i){var svc=i[0];if(!svcs[svc])svcs[svc]={};var ct=(i[4]||'').trim();if(ct)svcs[svc][ct]=(svcs[svc][ct]||0)+1;});
@@ -99,7 +113,7 @@ function showAnalysis(){
 
 function showNumbers(){
     page='services';
-    document.getElementById('app').innerHTML='<div class="header"><h1>📱 الأرقام</h1></div><button class="btn-sm" onclick="showMain()">← رجوع لـ OTP LIVE</button><div id="content" style="margin-top:10px;">⏳ جاري التحميل...</div>';
+    document.getElementById('app').innerHTML='<div class="header"><h1>📱 الأرقام</h1></div><button class="btn-sm" onclick="showMain()">← رجوع</button><div id="content" style="margin-top:10px;">⏳ جاري التحميل...</div>';
     fetch(PROXY+'/api/services').then(function(r){return r.json();}).then(function(d){
         if(!d.success)return;
         var html='';d.services.forEach(function(s){html+='<div class="tag" onclick="showCountries(\''+s.key+'\',\''+s.name+'\')"><div class="name">'+s.name+'</div><div class="count">'+s.count+'</div></div>';});
@@ -108,7 +122,6 @@ function showNumbers(){
 }
 
 function showCountries(key,name){
-    localStorage.setItem('curSvc',key);
     document.getElementById('app').innerHTML='<div class="header"><h1>🌍 '+name+'</h1></div><button class="btn-sm" onclick="showNumbers()">← خدمات</button><div id="content" style="margin-top:10px;">⏳ جاري التحميل...</div>';
     fetch(PROXY+'/api/countries?service='+key).then(function(r){return r.json();}).then(function(d){
         if(!d.success)return;
@@ -118,59 +131,29 @@ function showCountries(key,name){
 }
 
 function showNums(country,flag,svcName,svcKey){
-    localStorage.setItem('curCty',country);
-    localStorage.setItem('curFlag',flag);
     document.getElementById('app').innerHTML='<div class="header"><h1>'+flag+' '+(cNames[country]||country)+'</h1></div><button class="btn-sm" onclick="showCountries(\''+svcKey+'\',\''+svcName+'\')">← دول</button><div id="numsArea" style="margin-top:10px;">⏳ جاري جلب الأرقام...</div>';
-    
-    // نجيب 4 أرقام جديدة ونحفظهم
     var promises=[];
-    for(var i=0;i<4;i++){
-        promises.push(fetch(PROXY+'/api/request_number',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:svcKey,country:country})}).then(function(r){return r.json();}));
-    }
+    for(var i=0;i<4;i++){promises.push(fetch(PROXY+'/api/request_number',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:svcKey,country:country})}).then(function(r){return r.json();}));}
     Promise.all(promises).then(function(results){
-        // نمسح الأرقام القديمة ونضيف الجديدة
-        myNums=[];
-        var html='<div class="grid2">';
-        results.forEach(function(d){
-            if(d&&d.number){
-                var obj={num:d.number,flag:d.flag||flag,svc:svcName,country:country,code:''};
-                myNums.push(obj);
-                html+='<div class="num-box" onclick="navigator.clipboard.writeText(\''+d.number+'\')"><div class="flag">'+(d.flag||flag||'🌍')+'</div><div class="svc">'+svcName+'</div><div class="num">+'+d.number+'</div><div class="code" id="cd_'+d.number+'">---</div></div>';
-            }
-        });
-        saveNums();
-        html+='</div><div class="btn-row"><button class="btn-sm" onclick="showNums(\''+country+'\',\''+flag+'\',\''+svcName+'\',\''+svcKey+'\')">🔄 تغيير الأرقام</button><button class="btn-sm" onclick="showCountries(\''+svcKey+'\',\''+svcName+'\')">🌍 تغيير الدولة</button><button class="btn-sm" onclick="showNumbers()">📱 تغيير الخدمة</button></div><div class="btn-row"><button class="btn-sm" onclick="fetchCodes(\''+country+'\')">📩 جلب الأكواد</button></div>';
+        myNums=[];var html='<div class="grid2">';
+        results.forEach(function(d){if(d&&d.number){var obj={num:d.number,flag:d.flag||flag,svc:svcName,country:country,code:''};myNums.push(obj);html+='<div class="num-box" onclick="navigator.clipboard.writeText(\''+d.number+'\')"><div class="flag">'+(d.flag||flag||'🌍')+'</div><div class="svc">'+svcName+'</div><div class="num">+'+d.number+'</div><div class="code" id="cd_'+d.number+'">---</div></div>';}});
+        saveNums();html+='</div><div class="btn-row"><button class="btn-sm" onclick="showNums(\''+country+'\',\''+flag+'\',\''+svcName+'\',\''+svcKey+'\')">🔄 تغيير</button><button class="btn-sm" onclick="showCountries(\''+svcKey+'\',\''+svcName+'\')">🌍 دولة</button><button class="btn-sm" onclick="showNumbers()">📱 خدمة</button></div><div class="btn-row"><button class="btn-sm" onclick="fetchCodes(\''+country+'\')">📩 أكواد</button></div>';
         document.getElementById('numsArea').innerHTML=html;
     });
 }
 
 function fetchCodes(country){
-    var nums=document.querySelectorAll('.num-box .num');
-    var found=false;
     fetch(PROXY+'/api/otp?count=50').then(function(r){return r.json();}).then(function(d){
         if(!Array.isArray(d)){alert('❌ لا توجد أكواد');return;}
         var flt=d.filter(function(i){return i[4]&&i[4].trim()===country;});
-        if(flt.length===0){alert('❌ لا توجد أكواد لهذه الدولة حالياً');return;}
-        flt.forEach(function(i){
-            var code=extractCode(i[2]||'');
-            var el=document.getElementById('cd_'+i[1]);
-            if(el){el.textContent=code;found=true;}
-            // تحديث في myNums كمان
-            myNums.forEach(function(n){
-                if(n.num===i[1]){n.code=code;}
-            });
-        });
+        if(flt.length===0){alert('❌ لا توجد أكواد لهذه الدولة');return;}
+        flt.forEach(function(i){var code=extractCode(i[2]||'');var el=document.getElementById('cd_'+i[1]);if(el)el.textContent=code;myNums.forEach(function(n){if(n.num===i[1]){n.code=code;}});});
         saveNums();
-        if(!found){alert('⚠️ الأكواد مش متطابقة مع الأرقام الحالية');}
     });
 }
 
-function go(){
-    fetch(PROXY+'/api/otp?count=10').then(function(r){return r.json();}).then(function(d){if(Array.isArray(d)){d.forEach(function(i){var k=i[1]+'-'+i[2];if(!known[k]){known[k]=true;add(i);}});}});
-}
+function go(){fetch(PROXY+'/api/otp?count=10').then(function(r){return r.json();}).then(function(d){if(Array.isArray(d)){d.forEach(function(i){var k=i[1]+'-'+i[2];if(!known[k]){known[k]=true;add(i);}});}});}
 
-// استعادة الأرقام لو موجودة
-if(myNums.length>0){page='main';}
 showMain();go();setInterval(go,2000);
 </script>
 </body>
