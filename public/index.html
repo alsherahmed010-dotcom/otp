@@ -89,7 +89,7 @@ function filter(){renderCards();}
 
 function showMain(){
     page='main';
-    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE</h1><div class="sub">متصلين: <span id="onlineCount">0</span> <span class="online-dot"></span></div></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showAnalysis()">🏆 تحليل</button><button class="btn-sm" onclick="showNumbers()">📱 أرقام</button></div><div id="cards"></div><div class="stats" id="stats">⬢ '+c+' codes</div><div class="footer">أرقام وهمية لجميع المنصات - استلم كود التفعيل مجاناً | واتساب - فيسبوك - تيك توك - انستجرام</div>';
+    document.getElementById('app').innerHTML='<div class="header"><h1>⬢ OTP LIVE <span class="online-dot"></span> <span id="onlineCount">0</span></h1></div><div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث برقم أو كود..." onkeyup="filter()"><button class="btn-sm" onclick="showAnalysis()">🏆 تحليل</button><button class="btn-sm" onclick="showNumbers()">📱 أرقام</button></div><div id="cards"></div><div class="stats" id="stats">⬢ '+c+' codes</div><div class="footer">أرقام وهمية لجميع المنصات - استلم كود التفعيل مجاناً | واتساب - فيسبوك - تيك توك - انستجرام</div>';
     renderCards();if(myNums.length>0){showMyNums();}
 }
 
