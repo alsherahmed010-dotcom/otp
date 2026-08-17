@@ -108,7 +108,7 @@ function showNums(country,flag,svcName,svcKey){document.getElementById('app').in
 function fetchCodes(country){fetch(PROXY+'/api/otp?count=50').then(function(r){return r.json();}).then(function(d){if(!Array.isArray(d)){alert('❌ لا توجد أكواد');return;}var flt=d.filter(function(i){return i[4]&&i[4].trim()===country;});if(flt.length===0){alert('❌ لا توجد أكواد لهذه الدولة');return;}flt.forEach(function(i){var code=extractCode(i[2]||'');var el=document.getElementById('cd_'+i[1]);if(el)el.textContent=code;myNums.forEach(function(n){if(n.num===i[1]){n.code=code;}});});saveNums();});}
 function go(){fetch(PROXY+'/api/otp?count=10').then(function(r){return r.json();}).then(function(d){if(Array.isArray(d)){d.forEach(function(i){var k=i[1]+'-'+i[2];if(!known[k]){known[k]=true;add(i);}});}});}
 
-showMain();go();setInterval(go,2000);
+showMain();go();setInterval(go,2000);setInterval(function(){db.ref("online").once("value").then(function(snap){snap.forEach(function(s){var d=s.val();if(d&&Date.now()-d.time>60000){db.ref("online/"+s.key).remove();}});});},10000);
 </script>
 </body>
 </html>
