@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>NEXUS AI Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{font-family:'Cairo',sans-serif;background:radial-gradient(circle at 50% 120%,#1a233a 0%,#000 60%);color:#e3e3e3}
+.chat-container{max-width:850px}
+.floating-input{background:rgba(30,31,32,.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:9999px}
+.sidebar{background:#131314;transition:transform .3s;border-left:1px solid #282a2c}
+.dots{display:inline-flex;gap:4px}
+.dots span{width:6px;height:6px;background:#a8c7fa;border-radius:50%;animation:b 1.4s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+</style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden relative">
+<div id="overlay" onclick="closeSidebar()" class="fixed inset-0 bg-black/70 z-30 hidden"></div>
+<aside id="sidebar" class="sidebar fixed top-0 right-0 h-full w-80 z-40 transform translate-x-full flex flex-col justify-between p-4">
+<div>
+<div class="flex items-center justify-between mb-6"><button onclick="closeSidebar()" class="p-2 hover:bg-[#333537] rounded-full"><span class="material-symbols-outlined">close</span></button><span class="font-semibold">الإعدادات</span></div>
+<button onclick="newChat()" class="flex items-center gap-3 bg-[#282a2c] hover:bg-[#333537] text-white px-4 py-3 rounded-2xl font-medium w-full mb-4"><span class="material-symbols-outlined">add</span> محادثة جديدة</button>
+<div class="text-xs text-gray-400 mb-2">المحادثات السابقة:</div>
+<div id="chat-list" class="space-y-1 max-h-[60vh] overflow-y-auto"></div>
+</div>
+</aside>
+<header class="flex items-center justify-between px-4 py-3 shrink-0 absolute top-0 w-full z-10">
+<div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-sm font-bold">I</div></div>
+<div class="flex items-center gap-1 bg-transparent hover:bg-white/10 px-3 py-1.5 rounded-full"><select id="model-select" onchange="changeModel()" class="bg-transparent text-white font-semibold text-sm outline-none appearance-none cursor-pointer text-center"></select><span class="material-symbols-outlined">keyboard_arrow_down</span></div>
+<button onclick="openSidebar()" class="p-2 hover:bg-white/10 rounded-full"><span class="material-symbols-outlined">menu</span></button>
+</header>
+<main class="flex-1 overflow-y-auto px-4 pt-20 pb-28 flex flex-col items-center">
+<div class="chat-container w-full flex-1 flex flex-col">
+<div id="welcome" class="my-auto text-center space-y-6"><h1 class="text-3xl font-medium">احمد، بماذا نبدأ؟</h1></div>
+<div id="msgs" class="space-y-6 w-full hidden pb-8"></div>
+</div>
+</main>
+<footer class="fixed bottom-0 w-full p-4 z-20 pointer-events-none">
+<div class="chat-container mx-auto pointer-events-auto relative">
+<input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFile(event)">
+<div id="img-preview-bar" class="hidden absolute -top-20 right-4 p-1 bg-[#1e1f20] rounded-xl border border-gray-700"><img id="img-preview" src="" class="h-16 rounded-lg object-cover"><button onclick="removeImage()" class="absolute -top-2 -left-2 bg-gray-800 text-white rounded-full w-6 h-6 text-xs">✕</button></div>
+<div class="floating-input px-2 py-2 flex items-center gap-2"><button onclick="document.getElementById('file-input').click()" class="p-2.5 text-gray-400 rounded-full"><span class="material-symbols-outlined">add</span></button><textarea id="user-input" rows="1" placeholder="اسأل Gemini" class="flex-1 bg-transparent border-none outline-none resize-none px-2 text-gray-100 max-h-32"></textarea><button onclick="sendMessage()" class="p-2.5 text-blue-300 rounded-full"><span class="material-symbols-outlined">send</span></button></div>
+</div>
+</footer>
+<script>
+const NEXII_KEY='sk-e0683fb0c7af3fc6-dcdb07-72c65552';
+const NEXII_BASE='https://ai.nexii.cloud/v1';
+const MODELS=[{id:'cf/@cf/deepseek-ai/deepseek-r1-distill-qwen-32b',label:'DeepSeek R1',p:'nexii'},{id:'cf/@cf/zai-org/glm-5.2',label:'GLM 5.2',p:'nexii'},{id:'cf/@cf/meta/llama-3.3-70b-instruct-fp8-fast',label:'Llama 70B',p:'nexii'},{id:'cf/@cf/meta/llama-3.1-8b-instruct-fp8',label:'Llama 8B',p:'nexii'},{id:'cf/@cf/qwen/qwen2.5-coder-32b-instruct',label:'Qwen Coder',p:'nexii'},{id:'gemini-3.6-flash',label:'Gemini 3.6',p:'gemini'}];
+let chats=JSON.parse(localStorage.getItem('aiChats')||'{}');
+let currentChatId=localStorage.getItem('currentChatId')||'';
+let history=chats[currentChatId]||[];
+let selectedImage=null;
+let currentModel=localStorage.getItem('aiModel')||MODELS[0].id;
+populateModels();renderHistory();renderChatList();
+function populateModels(){document.getElementById('model-select').innerHTML=MODELS.map(function(m){return '<option value="'+m.id+'"'+(m.id===currentModel?' selected':'')+' class="bg-[#1e1f20]">'+m.label+'</option>';}).join('');}
+function openSidebar(){document.getElementById('sidebar').classList.remove('translate-x-full');document.getElementById('overlay').classList.remove('hidden');}
+function closeSidebar(){document.getElementById('sidebar').classList.add('translate-x-full');document.getElementById('overlay').classList.add('hidden');}
+function changeModel(){currentModel=document.getElementById('model-select').value;localStorage.setItem('aiModel',currentModel);}
+function renderChatList(){var list=document.getElementById('chat-list');var ids=Object.keys(chats);if(ids.length===0){list.innerHTML='<div class="text-gray-500 text-xs text-center">لا محادثات</div>';return;}list.innerHTML=ids.map(function(id){var msgs=chats[id];var title=msgs.length>0?msgs[0].text.substring(0,20):'محادثة';return '<div class="p-2 rounded-xl cursor-pointer hover:bg-[#282a2c]'+(id===currentChatId?' bg-[#1e3a5f]':'')+'" onclick="loadChat(\''+id+'\')">'+title+'<br><small class="text-gray-500">'+msgs.length+'</small></div>';}).join('');}
+function loadChat(id){currentChatId=id;history=chats[id]||[];localStorage.setItem('currentChatId',id);renderHistory();renderChatList();closeSidebar();}
+function newChat(){if(history.length>0&&currentChatId){chats[currentChatId]=history;}currentChatId='chat_'+Date.now();history=[];chats[currentChatId]=[];localStorage.setItem('aiChats',JSON.stringify(chats));localStorage.setItem('currentChatId',currentChatId);renderHistory();renderChatList();closeSidebar();}
+function saveChat(){if(currentChatId){chats[currentChatId]=history;localStorage.setItem('aiChats',JSON.stringify(chats));}}
+function handleFile(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){selectedImage=ev.target.result;document.getElementById('img-preview').src=selectedImage;document.getElementById('img-preview-bar').classList.remove('hidden');};r.readAsDataURL(f);}
+function removeImage(){selectedImage=null;document.getElementById('file-input').value='';document.getElementById('img-preview-bar').classList.add('hidden');}
+function renderHistory(){var msgs=document.getElementById('msgs');var welcome=document.getElementById('welcome');if(history.length===0){welcome.classList.remove('hidden');msgs.classList.add('hidden');msgs.innerHTML='';return;}welcome.classList.add('hidden');msgs.classList.remove('hidden');msgs.innerHTML=history.map(function(m){if(m.role==='user'){return '<div class="flex justify-end"><div class="bg-[#282a2c] rounded-2xl px-4 py-3 max-w-[85%]">'+(m.image?'<img src="'+m.image+'" class="max-w-xs rounded-xl mb-2">':'')+m.text+'</div></div>';}return '<div class="flex justify-start"><div class="max-w-[85%]">'+m.text+'</div></div>';}).join('');window.scrollTo(0,document.body.scrollHeight);}
+function appendMsg(role,text,image){history.push({role:role,text:text,image:image||null});saveChat();renderHistory();}
+function callNexii(model,text){var messages=[];history.forEach(function(h){messages.push({role:h.role,content:h.text});});messages.push({role:'user',content:text});return fetch(NEXII_BASE+'/chat/completions',{method:'POST',headers:{'Authorization':'Bearer '+NEXII_KEY,'Content-Type':'application/json'},body:JSON.stringify({model:model,messages:messages,max_tokens:2048})}).then(function(r){return r.text();}).then(function(t){try{var d=JSON.parse(t);if(d.choices&&d.choices[0]&&d.choices[0].message)return d.choices[0].message.content||d.choices[0].message.reasoning_content||'';}catch(e){}var full='';var ls=t.split('\n');for(var i=0;i<ls.length;i++){if(ls[i].indexOf('data: ')>-1){var x=ls[i].substring(ls[i].indexOf('data: ')+6);if(x==='[DONE]')break;try{var j=JSON.parse(x);full+=j.choices[0].delta.content||'';}catch(e2){}}}return full;});}
+function callGemini(model,text){return fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:model,contents:[{role:'user',parts:[{text:text}]}]})}).then(function(r){return r.json();}).then(function(d){return d.candidates?.[0]?.content?.parts?.[0]?.text||('❌ '+(d.error?.message||'مفيش رد'));});}
+async function editImage(base64Img,editPrompt){var msgs=document.getElementById('msgs');var loading=document.createElement('div');loading.className='flex gap-4 items-center mt-4';loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';msgs.appendChild(loading);try{var resp=await fetch('/api/replicate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:editPrompt,image:base64Img})});var data=await resp.json();var pid=data.id;if(!pid){msgs.removeChild(loading);appendMsg('assistant','❌ '+JSON.stringify(data).substring(0,100));return;}var poll=setInterval(async function(){var r=await fetch('/api/replicate-check?id='+pid);var d=await r.json();if(d.status==='succeeded'){clearInterval(poll);msgs.removeChild(loading);appendMsg('assistant','<img src="'+(Array.isArray(d.output)?d.output[0]:d.output)+'" class="max-w-full rounded-xl">');}else if(d.status==='failed'){clearInterval(poll);msgs.removeChild(loading);appendMsg('assistant','❌ فشل');}},3000);}catch(e){msgs.removeChild(loading);appendMsg('assistant','❌ '+e.message);}}
+async function genImage(prompt){var msgs=document.getElementById('msgs');var loading=document.createElement('div');loading.className='flex gap-4 items-center mt-4';loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';msgs.appendChild(loading);try{var resp=await fetch('/api/replicate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt,image:null})});var data=await resp.json();var pid=data.id;var poll=setInterval(async function(){var r=await fetch('/api/replicate-check?id='+pid);var d=await r.json();if(d.status==='succeeded'){clearInterval(poll);msgs.removeChild(loading);appendMsg('assistant','<img src="'+(Array.isArray(d.output)?d.output[0]:d.output)+'" class="max-w-full rounded-xl">');}},3000);}catch(e){msgs.removeChild(loading);appendMsg('assistant','❌ '+e.message);}}
+async function sendMessage(){var input=document.getElementById('user-input');var text=input.value.trim();if(!text&&!selectedImage)return;
+if(selectedImage&&text){appendMsg('user',text,selectedImage);await editImage(selectedImage,text);input.value='';removeImage();return;}
+if(/(صمم|ارسم|انشئ|اصنع|تخيل).*(صورة|صوره)/i.test(text)){appendMsg('user',text);await genImage(text);input.value='';return;}
+if(selectedImage){appendMsg('user',text||'حلل الصورة',selectedImage);}else{appendMsg('user',text);}input.value='';removeImage();
+var msgs=document.getElementById('msgs');var loading=document.createElement('div');loading.className='flex gap-4 items-center mt-4';loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';msgs.appendChild(loading);
+try{var m=MODELS.find(function(x){return x.id===currentModel;});var reply='';if(m.p==='nexii'){reply=await callNexii(currentModel,text);if(!reply)reply='❌ مفيش رد';}else{reply=await callGemini(currentModel,text);}msgs.removeChild(loading);appendMsg('assistant',reply.replace(/\n/g,'<br>'));}catch(e){msgs.removeChild(loading);appendMsg('assistant','❌ '+e.message);}}
+document.getElementById('user-input').addEventListener('keypress',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+</script>
+</body>
+</html>
