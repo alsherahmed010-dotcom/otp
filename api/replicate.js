@@ -17,10 +17,15 @@ export default async function handler(req, res) {
         safety_tolerance: 2
     };
     
-    // بس نبعت input_images لو فيه صورة فعلاً
-    if (image && image.length > 10) {
-        inputObj.input_images = [image];
+    // لو فيه صورة - نضيفها
+    if (image && image.length > 100) {
+        // نتأكد إن الصورة بصيغة Data URI
+        const imgData = image.startsWith('data:') ? image : 'data:image/jpeg;base64,' + image;
+        inputObj.input_images = [imgData];
+        console.log('📷 تم استلام صورة بحجم:', imgData.length);
     }
+    
+    console.log('طلب Replicate:', { prompt: inputObj.prompt, hasImage: !!inputObj.input_images });
     
     const resp = await fetch('https://api.replicate.com/v1/predictions', {
         method: 'POST',
