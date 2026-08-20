@@ -2,30 +2,34 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>⬢ OTP LIVE</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
-body{background:#000;color:#0f0;min-height:100vh}
+body{background:#000;color:#0f0;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,0.03) 2px,rgba(0,255,0,0.03) 4px);pointer-events:none;animation:scan 6s linear infinite;z-index:0}
 @keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
 .app{max-width:500px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
 .scanline{position:fixed;top:0;left:0;width:100%;height:2px;background:rgba(0,255,0,.4);animation:scanline 3s linear infinite;z-index:100;pointer-events:none}
 @keyframes scanline{0%{top:0}100%{top:100vh}}
-.header{text-align:center;padding:15px 0;border-bottom:2px solid #0f0;margin-bottom:15px}
-.header h1{font-size:24px;letter-spacing:3px;text-shadow:0 0 15px #0f0}
-.header .sub{font-size:11px;color:#0a0;margin-top:5px}
+.top-header{display:flex;justify-content:flex-end;gap:8px;padding-bottom:5px}
+.icon-btn{background:#000;border:1px solid #1a3a1a;color:#0f0;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:14px}
+.header{text-align:center;padding:10px 0 15px;border-bottom:2px solid #0f0;margin-bottom:15px}
+.header h1{font-size:22px;letter-spacing:3px;text-shadow:0 0 15px #0f0}
+.header .sub{font-size:10px;color:#0a0;margin-top:5px}
 .live-dot{display:inline-block;width:10px;height:10px;background:#0f0;border-radius:50%;animation:blink 1s infinite;margin-left:5px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-.stats-bar{display:flex;justify-content:space-between;color:#0a0;font-size:11px;padding:8px 0}
-.card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in .3s;transition:border-color .3s}
+.top-bar{display:flex;gap:8px;margin-bottom:15px}
+.search-box{flex:1;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:13px;border-radius:8px;outline:none}
+.btn-sm{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:10px 12px;font-size:12px;border-radius:8px;cursor:pointer;white-space:nowrap;font-weight:bold}
+.btn-sm:hover{background:#0f0;color:#000}
+.card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in .3s}
 .card:hover{border-color:#0f0}
 .card.new{border-color:#ff0;box-shadow:0 0 20px rgba(255,255,0,.2)}
 @keyframes in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 .card .flag{font-size:32px;min-width:45px;text-align:center}
 .card .info{flex:1}
 .card .phone{color:#fff;font-weight:bold;font-size:15px;direction:ltr;text-align:left}
-.card .prefix{color:#0ff;font-size:11px;direction:ltr;text-align:left}
 .card .code{font-size:28px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0;text-align:left}
 .card .svc{color:#f00;font-size:10px}
 .new-badge{background:#ff0;color:#000;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:bold;animation:blink .5s infinite}
@@ -40,12 +44,21 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <div class="app" id="app"></div>
 
 <script>
-var PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
+const API_KEY = 'np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw';
+const BASE = 'https://numberpanel.tech/api';
+const PROXY = 'https://api.allorigins.win/raw?url=';
+
 var known = {};
 var allCards = [];
 var totalCodes = 0;
 var isFirstLoad = true;
-var flags = {TG:'🇹🇬',LB:'🇱🇧',UA:'🇺🇦',AM:'🇦🇲',MZ:'🇲🇿',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',ID:'🇮🇩'};
+var page = 'main';
+
+var flags = {
+    'Togo':'🇹🇬','Lebanon':'🇱🇧','Ukraine':'🇺🇦','Armenia':'🇦🇲',
+    'Mozambique':'🇲🇿','Zimbabwe':'🇿🇼','Libya':'🇱🇾','Burkina Faso':'🇧🇫',
+    'Indonesia':'🇮🇩','USA':'🇺🇸','United States':'🇺🇸','UK':'🇬🇧','Egypt':'🇪🇬'
+};
 
 function extractCode(txt) {
     if (!txt) return '---';
@@ -57,10 +70,9 @@ function extractCode(txt) {
 
 function addCard(i, isNew) {
     var code = extractCode(i[2] || '');
-    var ct = (i[4] || '').trim();
+    var ct = i[4] || '';
     var flag = flags[ct] || '🌍';
     var svc = i[0] || 'Unknown';
-    var prefix = i[1] ? i[1].substring(0, 7) : '';
     var phone = i[1] || '';
     
     allCards.unshift({
@@ -68,7 +80,6 @@ function addCard(i, isNew) {
             '<span class="flag">' + flag + '</span>' +
             '<div class="info">' +
                 '<div class="phone">📱 +' + phone + ' <span class="svc">[' + svc + ']</span></div>' +
-                '<div class="prefix">🆔 ' + prefix + '</div>' +
                 '<div class="code">' + code + '</div>' +
             '</div>' +
             (isNew ? '<span class="new-badge">NEW</span>' : '') +
@@ -80,52 +91,96 @@ function addCard(i, isNew) {
 
 function copyCode(code) { navigator.clipboard.writeText(code); }
 
-function renderCards() {
+function renderCards(q) {
+    q = (q || '').toLowerCase();
     var html = '';
-    for (var i = 0; i < allCards.length && i < 50; i++) html += allCards[i].html;
-    document.getElementById('cards').innerHTML = html;
+    for (var i = 0; i < allCards.length && i < 100; i++) {
+        if (!q || allCards[i].html.toLowerCase().indexOf(q) >= 0) html += allCards[i].html;
+    }
+    document.getElementById('cards').innerHTML = html || '<div class="loading">❌ مفيش نتايج</div>';
     document.getElementById('stats').textContent = '⬢ ' + totalCodes + ' أكواد';
 }
 
 function showMain() {
+    page = 'main';
     document.getElementById('app').innerHTML = 
-        '<div class="header"><h1>⬢ OTP LIVE <span class="live-dot"></span></h1><div class="sub">تحديث كل ثانية</div></div>' +
-        '<div class="stats-bar"><span id="stats">⬢ 0 أكواد</span><span id="lastUpdate">⏳ جاري...</span></div>' +
+        '<div class="top-header">' +
+            '<button class="icon-btn" onclick="showAnalysis()">🏆 تحليل</button>' +
+            '<button class="icon-btn" onclick="showNumbers()">📱 أرقام</button>' +
+        '</div>' +
+        '<div class="header"><h1>⬢ OTP LIVE <span class="live-dot"></span></h1><div class="sub">تحديث تلقائي كل ثانية</div></div>' +
+        '<div class="top-bar"><input type="text" class="search-box" placeholder="🔍 بحث برقم أو كود..." onkeyup="renderCards(this.value)"></div>' +
+        '<div id="stats" style="color:#0a0;font-size:11px;padding:5px">⬢ 0 أكواد</div>' +
         '<div id="cards"><div class="loading">⏳ جاري التحميل...</div></div>' +
-        '<div class="footer">OTP LIVE | واتساب - فيسبوك - تيك توك - انستجرام</div>';
+        '<div class="footer">OTP LIVE | أرقام وهمية حقيقية | واتساب - فيسبوك - تيك توك</div>';
+}
+
+function showAnalysis() {
+    document.getElementById('app').innerHTML = 
+        '<div class="header"><h1>🏆 تحليل</h1></div>' +
+        '<button class="btn-sm" onclick="showMain()">← رجوع</button>' +
+        '<div id="content" style="margin-top:10px"><div class="loading">⏳ جاري...</div></div>' +
+        '<div class="footer">تحليل الأكواد</div>';
+    
+    fetch(PROXY + encodeURIComponent(BASE + '/stats/detailed?period=daily'))
+    .then(r => r.json())
+    .then(d => {
+        document.getElementById('content').innerHTML = 
+            '<div style="background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:20px;text-align:center">' +
+            '<p style="font-size:30px;color:#ff0">📊 ' + (d.otp_count || 0) + '</p><p>إجمالي الأكواد</p>' +
+            '<p style="margin-top:10px">🌍 ' + (d.countries_count || 0) + ' دولة</p>' +
+            '<p>📱 ' + (d.services_count || 0) + ' خدمة</p></div>';
+    })
+    .catch(() => { document.getElementById('content').innerHTML = '<div class="loading">❌ فشل</div>'; });
+}
+
+function showNumbers() {
+    document.getElementById('app').innerHTML = 
+        '<div class="header"><h1>📱 الأرقام</h1></div>' +
+        '<button class="btn-sm" onclick="showMain()">← رجوع</button>' +
+        '<div id="content" style="margin-top:10px"><div class="loading">⏳ جاري...</div></div>' +
+        '<div class="footer">أرقامي النشطة</div>';
+    
+    fetch(PROXY + encodeURIComponent(BASE + '/my_numbers'), {
+        headers: {'Authorization': 'Bearer ' + API_KEY}
+    })
+    .then(r => r.json())
+    .then(d => {
+        var nums = d.numbers || [];
+        document.getElementById('content').innerHTML = nums.length === 0 ? 
+            '<div class="loading">❌ لا توجد أرقام نشطة</div>' :
+            nums.map(n => '<div style="background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:15px;margin-bottom:8px;font-size:20px;font-weight:bold">📱 +' + n + '</div>').join('');
+    })
+    .catch(() => { document.getElementById('content').innerHTML = '<div class="loading">❌ فشل</div>'; });
 }
 
 function fetchOTP() {
-    fetch(PROXY + '/otp?count=50')
-    .then(function(r) { return r.json(); })
-    .then(function(d) {
-        var list = Array.isArray(d) ? d : (d.data || d.otp || d.results || []);
-        if (Array.isArray(list) && list.length > 0) {
+    fetch(PROXY + encodeURIComponent(BASE + '/otp?count=50'))
+    .then(r => r.json())
+    .then(d => {
+        var list = Array.isArray(d) ? d : (d.data || []);
+        if (list.length > 0) {
             var newCount = 0;
             for (var idx = 0; idx < list.length; idx++) {
                 var i = list[idx];
-                if (!i) continue;
-                var phone = i[1] || i.phone || i.number || '';
-                var msg = i[2] || i.message || i.code || '';
-                if (!phone) continue;
-                var k = phone + '-' + msg;
+                if (!i || !i[1]) continue;
+                var k = i[1] + '-' + i[2];
                 if (!known[k]) {
                     known[k] = true;
-                    var arr = [i[0]||i.service||'', phone, msg, i[3]||'', i[4]||i.country||''];
-                    addCard(arr, !isFirstLoad);
+                    addCard(i, !isFirstLoad);
                     if (!isFirstLoad) newCount++;
                 }
             }
             isFirstLoad = false;
-            document.getElementById('lastUpdate').textContent = '🔄 ' + new Date().toLocaleTimeString('ar-EG') + (newCount > 0 ? ' | +' + newCount + ' جديد' : '');
-            renderCards();
-        } else {
-            document.getElementById('lastUpdate').textContent = '⏳ مفيش أكواد...';
+            if (page === 'main') {
+                var q = document.querySelector('.search-box') ? document.querySelector('.search-box').value : '';
+                renderCards(q);
+            }
+            var stats = document.getElementById('stats');
+            if (stats) stats.textContent = '⬢ ' + totalCodes + ' أكواد' + (newCount > 0 ? ' | +' + newCount + ' جديد' : '');
         }
     })
-    .catch(function() {
-        document.getElementById('lastUpdate').textContent = '❌ فشل';
-    });
+    .catch(() => {});
 }
 
 showMain();
