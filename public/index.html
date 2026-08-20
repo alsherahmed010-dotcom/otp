@@ -33,7 +33,6 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 .copy-btn:hover{background:#0f0;color:#000}
 .footer{text-align:center;padding:15px;color:#0a0;font-size:10px;margin-top:20px;border-top:1px solid #1a3a1a}
 .loading{text-align:center;color:#0a0;padding:30px}
-.error-msg{text-align:center;color:#f00;padding:20px}
 </style>
 </head>
 <body>
@@ -84,22 +83,14 @@ function copyCode(code) { navigator.clipboard.writeText(code); }
 function renderCards() {
     var html = '';
     for (var i = 0; i < allCards.length && i < 50; i++) html += allCards[i].html;
-    var cardsEl = document.getElementById('cards');
-    if (cardsEl) cardsEl.innerHTML = html;
-    var statsEl = document.getElementById('stats');
-    if (statsEl) statsEl.textContent = '⬢ ' + totalCodes + ' أكواد';
+    document.getElementById('cards').innerHTML = html;
+    document.getElementById('stats').textContent = '⬢ ' + totalCodes + ' أكواد';
 }
 
 function showMain() {
     document.getElementById('app').innerHTML = 
-        '<div class="header">' +
-            '<h1>⬢ OTP LIVE <span class="live-dot"></span></h1>' +
-            '<div class="sub">تحديث كل ثانية</div>' +
-        '</div>' +
-        '<div class="stats-bar">' +
-            '<span id="stats">⬢ 0 أكواد</span>' +
-            '<span id="lastUpdate">⏳ جاري...</span>' +
-        '</div>' +
+        '<div class="header"><h1>⬢ OTP LIVE <span class="live-dot"></span></h1><div class="sub">تحديث كل ثانية</div></div>' +
+        '<div class="stats-bar"><span id="stats">⬢ 0 أكواد</span><span id="lastUpdate">⏳ جاري...</span></div>' +
         '<div id="cards"><div class="loading">⏳ جاري التحميل...</div></div>' +
         '<div class="footer">OTP LIVE | واتساب - فيسبوك - تيك توك - انستجرام</div>';
 }
@@ -109,42 +100,31 @@ function fetchOTP() {
     .then(function(r) { return r.json(); })
     .then(function(d) {
         var list = Array.isArray(d) ? d : (d.data || d.otp || d.results || []);
-        
         if (Array.isArray(list) && list.length > 0) {
             var newCount = 0;
-            for (var idx = list.length - 1; idx >= 0; idx--) {
+            for (var idx = 0; idx < list.length; idx++) {
                 var i = list[idx];
                 if (!i) continue;
-                
-                // دعم صيغ مختلفة
                 var phone = i[1] || i.phone || i.number || '';
                 var msg = i[2] || i.message || i.code || '';
-                
                 if (!phone) continue;
-                
                 var k = phone + '-' + msg;
                 if (!known[k]) {
                     known[k] = true;
-                    // تحويل لصيغة array
                     var arr = [i[0]||i.service||'', phone, msg, i[3]||'', i[4]||i.country||''];
                     addCard(arr, !isFirstLoad);
                     if (!isFirstLoad) newCount++;
                 }
             }
             isFirstLoad = false;
-            var updateEl = document.getElementById('lastUpdate');
-            if (updateEl) {
-                updateEl.textContent = '🔄 ' + new Date().toLocaleTimeString('ar-EG') + (newCount > 0 ? ' | +' + newCount + ' جديد' : '');
-            }
+            document.getElementById('lastUpdate').textContent = '🔄 ' + new Date().toLocaleTimeString('ar-EG') + (newCount > 0 ? ' | +' + newCount + ' جديد' : '');
             renderCards();
         } else {
-            var updateEl = document.getElementById('lastUpdate');
-            if (updateEl) updateEl.textContent = '⏳ مفيش أكواد جديدة...';
+            document.getElementById('lastUpdate').textContent = '⏳ مفيش أكواد...';
         }
     })
     .catch(function() {
-        var updateEl = document.getElementById('lastUpdate');
-        if (updateEl) updateEl.textContent = '❌ فشل الاتصال';
+        document.getElementById('lastUpdate').textContent = '❌ فشل';
     });
 }
 
