@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>⬢ OTP LIVE</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
 body{background:#000;color:#0f0;min-height:100vh}
@@ -12,6 +14,9 @@ body{background:#000;color:#0f0;min-height:100vh}
 .icon-btn{background:#000;border:1px solid #1a3a1a;color:#0f0;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:14px}
 .header{text-align:center;padding:10px 0 20px;border-bottom:2px solid #0f0;margin-bottom:15px}
 .header h1{font-size:22px;letter-spacing:2px;text-shadow:0 0 10px #0f0}
+.online-dot{display:inline-block;width:8px;height:8px;background:#0f0;border-radius:50%;animation:blink 1s infinite;margin-right:5px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.online-count{color:#0f0;font-weight:bold;font-size:14px}
 .top-bar{display:flex;gap:8px;margin-bottom:15px}
 .search-box{flex:1;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:13px;border-radius:8px;outline:none}
 .btn-sm{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:10px 14px;font-size:12px;border-radius:8px;cursor:pointer;white-space:nowrap}
@@ -39,23 +44,32 @@ body{background:#000;color:#0f0;min-height:100vh}
 <div class="app" id="app"></div>
 
 <script>
+firebase.initializeApp({
+    apiKey: "AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",
+    projectId: "otp-5acda",
+    databaseURL: "https://otp-5acda-default-rtdb.firebaseio.com"
+});
+const db = firebase.database();
+
 var known = {};
 var c = 0;
 var allCards = [];
 var page = 'main';
-var isFirstLoad = true;
 
 var flags = {
     'UA':'🇺🇦','TG':'🇹🇬','HT':'🇭🇹','VE':'🇻🇪','LK':'🇱🇰','MZ':'🇲🇿',
     'BF':'🇧🇫','CI':'🇨🇮','ID':'🇮🇩','LB':'🇱🇧','LY':'🇱🇾','ZW':'🇿🇼',
-    'AM':'🇦🇲','US':'🇺🇸','EG':'🇪🇬','CI':'🇨🇮','IT':'🇮🇹','IQ':'🇮🇶','KW':'🇰🇼','BH':'🇧🇭','Ukraine':'🇺🇦','Togo':'🇹🇬',
-    'Haiti':'🇭🇹','Venezuela':'🇻🇪','Mozambique':'🇲🇿','Indonesia':'🇮🇩'
+    'AM':'🇦🇲','US':'🇺🇸','EG':'🇪🇬','IT':'🇮🇹','IQ':'🇮🇶','KW':'🇰🇼',
+    'BH':'🇧🇭','Ukraine':'🇺🇦','Togo':'🇹🇬','Haiti':'🇭🇹',
+    'Venezuela':'🇻🇪','Mozambique':'🇲🇿','Indonesia':'🇮🇩',
+    'Italy':'🇮🇹','Iraq':'🇮🇶','Kuwait':'🇰🇼','Bahrain':'🇧🇭'
 };
 
 var cNames = {
     'UA':'أوكرانيا','TG':'توجو','HT':'هايتي','VE':'فنزويلا','LK':'سريلانكا',
     'MZ':'موزمبيق','BF':'بوركينا فاسو','CI':'ساحل العاج','ID':'إندونيسيا',
-    'LB':'لبنان','LY':'ليبيا','ZW':'زيمبابوي','AM':'أرمينيا','US':'أمريكا','EG':'مصر','CI':'ساحل العاج','IT':'إيطاليا','IQ':'العراق','KW':'الكويت','BH':'البحرين'
+    'LB':'لبنان','LY':'ليبيا','ZW':'زيمبابوي','AM':'أرمينيا','US':'أمريكا',
+    'EG':'مصر','IT':'إيطاليا','IQ':'العراق','KW':'الكويت','BH':'البحرين'
 };
 
 function getFlag(ct) { return flags[ct] || '🌍'; }
@@ -70,6 +84,15 @@ function extractCode(txt) {
 }
 
 function copyCode(c) { navigator.clipboard.writeText(c); }
+
+// عداد المتصلين
+var myRef = db.ref('online').push();
+myRef.set({time: Date.now()});
+myRef.onDisconnect().remove();
+db.ref('online').on('value', function(snap) {
+    var el = document.getElementById('onlineCount');
+    if (el) el.textContent = snap.numChildren();
+});
 
 function add(i) {
     var code = extractCode(i[2] || '');
@@ -108,7 +131,7 @@ function showMain() {
             '<button class="icon-btn" onclick="showAnalysis()">🏆 تحليل</button>' +
             '<button class="icon-btn" onclick="showNumbers()">📱 أرقام</button>' +
         '</div>' +
-        '<div class="header"><h1>⬢ OTP LIVE</h1></div>' +
+        '<div class="header"><h1>⬢ OTP LIVE</h1><div style="margin-top:5px"><span class="online-dot"></span><span class="online-count" id="onlineCount">0</span></div></div>' +
         '<div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث..." onkeyup="renderCards()"></div>' +
         '<div id="cards"></div>' +
         '<div class="stats" id="stats">⬢ 0 أكواد</div>' +
@@ -172,7 +195,8 @@ function showCountries(key, name) {
     fetch('/api/countries?service=' + key).then(function(r) { return r.json(); }).then(function(d) {
         var html = '';
         (d.countries || []).forEach(function(c) {
-            html += '<div class="tag" onclick="showNums(\'' + c.name + '\',\'' + (c.flag || getFlag(c.name)) + '\',\'' + name + '\',\'' + key + '\')"><div class="flag">' + (c.flag || getFlag(c.name)) + '</div><div class="name">' + getName(c.name) + '</div><div class="count">' + c.count + '</div></div>';
+            var f = c.flag || getFlag(c.name);
+            html += '<div class="tag" onclick="showNums(\'' + c.name + '\',\'' + f + '\',\'' + name + '\',\'' + key + '\')"><div class="flag">' + f + '</div><div class="name">' + getName(c.name) + '</div><div class="count">' + c.count + '</div></div>';
         });
         document.getElementById('content').innerHTML = html;
     });
@@ -182,7 +206,7 @@ function showNums(country, flag, svcName, svcKey) {
     document.getElementById('app').innerHTML =
         '<div class="header"><h1>' + (flag || getFlag(country)) + ' ' + getName(country) + '</h1></div>' +
         '<button class="btn-sm" onclick="showCountries(\'' + svcKey + '\',\'' + svcName + '\')">← رجوع</button>' +
-        '<div id="numsArea" style="margin-top:10px">⏳ جاري جلب الأرقام...</div>';
+        '<div id="numsArea" style="margin-top:10px">⏳ جاري...</div>';
     
     var promises = [];
     for (var i = 0; i < 4; i++) {
