@@ -138,7 +138,7 @@ function showMain() {
 function showAnalysis() {
     page = 'analysis';
     document.getElementById('app').innerHTML = '<div class="header"><h1>🏆 تحليل</h1></div><button class="btn-sm" onclick="showMain()">← رجوع</button><div id="content" style="margin-top:10px">⏳ جاري التحميل...</div>';
-    fetch(PROXY + '/otp?count=200').then(function(r) { return r.json(); }).then(function(d) {
+    fetch('/api/otp?count=200').then(function(r) { return r.json(); }).then(function(d) {
         var list = Array.isArray(d) ? d : (d.data || d.otp || []);
         if (!Array.isArray(list) || list.length === 0) {
             document.getElementById('content').innerHTML = '<div style="color:#f00;text-align:center">❌ لا توجد أكواد</div>';
@@ -172,7 +172,7 @@ function showAnalysis() {
 function showNumbers() {
     page = 'services';
     document.getElementById('app').innerHTML = '<div class="header"><h1>📱 أرقام</h1></div><button class="btn-sm" onclick="showMain()">← رجوع</button><div id="content" style="margin-top:10px">⏳ جاري التحميل...</div>';
-    fetch(PROXY + '/services').then(function(r) { return r.json(); }).then(function(d) {
+    fetch('/api/services').then(function(r) { return r.json(); }).then(function(d) {
         if (!d || !d.services) return;
         var html = '';
         d.services.forEach(function(s) {
@@ -184,7 +184,7 @@ function showNumbers() {
 
 function showCountries(key, name) {
     document.getElementById('app').innerHTML = '<div class="header"><h1>🌍 ' + name + '</h1></div><button class="btn-sm" onclick="showNumbers()">← رجوع</button><div id="content" style="margin-top:10px">⏳ جاري التحميل...</div>';
-    fetch(PROXY + '/countries?service=' + key).then(function(r) { return r.json(); }).then(function(d) {
+    fetch('/api/countries?service=' + key).then(function(r) { return r.json(); }).then(function(d) {
         if (!d || !d.countries) return;
         var html = '';
         d.countries.forEach(function(c) {
@@ -221,7 +221,7 @@ function showNums(country, flag, svcName, svcKey) {
 }
 
 function fetchCodes(country) {
-    fetch(PROXY + '/otp?count=50').then(function(r) { return r.json(); }).then(function(d) {
+    fetch('/api/otp?count=50').then(function(r) { return r.json(); }).then(function(d) {
         var list = Array.isArray(d) ? d : (d.data || d.otp || []);
         if (!Array.isArray(list) || list.length === 0) { alert('❌ لا توجد أكواد'); return; }
         var flt = list.filter(function(i) { return i[4] && i[4].trim() === country; });
@@ -246,7 +246,7 @@ function cleanOldUsers() {
 }
 
 function go() {
-    fetch(PROXY + '/otp?count=20').then(function(r) { return r.json(); }).then(function(d) {
+    fetch('/api/otp?count=20').then(function(r) { return r.json(); }).then(function(d) {
         var list = Array.isArray(d) ? d : (d.data || d.otp || []);
         if (Array.isArray(list)) {
             for (var idx = list.length - 1; idx >= 0; idx--) {
