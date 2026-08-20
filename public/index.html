@@ -1,60 +1,51 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>⬢ OTP LIVE</title>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
-        body{background:#000;color:#0f0;min-height:100vh;overflow-x:hidden}
-        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,0.03) 2px,rgba(0,255,0,0.03) 4px);pointer-events:none;animation:scan 6s linear infinite;z-index:0}
-        @keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
-        .app{max-width:500px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
-        .scanline{position:fixed;top:0;left:0;width:100%;height:2px;background:rgba(0,255,0,.4);animation:scanline 3s linear infinite;z-index:100;pointer-events:none}
-        @keyframes scanline{0%{top:0}100%{top:100vh}}
-        .header{text-align:center;padding:15px 0;border-bottom:2px solid #0f0;margin-bottom:15px}
-        .header h1{font-size:24px;letter-spacing:3px;text-shadow:0 0 15px #0f0}
-        .header .sub{font-size:11px;color:#0a0;margin-top:5px}
-        .live-dot{display:inline-block;width:10px;height:10px;background:#0f0;border-radius:50%;animation:blink 1s infinite;margin-left:5px}
-        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-        .stats-bar{display:flex;justify-content:space-between;color:#0a0;font-size:11px;padding:8px 0}
-        .card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in .3s;transition:border-color .3s}
-        .card:hover{border-color:#0f0}
-        .card.new{border-color:#ff0;box-shadow:0 0 20px rgba(255,255,0,.2)}
-        @keyframes in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-        .card .flag{font-size:32px;min-width:45px;text-align:center}
-        .card .info{flex:1}
-        .card .phone{color:#fff;font-weight:bold;font-size:15px;direction:ltr;text-align:left}
-        .card .prefix{color:#0ff;font-size:11px;direction:ltr;text-align:left}
-        .card .code{font-size:28px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0;text-align:left}
-        .card .svc{color:#f00;font-size:10px}
-        .new-badge{background:#ff0;color:#000;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:bold;animation:blink .5s infinite}
-        .copy-btn{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px}
-        .copy-btn:hover{background:#0f0;color:#000}
-        .footer{text-align:center;padding:15px;color:#0a0;font-size:10px;margin-top:20px;border-top:1px solid #1a3a1a}
-        .loading{text-align:center;color:#0a0;padding:30px}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>⬢ OTP LIVE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
+body{background:#000;color:#0f0;min-height:100vh}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,0.03) 2px,rgba(0,255,0,0.03) 4px);pointer-events:none;animation:scan 6s linear infinite;z-index:0}
+@keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+.app{max-width:500px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
+.scanline{position:fixed;top:0;left:0;width:100%;height:2px;background:rgba(0,255,0,.4);animation:scanline 3s linear infinite;z-index:100;pointer-events:none}
+@keyframes scanline{0%{top:0}100%{top:100vh}}
+.header{text-align:center;padding:15px 0;border-bottom:2px solid #0f0;margin-bottom:15px}
+.header h1{font-size:24px;letter-spacing:3px;text-shadow:0 0 15px #0f0}
+.header .sub{font-size:11px;color:#0a0;margin-top:5px}
+.live-dot{display:inline-block;width:10px;height:10px;background:#0f0;border-radius:50%;animation:blink 1s infinite;margin-left:5px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+.stats-bar{display:flex;justify-content:space-between;color:#0a0;font-size:11px;padding:8px 0}
+.card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in .3s;transition:border-color .3s}
+.card:hover{border-color:#0f0}
+.card.new{border-color:#ff0;box-shadow:0 0 20px rgba(255,255,0,.2)}
+@keyframes in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.card .flag{font-size:32px;min-width:45px;text-align:center}
+.card .info{flex:1}
+.card .phone{color:#fff;font-weight:bold;font-size:15px;direction:ltr;text-align:left}
+.card .prefix{color:#0ff;font-size:11px;direction:ltr;text-align:left}
+.card .code{font-size:28px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0;text-align:left}
+.card .svc{color:#f00;font-size:10px}
+.new-badge{background:#ff0;color:#000;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:bold;animation:blink .5s infinite}
+.copy-btn{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px}
+.copy-btn:hover{background:#0f0;color:#000}
+.footer{text-align:center;padding:15px;color:#0a0;font-size:10px;margin-top:20px;border-top:1px solid #1a3a1a}
+.loading{text-align:center;color:#0a0;padding:30px}
+.error-msg{text-align:center;color:#f00;padding:20px}
+</style>
 </head>
 <body>
-    <div class="scanline"></div>
-    <div class="app" id="app"></div>
+<div class="scanline"></div>
+<div class="app" id="app"></div>
 
 <script>
-firebase.initializeApp({
-    apiKey: "AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",
-    projectId: "otp-5acda",
-    databaseURL: "https://otp-5acda-default-rtdb.firebaseio.com"
-});
-const db = firebase.database();
-
 var PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
 var known = {};
 var allCards = [];
 var totalCodes = 0;
 var isFirstLoad = true;
-
 var flags = {TG:'🇹🇬',LB:'🇱🇧',UA:'🇺🇦',AM:'🇦🇲',MZ:'🇲🇿',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',ID:'🇮🇩'};
 
 function extractCode(txt) {
@@ -65,14 +56,6 @@ function extractCode(txt) {
     return m ? m[0] : txt.substring(0, 15);
 }
 
-var myRef = db.ref('online').push();
-myRef.set({time: Date.now()});
-myRef.onDisconnect().remove();
-db.ref('online').on('value', function(snap) {
-    var el = document.getElementById('onlineCount');
-    if (el) el.textContent = snap.numChildren();
-});
-
 function addCard(i, isNew) {
     var code = extractCode(i[2] || '');
     var ct = (i[4] || '').trim();
@@ -82,8 +65,6 @@ function addCard(i, isNew) {
     var phone = i[1] || '';
     
     allCards.unshift({
-        phone: phone,
-        code: code,
         html: '<div class="card' + (isNew ? ' new' : '') + '">' +
             '<span class="flag">' + flag + '</span>' +
             '<div class="info">' +
@@ -94,22 +75,17 @@ function addCard(i, isNew) {
             (isNew ? '<span class="new-badge">NEW</span>' : '') +
             '<button class="copy-btn" onclick="event.stopPropagation();copyCode(\'' + code + '\')">📋 نسخ</button>' +
         '</div>'
-    );
+    });
     totalCodes++;
 }
 
-function copyCode(code) {
-    navigator.clipboard.writeText(code);
-}
+function copyCode(code) { navigator.clipboard.writeText(code); }
 
 function renderCards() {
     var html = '';
-    for (var i = 0; i < allCards.length && i < 100; i++) {
-        html += allCards[i].html;
-    }
+    for (var i = 0; i < allCards.length && i < 50; i++) html += allCards[i].html;
     var cardsEl = document.getElementById('cards');
     if (cardsEl) cardsEl.innerHTML = html;
-    
     var statsEl = document.getElementById('stats');
     if (statsEl) statsEl.textContent = '⬢ ' + totalCodes + ' أكواد';
 }
@@ -118,7 +94,7 @@ function showMain() {
     document.getElementById('app').innerHTML = 
         '<div class="header">' +
             '<h1>⬢ OTP LIVE <span class="live-dot"></span></h1>' +
-            '<div class="sub">تحديث كل ثانية | <span id="onlineCount">0</span> متصل</div>' +
+            '<div class="sub">تحديث كل ثانية</div>' +
         '</div>' +
         '<div class="stats-bar">' +
             '<span id="stats">⬢ 0 أكواد</span>' +
@@ -129,55 +105,52 @@ function showMain() {
 }
 
 function fetchOTP() {
-    fetch(PROXY + '/otp?count=50').then(function(r) { return r.json(); }).then(function(d) {
-        var list = Array.isArray(d) ? d : (d.data || d.otp || []);
+    fetch(PROXY + '/otp?count=50')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        var list = Array.isArray(d) ? d : (d.data || d.otp || d.results || []);
         
-        if (Array.isArray(list)) {
+        if (Array.isArray(list) && list.length > 0) {
             var newCount = 0;
-            
             for (var idx = list.length - 1; idx >= 0; idx--) {
                 var i = list[idx];
-                if (!i || !i[1]) continue;
+                if (!i) continue;
                 
-                var k = i[1] + '-' + i[2];
+                // دعم صيغ مختلفة
+                var phone = i[1] || i.phone || i.number || '';
+                var msg = i[2] || i.message || i.code || '';
+                
+                if (!phone) continue;
+                
+                var k = phone + '-' + msg;
                 if (!known[k]) {
                     known[k] = true;
-                    addCard(i, !isFirstLoad);
+                    // تحويل لصيغة array
+                    var arr = [i[0]||i.service||'', phone, msg, i[3]||'', i[4]||i.country||''];
+                    addCard(arr, !isFirstLoad);
                     if (!isFirstLoad) newCount++;
                 }
             }
-            
             isFirstLoad = false;
-            
             var updateEl = document.getElementById('lastUpdate');
             if (updateEl) {
-                var time = new Date().toLocaleTimeString('ar-EG');
-                updateEl.textContent = '🔄 ' + time + (newCount > 0 ? ' | +' + newCount + ' جديد' : '');
+                updateEl.textContent = '🔄 ' + new Date().toLocaleTimeString('ar-EG') + (newCount > 0 ? ' | +' + newCount + ' جديد' : '');
             }
-            
             renderCards();
+        } else {
+            var updateEl = document.getElementById('lastUpdate');
+            if (updateEl) updateEl.textContent = '⏳ مفيش أكواد جديدة...';
         }
-    }).catch(function(e) {
+    })
+    .catch(function() {
         var updateEl = document.getElementById('lastUpdate');
         if (updateEl) updateEl.textContent = '❌ فشل الاتصال';
-    });
-}
-
-function cleanOldUsers() {
-    db.ref("online").once("value").then(function(snap) {
-        snap.forEach(function(s) {
-            var d = s.val();
-            if (d && Date.now() - d.time > 300000) {
-                db.ref("online/" + s.key).remove();
-            }
-        });
     });
 }
 
 showMain();
 fetchOTP();
 setInterval(fetchOTP, 1000);
-setInterval(cleanOldUsers, 10000);
 </script>
 </body>
 </html>
