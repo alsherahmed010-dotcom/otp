@@ -261,7 +261,7 @@ function go() {
 
 showMain();
 go();
-setInterval(go, 1000);
+setInterval(go, 1000); setInterval(function(){ if(page==='numbers' || document.getElementById('numsArea')) { var country = localStorage.getItem('lastCountry'); if(country) fetchCodes(country); } }, 3000);
 </script>
 </body>
 </html>
