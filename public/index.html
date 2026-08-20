@@ -50,7 +50,7 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 var known = {}, c = 0, allCards = [], page = 'main', isFirstLoad = true;
 var myNumbers = [];
 
-var flags = {'UA':'🇺🇦','TG':'🇹🇬','HT':'🇭🇹','VE':'🇻🇪','LK':'🇱🇰','MZ':'🇲🇿','BF':'🇧🇫','CI':'🇨🇮','ID':'🇮🇩','LB':'🇱🇧','LY':'🇱🇾','ZW':'🇿🇼','AM':'🇦🇲','US':'🇺🇸','EG':'🇪🇬'};
+var flags = {'UA':'🇺🇦','Ukraine':'🇺🇦','TG':'🇹🇬','Togo':'🇹🇬','HT':'🇭🇹','Haiti':'🇭🇹','VE':'🇻🇪','Venezuela':'🇻🇪','LK':'🇱🇰','Sri Lanka':'🇱🇰','MZ':'🇲🇿','Mozambique':'🇲🇿','BF':'🇧🇫','Burkina Faso':'🇧🇫','CI':'🇨🇮','ID':'🇮🇩','Indonesia':'🇮🇩','LB':'🇱🇧','LY':'🇱🇾','ZW':'🇿🇼','AM':'🇦🇲','US':'🇺🇸','EG':'🇪🇬'};
 var cNames = {'UA':'أوكرانيا','TG':'توجو','HT':'هايتي','VE':'فنزويلا','LK':'سريلانكا','MZ':'موزمبيق','BF':'بوركينا فاسو','CI':'ساحل العاج','ID':'إندونيسيا','LB':'لبنان','LY':'ليبيا','ZW':'زيمبابوي','AM':'أرمينيا','US':'أمريكا','EG':'مصر'};
 
 function getFlag(ct){return flags[ct]||'🌍';}
