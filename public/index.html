@@ -7,35 +7,27 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
 body{background:#000;color:#0f0;min-height:100vh}
-body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,0.03) 2px,rgba(0,255,0,0.03) 4px);pointer-events:none;animation:scan 6s linear infinite}
-@keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
-.app{max-width:500px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
+.app{max-width:500px;margin:0 auto;min-height:100vh;padding:15px}
 .top-header{display:flex;justify-content:flex-end;gap:10px;padding-bottom:5px}
-.icon-btn{background:#000;border:1px solid #1a3a1a;color:#0f0;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px}
+.icon-btn{background:#000;border:1px solid #1a3a1a;color:#0f0;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:14px}
 .header{text-align:center;padding:10px 0 20px;border-bottom:2px solid #0f0;margin-bottom:15px}
 .header h1{font-size:22px;letter-spacing:2px;text-shadow:0 0 10px #0f0}
-.online-dot{display:inline-block;width:10px;height:10px;background:#0f0;border-radius:50%;animation:blink 1s infinite;margin-left:5px}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
 .top-bar{display:flex;gap:8px;margin-bottom:15px}
 .search-box{flex:1;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:13px;border-radius:8px;outline:none}
-.btn-sm{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:10px 14px;font-size:13px;border-radius:8px;cursor:pointer;white-space:nowrap;font-weight:bold}
-.btn-sm:hover{background:#0f0;color:#000}
-.card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in .2s}
-@keyframes in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.btn-sm{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:10px 14px;font-size:12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px}
 .card .flag{font-size:32px;min-width:45px;text-align:center}
 .card .info{flex:1}
 .card .phone{color:#fff;font-weight:bold;font-size:15px;direction:ltr;text-align:left}
-.card .code{font-size:28px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-align:left}
+.card .code{font-size:28px;font-weight:bold;color:#ff0;direction:ltr;text-align:left}
 .card .country{color:#0ff;font-size:11px;text-align:left}
 .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
 .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.num-box{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;text-align:center;cursor:pointer}
-.num-box .flag{font-size:28px}
-.num-box .svc{color:#f00;font-size:10px}
-.num-box .num{color:#fff;font-weight:bold;font-size:18px;direction:ltr}
-.num-box .code{background:#000;border:1px solid #ff0;color:#ff0;padding:4px 10px;border-radius:4px;font-weight:bold;font-size:16px;direction:ltr;display:inline-block;margin-top:6px}
-.tag{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:12px;text-align:center;cursor:pointer;font-size:14px;display:inline-block;margin:4px}
-.tag .name{color:#fff;font-weight:bold}
+.num-box{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;text-align:center}
+.num-box .num{color:#fff;font-weight:bold;font-size:16px;direction:ltr}
+.num-box .code{background:#000;border:1px solid #ff0;color:#ff0;padding:4px 10px;border-radius:4px;font-size:16px;direction:ltr;display:inline-block;margin-top:6px}
+.tag{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:12px;text-align:center;cursor:pointer;display:inline-block;margin:4px}
+.tag .name{color:#fff;font-weight:bold;font-size:14px}
 .tag .count{color:#ff0;font-size:12px}
 .tag .flag{font-size:24px}
 .btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
@@ -47,143 +39,205 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <div class="app" id="app"></div>
 
 <script>
-<script src="flags.js"></script>
-var known = {}, c = 0, allCards = [], page = 'main', isFirstLoad = true;
-var myNumbers = [];
+var known = {};
+var c = 0;
+var allCards = [];
+var page = 'main';
+var isFirstLoad = true;
 
-var flags = {'UA':'🇺🇦','Ukraine':'🇺🇦','TG':'🇹🇬','Togo':'🇹🇬','HT':'🇭🇹','Haiti':'🇭🇹','VE':'🇻🇪','Venezuela':'🇻🇪','LK':'🇱🇰','Sri Lanka':'🇱🇰','MZ':'🇲🇿','Mozambique':'🇲🇿','BF':'🇧🇫','Burkina Faso':'🇧🇫','CI':'🇨🇮','ID':'🇮🇩','Indonesia':'🇮🇩','LB':'🇱🇧','LY':'🇱🇾','ZW':'🇿🇼','AM':'🇦🇲','US':'🇺🇸','EG':'🇪🇬'};
-var cNames = {'UA':'أوكرانيا','TG':'توجو','HT':'هايتي','VE':'فنزويلا','LK':'سريلانكا','MZ':'موزمبيق','BF':'بوركينا فاسو','CI':'ساحل العاج','ID':'إندونيسيا','LB':'لبنان','LY':'ليبيا','ZW':'زيمبابوي','AM':'أرمينيا','US':'أمريكا','EG':'مصر'};
+var flags = {
+    'UA':'🇺🇦','TG':'🇹🇬','HT':'🇭🇹','VE':'🇻🇪','LK':'🇱🇰','MZ':'🇲🇿',
+    'BF':'🇧🇫','CI':'🇨🇮','ID':'🇮🇩','LB':'🇱🇧','LY':'🇱🇾','ZW':'🇿🇼',
+    'AM':'🇦🇲','US':'🇺🇸','EG':'🇪🇬','Ukraine':'🇺🇦','Togo':'🇹🇬',
+    'Haiti':'🇭🇹','Venezuela':'🇻🇪','Mozambique':'🇲🇿','Indonesia':'🇮🇩'
+};
 
-function getFlag(ct){return flags[ct]||'🌍';}
-function getName(ct){return cNames[ct]||ct||'';}
-function extractCode(txt){
-    if(!txt)return'---';
-    var m=txt.match(/\d{3}[-.\s]?\d{3}/);
-    if(m)return m[0];
-    m=txt.match(/\d{4,8}/);
-    return m?m[0]:'---';
+var cNames = {
+    'UA':'أوكرانيا','TG':'توجو','HT':'هايتي','VE':'فنزويلا','LK':'سريلانكا',
+    'MZ':'موزمبيق','BF':'بوركينا فاسو','CI':'ساحل العاج','ID':'إندونيسيا',
+    'LB':'لبنان','LY':'ليبيا','ZW':'زيمبابوي','AM':'أرمينيا','US':'أمريكا','EG':'مصر'
+};
+
+function getFlag(ct) { return flags[ct] || '🌍'; }
+function getName(ct) { return cNames[ct] || ct || ''; }
+
+function extractCode(txt) {
+    if (!txt) return '---';
+    var m = txt.match(/\d{3}[-.\s]?\d{3}/);
+    if (m) return m[0];
+    m = txt.match(/\d{4,8}/);
+    return m ? m[0] : '---';
 }
-function copyCode(c){navigator.clipboard.writeText(c);}
 
-function add(i){
-    var code=extractCode(i[2]||'');
-    var ct=(i[4]||'').trim();
-    allCards.unshift({html:'<div class="card" onclick="copyCode(\''+code+'\')"><span class="flag">'+getFlag(ct)+'</span><div class="info"><div class="phone">📱 +'+i[1]+'</div><div class="country">'+getFlag(ct)+' '+getName(ct)+'</div><div class="code">'+code+'</div></div></div>',search:(i[1]||'')+' '+code});
+function copyCode(c) { navigator.clipboard.writeText(c); }
+
+function add(i) {
+    var code = extractCode(i[2] || '');
+    var ct = (i[4] || '').trim();
+    var f = getFlag(ct);
+    var n = getName(ct);
+    
+    allCards.unshift({
+        html: '<div class="card" onclick="copyCode(\'' + code + '\')">' +
+            '<span class="flag">' + f + '</span>' +
+            '<div class="info">' +
+                '<div class="phone">📱 +' + i[1] + '</div>' +
+                '<div class="country">' + f + ' ' + n + '</div>' +
+                '<div class="code">' + code + '</div>' +
+            '</div></div>',
+        search: (i[1] || '') + ' ' + code + ' ' + n
+    });
     c++;
-    if(page==='main')renderCards();
-    var s=document.getElementById('stats');
-    if(s)s.textContent='⬢ '+c+' أكواد';
+    if (page === 'main') renderCards();
 }
 
-function renderCards(){
-    var q=(document.getElementById('search')?document.getElementById('search').value:'').toLowerCase();
-    var html='';
-    for(var i=0;i<allCards.length;i++){if(!q||allCards[i].search.toLowerCase().indexOf(q)>=0)html+=allCards[i].html;}
-    var cards=document.getElementById('cards');
-    if(cards)cards.innerHTML=html;
+function renderCards() {
+    var q = (document.getElementById('search') ? document.getElementById('search').value : '').toLowerCase();
+    var html = '';
+    for (var i = 0; i < allCards.length; i++) {
+        if (!q || allCards[i].search.toLowerCase().indexOf(q) >= 0) html += allCards[i].html;
+    }
+    document.getElementById('cards').innerHTML = html;
+    document.getElementById('stats').textContent = '⬢ ' + c + ' أكواد';
 }
 
-function showMain(){
-    page='main';
-    document.getElementById('app').innerHTML=
-        '<div class="top-header"><button class="icon-btn" onclick="showAnalysis()">🏆 تحليل</button><button class="icon-btn" onclick="showNumbers()">📱 أرقام</button></div>'+
-        '<div class="header"><h1>⬢ OTP LIVE <span class="online-dot"></span></h1></div>'+
-        '<div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث..." onkeyup="renderCards()"></div>'+
-        '<div id="cards"></div><div class="stats" id="stats">⬢ 0 أكواد</div>'+
+function showMain() {
+    page = 'main';
+    document.getElementById('app').innerHTML =
+        '<div class="top-header">' +
+            '<button class="icon-btn" onclick="showAnalysis()">🏆 تحليل</button>' +
+            '<button class="icon-btn" onclick="showNumbers()">📱 أرقام</button>' +
+        '</div>' +
+        '<div class="header"><h1>⬢ OTP LIVE</h1></div>' +
+        '<div class="top-bar"><input type="text" class="search-box" id="search" placeholder="🔍 بحث..." onkeyup="renderCards()"></div>' +
+        '<div id="cards"></div>' +
+        '<div class="stats" id="stats">⬢ 0 أكواد</div>' +
         '<div class="footer">أرقام وهمية لجميع المنصات</div>';
     renderCards();
 }
 
-function showAnalysis(){
-    page='analysis';
-    document.getElementById('app').innerHTML='<div class="header"><h1>🏆 تحليل</h1></div><button class="btn-sm" onclick="showMain()">← رجوع</button><div id="content" style="margin-top:10px">⏳ جاري...</div>';
-    fetch('/api/otp?count=200').then(r=>r.json()).then(d=>{
-        var list=Array.isArray(d)?d:[];
-        if(!list.length){document.getElementById('content').innerHTML='❌ مفيش';return;}
-        var svcs={};
-        list.forEach(i=>{var svc=i[0]||'Unknown';var ct=(i[4]||'').trim();if(!svcs[svc])svcs[svc]={};if(ct)svcs[svc][ct]=(svcs[svc][ct]||0)+1;});
-        var html='';
-        for(var svc in svcs){
-            var top=[];
-            for(var k in svcs[svc])top.push([k,svcs[svc][k]]);
-            top.sort((a,b)=>b[1]-a[1]);
-            html+='<div style="margin-bottom:15px"><h3 style="color:#ff0">📱 '+svc+'</h3><div style="display:flex;flex-wrap:wrap;gap:8px">';
-            top.slice(0,10).forEach(t=>{html+='<div class="tag"><div class="flag">'+getFlag(t[0])+'</div><div class="name">'+getName(t[0])+'</div><div class="count">'+t[1]+'</div></div>';});
-            html+='</div></div>';
-        }
-        document.getElementById('content').innerHTML=html;
-    }).catch(()=>{document.getElementById('content').innerHTML='❌ فشل';});
-}
-
-function showNumbers(){
-    page='services';
-    document.getElementById('app').innerHTML='<div class="header"><h1>📱 أرقام</h1></div><button class="btn-sm" onclick="showMain()">← رجوع</button><div id="content" style="margin-top:10px">⏳ جاري...</div>';
-    fetch('/api/services').then(r=>r.json()).then(d=>{
-        var html='';
-        (d.services||[]).forEach(s=>{html+='<div class="tag" onclick="showCountries(\''+s.key+'\',\''+s.name+'\')"><div class="name">'+s.name+'</div><div class="count">'+s.count+'</div></div>';});
-        document.getElementById('content').innerHTML=html;
-    });
-}
-
-function showCountries(key,name){
-    document.getElementById('app').innerHTML='<div class="header"><h1>🌍 '+name+'</h1></div><button class="btn-sm" onclick="showNumbers()">← رجوع</button><div id="content" style="margin-top:10px">⏳ جاري...</div>';
-    fetch('/api/countries?service='+key).then(r=>r.json()).then(d=>{
-        var html='';
-        (d.countries||[]).forEach(c=>{html+='<div class="tag" onclick="showNums(\''+c.name+'\',\''+(c.flag||getFlag(c.name))+'\',\''+name+'\',\''+key+'\')"><div class="flag">'+(c.flag||getFlag(c.name))+'</div><div class="name">'+getName(c.name)+'</div><div class="count">'+c.count+'</div></div>';});
-        document.getElementById('content').innerHTML=html;
-    });
-}
-
-function showNums(country,flag,svcName,svcKey){
-    document.getElementById('app').innerHTML='<div class="header"><h1>'+(flag||getFlag(country))+' '+getName(country)+'</h1></div><button class="btn-sm" onclick="showCountries(\''+svcKey+'\',\''+svcName+'\')">← رجوع</button><div id="numsArea" style="margin-top:10px">⏳ جاري جلب الأرقام...</div>';
+function showAnalysis() {
+    page = 'analysis';
+    document.getElementById('app').innerHTML =
+        '<div class="header"><h1>🏆 تحليل</h1></div>' +
+        '<button class="btn-sm" onclick="showMain()">← رجوع</button>' +
+        '<div id="content" style="margin-top:10px">⏳ جاري...</div>';
     
-    var promises=[];
-    for(var i=0;i<4;i++){
-        promises.push(fetch('/api/request-number',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({service:svcKey,country:country})}).then(r=>r.json()).catch(()=>({})));
+    fetch('/api/otp?count=200').then(function(r) { return r.json(); }).then(function(d) {
+        var list = Array.isArray(d) ? d : [];
+        var svcs = {};
+        list.forEach(function(i) {
+            var svc = i[0] || 'Unknown';
+            var ct = (i[4] || '').trim();
+            if (!svcs[svc]) svcs[svc] = {};
+            if (ct) svcs[svc][ct] = (svcs[svc][ct] || 0) + 1;
+        });
+        var html = '';
+        for (var svc in svcs) {
+            var top = [];
+            for (var k in svcs[svc]) top.push([k, svcs[svc][k]]);
+            top.sort(function(a, b) { return b[1] - a[1]; });
+            html += '<div style="margin-bottom:15px"><h3 style="color:#ff0">📱 ' + svc + '</h3><div style="display:flex;flex-wrap:wrap;gap:8px">';
+            top.slice(0, 10).forEach(function(t) {
+                html += '<div class="tag"><div class="flag">' + getFlag(t[0]) + '</div><div class="name">' + getName(t[0]) + '</div><div class="count">' + t[1] + '</div></div>';
+            });
+            html += '</div></div>';
+        }
+        document.getElementById('content').innerHTML = html;
+    });
+}
+
+function showNumbers() {
+    page = 'services';
+    document.getElementById('app').innerHTML =
+        '<div class="header"><h1>📱 أرقام</h1></div>' +
+        '<button class="btn-sm" onclick="showMain()">← رجوع</button>' +
+        '<div id="content" style="margin-top:10px">⏳ جاري...</div>';
+    
+    fetch('/api/services').then(function(r) { return r.json(); }).then(function(d) {
+        var html = '';
+        (d.services || []).forEach(function(s) {
+            html += '<div class="tag" onclick="showCountries(\'' + s.key + '\',\'' + s.name + '\')"><div class="name">' + s.name + '</div><div class="count">' + s.count + '</div></div>';
+        });
+        document.getElementById('content').innerHTML = html;
+    });
+}
+
+function showCountries(key, name) {
+    document.getElementById('app').innerHTML =
+        '<div class="header"><h1>🌍 ' + name + '</h1></div>' +
+        '<button class="btn-sm" onclick="showNumbers()">← رجوع</button>' +
+        '<div id="content" style="margin-top:10px">⏳ جاري...</div>';
+    
+    fetch('/api/countries?service=' + key).then(function(r) { return r.json(); }).then(function(d) {
+        var html = '';
+        (d.countries || []).forEach(function(c) {
+            html += '<div class="tag" onclick="showNums(\'' + c.name + '\',\'' + (c.flag || getFlag(c.name)) + '\',\'' + name + '\',\'' + key + '\')"><div class="flag">' + (c.flag || getFlag(c.name)) + '</div><div class="name">' + getName(c.name) + '</div><div class="count">' + c.count + '</div></div>';
+        });
+        document.getElementById('content').innerHTML = html;
+    });
+}
+
+function showNums(country, flag, svcName, svcKey) {
+    document.getElementById('app').innerHTML =
+        '<div class="header"><h1>' + (flag || getFlag(country)) + ' ' + getName(country) + '</h1></div>' +
+        '<button class="btn-sm" onclick="showCountries(\'' + svcKey + '\',\'' + svcName + '\')">← رجوع</button>' +
+        '<div id="numsArea" style="margin-top:10px">⏳ جاري جلب الأرقام...</div>';
+    
+    var promises = [];
+    for (var i = 0; i < 4; i++) {
+        promises.push(fetch('/api/request-number', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({service: svcKey, country: country})
+        }).then(function(r) { return r.json(); }).catch(function() { return {}; }));
     }
     
-    Promise.all(promises).then(results=>{
-        var html='<div class="grid2">';
-        results.forEach(d=>{
-            if(d&&d.number){
-                html+='<div class="num-box" onclick="copyCode(\''+d.number+'\')"><div class="flag">'+(flag||getFlag(country))+'</div><div class="svc">'+svcName+'</div><div class="num">+'+d.number+'</div><div class="code" id="cd_'+d.number+'">***</div></div>';
+    Promise.all(promises).then(function(results) {
+        var html = '<div class="grid2">';
+        results.forEach(function(d) {
+            if (d && d.number) {
+                html += '<div class="num-box" onclick="copyCode(\'' + d.number + '\')"><div class="flag">' + (flag || getFlag(country)) + '</div><div style="color:#f00;font-size:10px">' + svcName + '</div><div class="num">+' + d.number + '</div><div class="code" id="cd_' + d.number + '">***</div></div>';
             }
         });
-        html+='</div>';
-        html+='<div class="btn-row"><button class="btn-sm" onclick="showNums(\''+country+'\',\''+flag+'\',\''+svcName+'\',\''+svcKey+'\')">🔄 تغيير الرقم</button><button class="btn-sm" onclick="showCountries(\''+svcKey+'\',\''+svcName+'\')">🌍 تغيير الدولة</button></div>';
-        html+='<div class="btn-row"><button class="btn-sm" onclick="fetchCodes(\''+country+'\')">📩 تحديث الأكواد</button></div>';
-        document.getElementById('numsArea').innerHTML=html;
+        html += '</div>';
+        html += '<div class="btn-row"><button class="btn-sm" onclick="showNums(\'' + country + '\',\'' + flag + '\',\'' + svcName + '\',\'' + svcKey + '\')">🔄 تغيير الرقم</button><button class="btn-sm" onclick="showCountries(\'' + svcKey + '\',\'' + svcName + '\')">🌍 تغيير الدولة</button></div>';
+        html += '<div class="btn-row"><button class="btn-sm" onclick="fetchCodes(\'' + country + '\')">📩 تحديث الأكواد</button></div>';
+        document.getElementById('numsArea').innerHTML = html;
     });
 }
 
-function fetchCodes(country){
-    fetch('/api/otp?count=50').then(r=>r.json()).then(d=>{
-        var list=Array.isArray(d)?d:[];
-        var flt=list.filter(i=>i[4]&&i[4].trim()===country);
-        flt.forEach(i=>{
-            var code=extractCode(i[2]||'');
-            var el=document.getElementById('cd_'+i[1]);
-            if(el)el.textContent=code;
+function fetchCodes(country) {
+    fetch('/api/otp?count=50').then(function(r) { return r.json(); }).then(function(d) {
+        var list = Array.isArray(d) ? d : [];
+        list.forEach(function(i) {
+            if (i[4] && i[4].trim() === country) {
+                var code = extractCode(i[2] || '');
+                var el = document.getElementById('cd_' + i[1]);
+                if (el) el.textContent = code;
+            }
         });
     });
 }
 
-function go(){
-    fetch('/api/otp?count=50').then(r=>r.json()).then(d=>{
-        var list=Array.isArray(d)?d:[];
-        for(var idx=list.length-1;idx>=0;idx--){
-            var i=list[idx];
-            if(!i||!i[1])continue;
-            var k=i[1]+'-'+i[2];
-            if(!known[k]){known[k]=true;add(i);}
+function go() {
+    fetch('/api/otp?count=50').then(function(r) { return r.json(); }).then(function(d) {
+        var list = Array.isArray(d) ? d : [];
+        for (var idx = list.length - 1; idx >= 0; idx--) {
+            var i = list[idx];
+            if (!i || !i[1]) continue;
+            var k = i[1] + '-' + i[2];
+            if (!known[k]) {
+                known[k] = true;
+                add(i);
+            }
         }
-        isFirstLoad=false;
-    }).catch(()=>{});
+    });
 }
 
 showMain();
 go();
-setInterval(go,1000);
+setInterval(go, 1000);
 </script>
 </body>
 </html>
