@@ -1,175 +1,444 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>⬢ OTP LIVE</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
-body{background:#000;color:#0f0;min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,0.03) 2px,rgba(0,255,0,0.03) 4px);pointer-events:none;animation:scan 6s linear infinite;z-index:0}
-@keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
-.app{max-width:500px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
-.scanline{position:fixed;top:0;left:0;width:100%;height:2px;background:rgba(0,255,0,.4);animation:scanline 3s linear infinite;z-index:100;pointer-events:none}
-@keyframes scanline{0%{top:0}100%{top:100vh}}
-.top-header{display:flex;justify-content:flex-end;gap:8px;padding-bottom:5px}
-.icon-btn{background:#000;border:1px solid #1a3a1a;color:#0f0;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:14px}
-.header{text-align:center;padding:10px 0 15px;border-bottom:2px solid #0f0;margin-bottom:15px}
-.header h1{font-size:22px;letter-spacing:3px;text-shadow:0 0 15px #0f0}
-.header .sub{font-size:10px;color:#0a0;margin-top:5px}
-.live-dot{display:inline-block;width:10px;height:10px;background:#0f0;border-radius:50%;animation:blink 1s infinite;margin-left:5px}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-.top-bar{display:flex;gap:8px;margin-bottom:15px}
-.search-box{flex:1;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:13px;border-radius:8px;outline:none}
-.btn-sm{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:10px 12px;font-size:12px;border-radius:8px;cursor:pointer;white-space:nowrap;font-weight:bold}
-.card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in .3s}
-.card.new{border-color:#ff0}
-@keyframes in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.card .flag{font-size:32px;min-width:45px;text-align:center}
-.card .info{flex:1}
-.card .phone{color:#fff;font-weight:bold;font-size:15px;direction:ltr;text-align:left}
-.card .code{font-size:28px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-align:left}
-.card .svc{color:#f00;font-size:10px}
-.copy-btn{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px}
-.footer{text-align:center;padding:15px;color:#0a0;font-size:10px;margin-top:20px;border-top:1px solid #1a3a1a}
-.loading{text-align:center;color:#0a0;padding:30px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>أرقام وهمية لجميع المنصات - استلم الكود في ثواني مجاناً</title>
+    <meta name="description" content="أرقام وهمية لتفعيل الواتساب وفيسبوك وتيك توك وجميع المنصات. استلم كود التفعيل في ثواني مجاناً.">
+    <meta name="keywords" content="أرقام وهمية,ارقام تفعيل,otp,ارقام مؤقتة,تفعيل واتساب,ارقام مجانية,كود تفعيل">
+    <meta name="robots" content="index,follow">
+    <meta property="og:title" content="أرقام وهمية لجميع المنصات - استلم الكود في ثواني">
+    <meta property="og:description" content="أرقام وهمية مجانية لتفعيل جميع حساباتك. استلم كود التفعيل فوراً.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://otp-seven-phi.vercel.app">
+    <link rel="canonical" href="https://otp-seven-phi.vercel.app">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Courier New',monospace}
+        body{background:#000;color:#0f0;min-height:100vh}
+        body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,0.03) 2px,rgba(0,255,0,0.03) 4px);pointer-events:none;animation:scan 6s linear infinite}
+        @keyframes scan{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+        .app{max-width:500px;margin:0 auto;min-height:100vh;position:relative;z-index:1;padding:15px}
+        
+        .top-header{display:flex;justify-content:flex-end;gap:10px;padding-bottom:5px}
+        .icon-btn{background:#000;border:1px solid #1a3a1a;color:#0f0;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:16px;transition:all 0.2s}
+        .icon-btn:hover{border-color:#0f0;background:#0a0a0a}
+
+        .header{text-align:center;padding:10px 0 20px 0;border-bottom:2px solid #0f0;margin-bottom:15px}
+        .header h1{font-size:22px;letter-spacing:2px;text-shadow:0 0 10px #0f0}
+        .header .sub{font-size:12px;color:#0a0;margin-top:5px}
+        .online-dot{display:inline-block;width:10px;height:10px;background:#0f0;border-radius:50%;animation:blink 1s infinite;margin-left:5px}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+        
+        .top-bar{display:flex;gap:8px;margin-bottom:15px;align-items:center}
+        .search-box{flex:1;background:#0a0a0a;border:1px solid #1a3a1a;color:#0f0;padding:12px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;outline:none}
+        .search-box:focus{border-color:#0f0}
+        .btn-sm{background:#0a0a0a;border:1px solid #0f0;color:#0f0;padding:12px 14px;font-size:13px;font-family:'Courier New',monospace;border-radius:8px;cursor:pointer;white-space:nowrap;font-weight:bold;transition:all 0.2s}
+        .btn-sm:hover{background:#0f0;color:#000}
+        .btn-active{background:#0f0 !important;color:#000 !important}
+        
+        .card{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-bottom:8px;animation:in 0.2s}
+        .card:hover{border-color:#0f0}
+        @keyframes in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+        .card .flag{font-size:32px;min-width:45px;text-align:center}
+        .card .info{flex:1}
+        .card .phone{color:#fff;font-weight:bold;font-size:16px;direction:ltr;text-align:left}
+        .card .code{font-size:30px;font-weight:bold;color:#ff0;letter-spacing:3px;direction:ltr;text-shadow:0 0 10px #ff0;text-align:left}
+        .card .prefix{color:#0ff;font-size:11px;text-align:left}
+        .stats{text-align:center;color:#0a0;font-size:11px;padding:10px}
+        .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+        .num-box{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:14px;text-align:center;cursor:pointer}
+        .num-box:hover{border-color:#0f0}
+        .num-box .flag{font-size:28px}
+        .num-box .svc{color:#f00;font-size:10px}
+        .num-box .num{color:#fff;font-weight:bold;font-size:18px;direction:ltr}
+        .num-box .code{background:#000;border:1px solid #ff0;color:#ff0;padding:4px 10px;border-radius:4px;font-weight:bold;font-size:16px;direction:ltr;display:inline-block;margin-top:6px}
+        .tag{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:12px;text-align:center;cursor:pointer;font-size:14px;display:inline-block;margin:4px}
+        .tag:hover{border-color:#0f0}
+        .tag .name{color:#fff;font-weight:bold}
+        .tag .count{color:#ff0;font-size:12px}
+        .tag .flag{font-size:24px}
+        .btn-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+        .btn-row .btn-sm{flex:1;min-width:80px}
+        .setting-box{background:#0a0a0a;border:1px solid #1a3a1a;border-radius:8px;padding:15px;margin-bottom:15px}
+        .setting-box h3{color:#0f0;margin-bottom:10px;font-size:14px}
+        .footer{text-align:center;padding:15px;color:#0a0;font-size:10px;margin-top:20px;border-top:1px solid #1a3a1a}
+    </style>
 </head>
 <body>
-<div class="scanline"></div>
-<div class="app" id="app"></div>
+    <div class="app" id="app"></div>
 
 <script>
-const BASE = 'https://numberpanel.tech/api';
-const PROXIES = [
-    'https://api.allorigins.win/raw?url=',
-    'https://corsproxy.io/?',
-    'https://thingproxy.freeboard.io/fetch/'
-];
+firebase.initializeApp({
+    apiKey: "AIzaSyA5LuJwdTckc6V2zClBeRiozM_tdMx5fAQ",
+    projectId: "otp-5acda",
+    databaseURL: "https://otp-5acda-default-rtdb.firebaseio.com"
+});
+const db = firebase.database();
 
-var known = {};
-var allCards = [];
-var totalCodes = 0;
+var PROXY = 'https://ai-proxy-eosin.vercel.app/api/panel';
+var known = {}, c = 0, allCards = [], page = 'main';
 var isFirstLoad = true;
-var proxyIndex = 0;
+var myNums = JSON.parse(localStorage.getItem('myNums') || '[]');
+var curLang = localStorage.getItem('appLang') || 'ar';
 
-var flags = {'Ukraine':'🇺🇦','Togo':'🇹🇬','Haiti':'🇭🇹','Mozambique':'🇲🇿','Burkina Faso':'🇧🇫','Libya':'🇱🇾','USA':'🇺🇸'};
+var dict = {
+    ar: {
+        searchPlaceholder: "🔍 بحث برقم أو كود...",
+        btnAnalysis: "🏆 تحليل",
+        btnNumbers: "📱 أرقام",
+        btnSettings: "⚙️ إعدادات",
+        myNumbers: "💾 أرقامي",
+        back: "← رجوع",
+        loading: "⏳ جاري التحميل...",
+        settingsTitle: "⚙️ الإعدادات",
+        langLabel: "🌐 لغة التطبيق",
+        notifLabel: "🔔 إشعارات الكود",
+        enableNotif: "🔔 تفعيل الإشعارات",
+        notifActive: "✅ الإشعارات مفعلة",
+        notifBlocked: "❌ الإشعارات محظورة في المتصفح",
+        notifNotSupported: "❌ المتصفح لا يدعم الإشعارات",
+        codesCount: "أكواد",
+        codesBtn: "📩 أكواد",
+        changeBtn: "🔄 تغيير",
+        countryBtn: "🌍 دولة",
+        serviceBtn: "📱 خدمة",
+        noCodes: "❌ لا توجد أكواد",
+        noCodesCountry: "❌ لا توجد أكواد لهذه الدولة",
+        fetchingNums: "⏳ جاري جلب الأرقام...",
+        footer: "أرقام وهمية لجميع المنصات - استلم كود التفعيل مجاناً | واتساب - فيسبوك - تيك توك - انستجرام",
+        newCodeTitle: "⚡ كود تفعيل جديد!",
+        notifSuccessMsg: "✅ تم تفعيل الإشعارات بنجاح!"
+    },
+    en: {
+        searchPlaceholder: "🔍 Search number or code...",
+        btnAnalysis: "🏆 Analysis",
+        btnNumbers: "📱 Numbers",
+        btnSettings: "⚙️ Settings",
+        myNumbers: "💾 My Numbers",
+        back: "← Back",
+        loading: "⏳ Loading...",
+        settingsTitle: "⚙️ Settings",
+        langLabel: "🌐 App Language",
+        notifLabel: "🔔 OTP Notifications",
+        enableNotif: "🔔 Enable Notifications",
+        notifActive: "✅ Notifications Active",
+        notifBlocked: "❌ Blocked in Browser",
+        notifNotSupported: "❌ Not Supported",
+        codesCount: "codes",
+        codesBtn: "📩 Codes",
+        changeBtn: "🔄 Change",
+        countryBtn: "🌍 Country",
+        serviceBtn: "📱 Service",
+        noCodes: "❌ No codes found",
+        noCodesCountry: "❌ No codes for this country",
+        fetchingNums: "⏳ Fetching numbers...",
+        footer: "Free Virtual Numbers - Receive OTP Instantly | WhatsApp - Facebook - TikTok - Instagram",
+        newCodeTitle: "⚡ New OTP Received!",
+        notifSuccessMsg: "✅ Notifications enabled successfully!"
+    }
+};
+
+var flags = {TG:'🇹🇬',LB:'🇱🇧',UA:'🇺🇦',AM:'🇦🇲',MZ:'🇲🇿',ZW:'🇿🇼',LY:'🇱🇾',BF:'🇧🇫',ID:'🇮🇩'};
+var cNamesAr = {TG:'توجو',LB:'لبنان',UA:'أوكرانيا',AM:'أرمينيا',MZ:'موزمبيق',ZW:'زيمبابوي',LY:'ليبيا',BF:'بوركينا فاسو',ID:'إندونيسيا'};
+var cNamesEn = {TG:'Togo',LB:'Lebanon',UA:'Ukraine',AM:'Armenia',MZ:'Mozambique',ZW:'Zimbabwe',LY:'Libya',BF:'Burkina Faso',ID:'Indonesia'};
+
+function getCountryName(code) {
+    return (curLang === 'ar' ? cNamesAr[code] : cNamesEn[code]) || code;
+}
+
+function applyLangDir() {
+    document.documentElement.lang = curLang;
+    document.documentElement.dir = curLang === 'ar' ? 'rtl' : 'ltr';
+}
+
+function setLanguage(lang) {
+    curLang = lang;
+    localStorage.setItem('appLang', lang);
+    applyLangDir();
+    if (page === 'settings') showSettings();
+    else showMain();
+}
+
+function toggleNotifications() {
+    if (!("Notification" in window)) {
+        alert(dict[curLang].notifNotSupported);
+        return;
+    }
+    if (Notification.permission === "granted") {
+        alert(dict[curLang].notifActive);
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(function(permission) {
+            if (permission === "granted") {
+                alert(dict[curLang].notifSuccessMsg);
+                new Notification("OTP Live", {
+                    body: curLang === 'ar' ? "سيصلك إشعار فور وصول أي كود جديد!" : "You will receive notifications for new codes!"
+                });
+            } else {
+                alert(dict[curLang].notifBlocked);
+            }
+            if (page === 'settings') showSettings();
+            else showMain();
+        });
+    } else {
+        alert(dict[curLang].notifBlocked);
+    }
+}
+
+function triggerCodeNotification(phone, code) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(dict[curLang].newCodeTitle, {
+            body: (curLang === 'ar' ? 'الرقم: ' : 'Phone: ') + '+' + phone + '\n' + (curLang === 'ar' ? 'الكود: ' : 'Code: ') + code
+        });
+    }
+}
+
+var myRef = db.ref('online').push();
+myRef.set({time: Date.now()});
+myRef.onDisconnect().remove();
+db.ref('online').on('value', function(snap) {
+    var count = snap.numChildren();
+    var el = document.getElementById('onlineCount');
+    if (el) el.textContent = count;
+});
+
+function saveNums() { localStorage.setItem('myNums', JSON.stringify(myNums)); }
 
 function extractCode(txt) {
     if (!txt) return '---';
-    var codes = txt.match(/\d{3}[-.\s]?\d{3}/g);
-    if (codes) return codes[0];
-    var m = txt.match(/\d{4,8}/);
-    return m ? m[0] : '---';
+    var m = txt.match(/\d{3,8}[-.\s]?\d{3,8}/);
+    if (m) return m[0];
+    m = txt.match(/\d{4,8}/);
+    return m ? m[0] : txt.substring(0, 15);
 }
 
-function addCard(i, isNew) {
+function add(i) {
     var code = extractCode(i[2] || '');
     var ct = (i[4] || '').trim();
     var flag = flags[ct] || '🌍';
-    var svc = i[0] || '';
-    var phone = i[1] || '';
+    var prefix = i[1] ? i[1].substring(0, 7) : '';
     
     allCards.unshift({
-        html: '<div class="card' + (isNew ? ' new' : '') + '">' +
-            '<span class="flag">' + flag + '</span>' +
-            '<div class="info">' +
-                '<div class="phone">📱 +' + phone + ' <span class="svc">[' + svc + ']</span></div>' +
-                '<div class="code">' + code + '</div>' +
-            '</div>' +
-            '<button class="copy-btn" onclick="event.stopPropagation();copyCode(\'' + code + '\')">📋 نسخ</button>' +
-        '</div>'
+        html: '<div class="card" onclick="navigator.clipboard.writeText(\'' + code + '\')"><span class="flag">' + flag + '</span><div class="info"><div class="phone">📱 +' + i[1] + '</div><div class="prefix">🆔 Prefix: ' + prefix + '</div><div class="code">' + code + '</div></div></div>',
+        search: (i[1] || '') + ' ' + code
     });
-    totalCodes++;
+    
+    if (page === 'main') { renderCards(); }
+    c++;
+    var s = document.getElementById('stats');
+    if (s) s.textContent = '⬢ ' + c + ' ' + dict[curLang].codesCount;
 }
 
-function copyCode(c) { navigator.clipboard.writeText(c); }
-
-function renderCards(q) {
-    q = (q || '').toLowerCase();
+function renderCards() {
+    var q = (document.getElementById('search') ? document.getElementById('search').value : '').toLowerCase();
     var html = '';
-    for (var i = 0; i < allCards.length && i < 50; i++) {
-        if (!q || allCards[i].html.toLowerCase().indexOf(q) >= 0) html += allCards[i].html;
+    for (var i = 0; i < allCards.length; i++) {
+        if (!q || allCards[i].search.toLowerCase().indexOf(q) >= 0) html += allCards[i].html;
     }
-    document.getElementById('cards').innerHTML = html || '<div class="loading">❌ مفيش نتايج</div>';
-    document.getElementById('stats').textContent = '⬢ ' + totalCodes + ' أكواد';
+    var cards = document.getElementById('cards');
+    if (cards) cards.innerHTML = html;
 }
+
+function filter() { renderCards(); }
 
 function showMain() {
+    page = 'main';
+    applyLangDir();
+    var notifIcon = ("Notification" in window && Notification.permission === "granted") ? "🔔" : "🔕";
+    
     document.getElementById('app').innerHTML = 
         '<div class="top-header">' +
-            '<button class="icon-btn" onclick="showAnalysis()">🏆 تحليل</button>' +
-            '<button class="icon-btn" onclick="showNumbers()">📱 أرقام</button>' +
+            '<button class="icon-btn" onclick="toggleNotifications()" title="' + dict[curLang].notifLabel + '">' + notifIcon + '</button>' +
+            '<button class="icon-btn" onclick="showSettings()" title="' + dict[curLang].btnSettings + '">⚙️</button>' +
         '</div>' +
-        '<div class="header"><h1>⬢ OTP LIVE <span class="live-dot"></span></h1><div class="sub">تحديث كل ثانية</div></div>' +
-        '<div class="top-bar"><input type="text" class="search-box" placeholder="🔍 بحث..." onkeyup="renderCards(this.value)"></div>' +
-        '<div id="stats" style="color:#0a0;font-size:11px;padding:5px">⬢ 0 أكواد</div>' +
-        '<div id="cards"><div class="loading">⏳ جاري التحميل...</div></div>' +
-        '<div class="footer">OTP LIVE</div>';
+        '<div class="header"><h1>⬢ OTP LIVE <span class="online-dot"></span> <span id="onlineCount">0</span></h1></div>' +
+        '<div class="top-bar">' +
+            '<input type="text" class="search-box" id="search" placeholder="' + dict[curLang].searchPlaceholder + '" onkeyup="filter()">' +
+            '<button class="btn-sm" onclick="showAnalysis()">' + dict[curLang].btnAnalysis + '</button>' +
+            '<button class="btn-sm" onclick="showNumbers()">' + dict[curLang].btnNumbers + '</button>' +
+        '</div>' +
+        '<div id="cards"></div>' +
+        '<div id="myNumsArea"></div>' +
+        '<div class="stats" id="stats">⬢ ' + c + ' ' + dict[curLang].codesCount + '</div>' +
+        '<div class="footer">' + dict[curLang].footer + '</div>';
+        
+    renderCards();
+    if (myNums.length > 0) { showMyNums(); }
+}
+
+function showSettings() {
+    page = 'settings';
+    var notifText = !("Notification" in window) 
+        ? dict[curLang].notifNotSupported 
+        : (Notification.permission === 'granted' ? dict[curLang].notifActive : dict[curLang].enableNotif);
+
+    document.getElementById('app').innerHTML = 
+        '<div class="header"><h1>' + dict[curLang].settingsTitle + '</h1></div>' +
+        '<button class="btn-sm" onclick="showMain()">' + dict[curLang].back + '</button>' +
+        '<div style="margin-top:15px;">' +
+            '<div class="setting-box">' +
+                '<h3>' + dict[curLang].langLabel + '</h3>' +
+                '<div style="display:flex;gap:10px;">' +
+                    '<button class="btn-sm ' + (curLang === 'ar' ? 'btn-active' : '') + '" onclick="setLanguage(\'ar\')">العربية 🇪🇬</button>' +
+                    '<button class="btn-sm ' + (curLang === 'en' ? 'btn-active' : '') + '" onclick="setLanguage(\'en\')">English 🇬🇧</button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="setting-box">' +
+                '<h3>' + dict[curLang].notifLabel + '</h3>' +
+                '<button class="btn-sm" onclick="toggleNotifications()">' + notifText + '</button>' +
+            '</div>' +
+        '</div>' +
+        '<div class="footer">' + dict[curLang].footer + '</div>';
+}
+
+function showMyNums() {
+    var html = '<div style="margin-top:15px"><h3 style="color:#ff0;margin-bottom:8px">' + dict[curLang].myNumbers + ' (' + myNums.length + ')</h3><div class="grid2">';
+    myNums.forEach(function(n) {
+        html += '<div class="num-box" onclick="navigator.clipboard.writeText(\'' + n.num + '\')"><div class="flag">' + (n.flag || '🌍') + '</div><div class="svc">' + n.svc + '</div><div class="num">+' + n.num + '</div><div class="code">' + (n.code || '---') + '</div></div>';
+    });
+    html += '</div></div>';
+    var area = document.getElementById('myNumsArea');
+    if (area) area.innerHTML = html;
 }
 
 function showAnalysis() {
-    document.getElementById('app').innerHTML = '<div class="header"><h1>🏆 تحليل</h1></div><button class="btn-sm" onclick="showMain()">← رجوع</button><div id="content" style="margin-top:10px"><div class="loading">⏳...</div></div>';
-    
-    fetch(PROXIES[0] + encodeURIComponent(BASE + '/stats/detailed?period=daily'))
-    .then(r => r.json())
-    .then(d => {
-        document.getElementById('content').innerHTML = 
-            '<div style="background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:20px;text-align:center">' +
-            '<p style="font-size:30px;color:#ff0">📊 ' + (d.otp_count || 0) + '</p><p>كود اليوم</p>' +
-            '<p>🌍 ' + (d.countries_count || 0) + ' دولة</p>' +
-            '<p>📱 ' + (d.services_count || 0) + ' خدمة</p></div>';
-    })
-    .catch(() => { document.getElementById('content').innerHTML = '<div class="loading">❌ فشل</div>'; });
+    page = 'analysis';
+    document.getElementById('app').innerHTML = '<div class="header"><h1>' + dict[curLang].btnAnalysis + '</h1></div><button class="btn-sm" onclick="showMain()">' + dict[curLang].back + '</button><div id="content" style="margin-top:10px;">' + dict[curLang].loading + '</div>';
+    fetch(PROXY + '/otp?count=200').then(function(r) { return r.json(); }).then(function(d) {
+        var list = Array.isArray(d) ? d : (d.data || d.otp || []);
+        if (!Array.isArray(list) || list.length === 0) {
+            document.getElementById('content').innerHTML = '<div style="color:#f00;text-align:center;">' + dict[curLang].noCodes + '</div>';
+            return;
+        }
+        var svcs = {};
+        list.forEach(function(i) {
+            var svc = i[0] || 'Unknown';
+            if (!svcs[svc]) svcs[svc] = {};
+            var ct = (i[4] || '').trim();
+            if (ct) svcs[svc][ct] = (svcs[svc][ct] || 0) + 1;
+        });
+        var html = '';
+        for (var svc in svcs) {
+            var top = [];
+            for (var k in svcs[svc]) top.push([k, svcs[svc][k]]);
+            top.sort(function(a, b) { return b[1] - a[1]; });
+            top = top.slice(0, 5);
+            html += '<div style="margin-bottom:15px"><h3 style="color:#ff0">📱 ' + svc + '</h3><div style="display:flex;flex-wrap:wrap;gap:8px">';
+            for (var i = 0; i < top.length; i++) {
+                html += '<div class="tag"><div class="flag">' + (flags[top[i][0]] || '🌍') + '</div><div class="name">' + getCountryName(top[i][0]) + '</div><div class="count">' + top[i][1] + '</div></div>';
+            }
+            html += '</div></div>';
+        }
+        document.getElementById('content').innerHTML = html;
+    }).catch(function(e) {
+        document.getElementById('content').innerHTML = '<div style="color:#f00;text-align:center;">' + dict[curLang].noCodes + '</div>';
+    });
 }
 
 function showNumbers() {
-    document.getElementById('app').innerHTML = '<div class="header"><h1>📱 أرقام</h1></div><button class="btn-sm" onclick="showMain()">← رجوع</button><div id="content" style="margin-top:10px"><div class="loading">⏳...</div></div>';
-    
-    fetch(PROXIES[0] + encodeURIComponent(BASE + '/my_numbers'), {headers: {'Authorization': 'Bearer np_live_6DknI4df2uZ0_BFv6CGGpX_BCBAq60TG1sKev64WPkw'}})
-    .then(r => r.json())
-    .then(d => {
-        var nums = d.numbers || [];
-        document.getElementById('content').innerHTML = nums.length === 0 ? 
-            '<div class="loading">❌ لا توجد أرقام</div>' :
-            nums.map(n => '<div style="background:#0a0a0a;border:1px solid #1a3a1a;border-radius:10px;padding:15px;margin-bottom:8px">📱 +' + n + '</div>').join('');
-    })
-    .catch(() => { document.getElementById('content').innerHTML = '<div class="loading">❌ فشل</div>'; });
+    page = 'services';
+    document.getElementById('app').innerHTML = '<div class="header"><h1>' + dict[curLang].btnNumbers + '</h1></div><button class="btn-sm" onclick="showMain()">' + dict[curLang].back + '</button><div id="content" style="margin-top:10px;">' + dict[curLang].loading + '</div>';
+    fetch(PROXY + '/services').then(function(r) { return r.json(); }).then(function(d) {
+        if (!d || !d.services) return;
+        var html = '';
+        d.services.forEach(function(s) {
+            html += '<div class="tag" onclick="showCountries(\'' + s.key + '\',\'' + s.name + '\')"><div class="name">' + s.name + '</div><div class="count">' + s.count + '</div></div>';
+        });
+        document.getElementById('content').innerHTML = html;
+    });
 }
 
-function fetchOTP() {
-    var proxy = PROXIES[proxyIndex];
-    fetch(proxy + encodeURIComponent(BASE + '/otp?count=50'))
-    .then(r => r.json())
-    .then(d => {
-        var list = Array.isArray(d) ? d : (d.data || []);
-        if (list.length > 0) {
-            var newCount = 0;
-            for (var idx = 0; idx < list.length; idx++) {
+function showCountries(key, name) {
+    document.getElementById('app').innerHTML = '<div class="header"><h1>🌍 ' + name + '</h1></div><button class="btn-sm" onclick="showNumbers()">' + dict[curLang].back + '</button><div id="content" style="margin-top:10px;">' + dict[curLang].loading + '</div>';
+    fetch(PROXY + '/countries?service=' + key).then(function(r) { return r.json(); }).then(function(d) {
+        if (!d || !d.countries) return;
+        var html = '';
+        d.countries.forEach(function(c) {
+            html += '<div class="tag" onclick="showNums(\'' + c.name + '\',\'' + (c.flag || '') + '\',\'' + name + '\',\'' + key + '\')"><div class="flag">' + (c.flag || '🌍') + '</div><div class="name">' + getCountryName(c.name) + '</div><div class="count">' + c.count + '</div></div>';
+        });
+        document.getElementById('content').innerHTML = html;
+    });
+}
+
+function showNums(country, flag, svcName, svcKey) {
+    document.getElementById('app').innerHTML = '<div class="header"><h1>' + flag + ' ' + getCountryName(country) + '</h1></div><button class="btn-sm" onclick="showCountries(\'' + svcKey + '\',\'' + svcName + '\')">' + dict[curLang].back + '</button><div id="numsArea" style="margin-top:10px;">' + dict[curLang].fetchingNums + '</div>';
+    var promises = [];
+    for (var i = 0; i < 4; i++) {
+        promises.push(fetch(PROXY + '/request_number', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ service: svcKey, country: country })
+        }).then(function(r) { return r.json(); }));
+    }
+    Promise.all(promises).then(function(results) {
+        myNums = [];
+        var html = '<div class="grid2">';
+        results.forEach(function(d) {
+            if (d && d.number) {
+                var obj = { num: d.number, flag: d.flag || flag, svc: svcName, country: country, code: '' };
+                myNums.push(obj);
+                html += '<div class="num-box" onclick="navigator.clipboard.writeText(\'' + d.number + '\')"><div class="flag">' + (d.flag || flag || '🌍') + '</div><div class="svc">' + svcName + '</div><div class="num">+' + d.number + '</div><div class="code" id="cd_' + d.number + '">---</div></div>';
+            }
+        });
+        saveNums();
+        html += '</div><div class="btn-row"><button class="btn-sm" onclick="showNums(\'' + country + '\',\'' + flag + '\',\'' + svcName + '\',\'' + svcKey + '\')">' + dict[curLang].changeBtn + '</button><button class="btn-sm" onclick="showCountries(\'' + svcKey + '\',\'' + svcName + '\')">' + dict[curLang].countryBtn + '</button><button class="btn-sm" onclick="showNumbers()">' + dict[curLang].serviceBtn + '</button></div><div class="btn-row"><button class="btn-sm" onclick="fetchCodes(\'' + country + '\')">' + dict[curLang].codesBtn + '</button></div>';
+        document.getElementById('numsArea').innerHTML = html;
+    });
+}
+
+function fetchCodes(country) {
+    fetch(PROXY + '/otp?count=50').then(function(r) { return r.json(); }).then(function(d) {
+        var list = Array.isArray(d) ? d : (d.data || d.otp || []);
+        if (!Array.isArray(list) || list.length === 0) { alert(dict[curLang].noCodes); return; }
+        var flt = list.filter(function(i) { return i[4] && i[4].trim() === country; });
+        if (flt.length === 0) { alert(dict[curLang].noCodesCountry); return; }
+        flt.forEach(function(i) {
+            var code = extractCode(i[2] || '');
+            var el = document.getElementById('cd_' + i[1]);
+            if (el) el.textContent = code;
+            myNums.forEach(function(n) { if (n.num === i[1]) { n.code = code; } });
+        });
+        saveNums();
+    });
+}
+
+function cleanOldUsers() {
+    db.ref("online").once("value").then(function(snap) {
+        snap.forEach(function(s) {
+            var d = s.val();
+            if (d && Date.now() - d.time > 300000) { db.ref("online/" + s.key).remove(); }
+        });
+    });
+}
+
+function go() {
+    fetch(PROXY + '/otp?count=20').then(function(r) { return r.json(); }).then(function(d) {
+        var list = Array.isArray(d) ? d : (d.data || d.otp || []);
+        if (Array.isArray(list)) {
+            for (var idx = list.length - 1; idx >= 0; idx--) {
                 var i = list[idx];
                 if (!i || !i[1]) continue;
                 var k = i[1] + '-' + i[2];
                 if (!known[k]) {
                     known[k] = true;
-                    addCard(i, !isFirstLoad);
-                    if (!isFirstLoad) newCount++;
+                    if (!isFirstLoad) {
+                        triggerCodeNotification(i[1], extractCode(i[2] || ''));
+                    }
+                    add(i);
                 }
             }
             isFirstLoad = false;
-            var q = document.querySelector('.search-box') ? document.querySelector('.search-box').value : '';
-            renderCards(q);
-            var stats = document.getElementById('stats');
-            if (stats) stats.textContent = '⬢ ' + totalCodes + ' أكواد' + (newCount > 0 ? ' | +' + newCount + ' 🔥' : '');
         }
-    })
-    .catch(() => {
-        proxyIndex = (proxyIndex + 1) % PROXIES.length;
-    });
+    }).catch(function(e){});
 }
 
+cleanOldUsers();
 showMain();
-fetchOTP();
-setInterval(fetchOTP, 1000);
+go();
+
+setInterval(go, 1000);
+setInterval(cleanOldUsers, 10000);
 </script>
 </body>
 </html>
